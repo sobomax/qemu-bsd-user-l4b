@@ -32,7 +32,7 @@ struct target_pt_regs {
 
 #define UNAME_MACHINE "riscv64"
 
-#define TARGET_HW_MACHINE       "riscv64"
+#define TARGET_HW_MACHINE       "riscv"
 #define TARGET_HW_MACHINE_ARCH  UNAME_MACHINE
 
 #endif /* BSD_USER_RISCV_TARGET_SYSCALL_H */
