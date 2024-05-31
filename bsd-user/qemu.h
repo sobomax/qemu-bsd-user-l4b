@@ -334,8 +334,8 @@ abi_long freebsd_umtx_robust_list(abi_ulong target_addr, size_t rbsize);
 
 /* user access */
 
-#define VERIFY_READ 0
-#define VERIFY_WRITE 1 /* implies read access */
+#define VERIFY_READ  PAGE_READ
+#define VERIFY_WRITE (PAGE_READ | PAGE_WRITE)
 
 static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
 {
