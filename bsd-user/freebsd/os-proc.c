@@ -368,7 +368,7 @@ do_freebsd_procctl(void *cpu_env, int idtype, abi_ulong arg2, abi_ulong arg3,
     void *data;
     int host_cmd, flags;
     uint32_t u, target_rp_count;
-    g_autofree union {
+    union {
         struct procctl_reaper_status rs;
         struct procctl_reaper_pids rp;
         struct procctl_reaper_kill rk;
