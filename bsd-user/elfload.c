@@ -191,8 +191,9 @@ static void setup_arg_pages(struct bsd_binprm *bprm, struct image_info *info,
      */
     size = target_dflssiz;
     stack_base = TARGET_USRSTACK - size;
+    /* XXX: Add a sigtramp_page like linux-user to avoid executable stack */
     addr = target_mmap(stack_base , size + qemu_host_page_size,
-            PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+            PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0);
     if (addr == -1) {
         perror("stk mmap");
         exit(-1);
