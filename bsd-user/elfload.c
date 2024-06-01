@@ -199,10 +199,10 @@ static void setup_arg_pages(struct bsd_binprm *bprm, struct image_info *info,
         exit(-1);
     }
     /* we reserve one extra page at the top of the stack as guard */
-    target_mprotect(addr + size, qemu_host_page_size, PROT_NONE);
+    target_mprotect(addr, qemu_host_page_size, PROT_NONE);
 
     target_stksiz = size;
-    target_stkbas = addr;
+    target_stkbas = addr + qemu_host_page_size;
 
     if (setup_initial_stack(bprm, stackp, stringp) != 0) {
         perror("stk setup");
