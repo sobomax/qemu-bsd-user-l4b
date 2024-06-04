@@ -6,7 +6,6 @@
 
 	.text
 	.attribute	4, 16
-	.attribute	5, "rv64i2p0_m2p0_a2p0_f2p0_d2p0_c2p0"
 	.globl	qemu_start
 	.p2align	1
 qemu_start:
