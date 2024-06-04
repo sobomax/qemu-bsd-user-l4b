@@ -38,8 +38,8 @@ static inline void target_thread_set_upcall(CPURISCVState *regs,
 static inline void target_thread_init(struct target_pt_regs *regs,
     struct image_info *infop)
 {
-    regs->sepc = infop->entry & ~0x03;
-    regs->regs[xRA] = infop->entry & ~0x03;
+    regs->sepc = infop->entry;
+    regs->regs[xRA] = infop->entry;
     regs->regs[10] = infop->start_stack;               /* a0 */
     regs->regs[xSP] = infop->start_stack & ~(16 - 1);
 }

@@ -35,7 +35,7 @@ static inline void target_thread_set_upcall(CPUARMState *regs, abi_ulong entry,
     /* sp = stack base */
     regs->xregs[31] = sp;
     /* pc = start function entry */
-    regs->pc = entry &  ~0x3ULL;
+    regs->pc = entry;
     /* r0 = arg */
     regs->xregs[0] = arg;
 
@@ -54,7 +54,7 @@ static inline void target_thread_init(struct target_pt_regs *regs,
 
     memset(regs, 0, sizeof(*regs));
     regs->regs[0] = infop->start_stack;
-    regs->pc = infop->entry &  ~0x3ULL;
+    regs->pc = infop->entry;
     regs->sp = stack & ~(16 - 1);
 }
 
