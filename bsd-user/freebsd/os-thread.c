@@ -153,6 +153,7 @@ void *new_freebsd_thread_start(void *arg)
     /* Set arch dependent registers to start thread. */
     target_thread_set_upcall(env, info->param.start_func, info->param.arg,
         info->param.stack_base, info->param.stack_size);
+    target_cpu_set_tls(env, info->param.tls_base);
 
     /* Enable signals */
     sigprocmask(SIG_SETMASK, &info->sigmask, NULL);
@@ -160,7 +161,7 @@ void *new_freebsd_thread_start(void *arg)
     pthread_mutex_lock(&info->mutex);
     pthread_cond_broadcast(&info->cond);
     pthread_mutex_unlock(&info->mutex);
-    /* Wait until the parent has finished initializing the TLS state. */
+    /* Wait until the parent has finished. */
     pthread_mutex_lock(new_freebsd_thread_lock_ptr);
     pthread_mutex_unlock(new_freebsd_thread_lock_ptr);
 
@@ -1563,15 +1564,11 @@ abi_long do_freebsd_thr_new(CPUArchState *env,
     new_env = cpu_copy(env);
     //target_cpu_reset(new_env); /* XXX called in cpu_copy()? */
 
-    /* init regs that differ from the parent thread. */
-    target_cpu_clone_regs(new_env, info.param.stack_base);
     new_cpu = env_cpu(new_env);
     new_cpu->opaque = ts;
     ts->bprm = parent_ts->bprm;
     ts->info = parent_ts->info;
     ts->signal_mask = parent_ts->signal_mask;
-
-    target_cpu_set_tls(new_env, info.param.tls_base);
 
     pthread_mutex_init(&info.mutex, NULL);
     pthread_mutex_lock(&info.mutex);
