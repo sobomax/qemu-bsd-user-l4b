@@ -388,6 +388,8 @@ static int init_blk_migration(QEMUFile *f)
     Error *local_err = NULL;
     int ret;
 
+    GRAPH_RDLOCK_GUARD_MAINLOOP();
+
     block_mig_state.submitted = 0;
     block_mig_state.read_done = 0;
     block_mig_state.transferred = 0;
@@ -729,18 +731,13 @@ static int block_save_setup(QEMUFile *f, void *opaque)
     trace_migration_block_save("setup", block_mig_state.submitted,
                                block_mig_state.transferred);
 
-    qemu_mutex_lock_iothread();
     ret = init_blk_migration(f);
     if (ret < 0) {
-        qemu_mutex_unlock_iothread();
         return ret;
     }
 
     /* start track dirty blocks */
     ret = set_dirty_tracking();
-
-    qemu_mutex_unlock_iothread();
-
     if (ret) {
         return ret;
     }
