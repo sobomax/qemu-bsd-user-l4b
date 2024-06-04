@@ -959,7 +959,6 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
         addr = g2h_untagged((uintptr_t)&target_umutex->m_owner);
 
         unlock_user_struct(target_umutex, target_addr, 1);
-        pthread_mutex_unlock(&umtx_wait_lck);
 
         DEBUG_UMTX("<WAIT UMUTEX> %s: _umtx_op(%p, %d, 0x%x, %d, %jx) "
                 "count = %d\n", __func__, g2h_untagged(target_addr), UMTX_OP_WAIT_PRIVATE,
