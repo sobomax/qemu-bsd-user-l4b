@@ -62,23 +62,32 @@ static inline abi_long do_freebsd_thr_exit(CPUArchState *cpu_env,
     CPUState *cpu = env_cpu(cpu_env);
     TaskState *ts;
 
-    /*
-     * XXX This probably breaks if a signal arrives.
-     * We should disable signals.
-     */
-    cpu_list_lock();
-    /* Remove the CPU from the list. */
-    QTAILQ_REMOVE_RCU(&cpus, cpu, node);
-    cpu_list_unlock();
+    if (block_signals()) {
+        return -TARGET_ERESTART;
+    }
+
+    pthread_mutex_lock(new_freebsd_thread_lock_ptr);
+
+    ts = cpu->opaque;
+
     if (tid_addr) {
         /* Signal target userland that it can free the stack. */
         if (!put_user_sal(1, tid_addr)) {
             freebsd_umtx_wake(tid_addr, INT_MAX);
         }
     }
-    thread_cpu = NULL;
+
+    object_unparent(OBJECT(env_cpu(cpu_env)));
     object_unref(OBJECT(env_cpu(cpu_env)));
-    ts = cpu->opaque;
+    /*
+     * At this point the CPU should be unrealized and removed
+     * from cpu lists. We can clean-up the rest of the thread
+     * data without the lock held.
+     */
+
+    pthread_mutex_unlock(new_freebsd_thread_lock_ptr);
+
+    thread_cpu = NULL;
     g_free(ts);
     rcu_unregister_thread();
     pthread_exit(NULL);
