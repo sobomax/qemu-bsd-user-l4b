@@ -142,9 +142,12 @@ void *new_freebsd_thread_start(void *arg)
     thread_cpu = cpu;
     (void)thr_self(&tid);
 
-    /* copy out the child TID */
+    /* copy out the child TID to both locations */
     if (info->param.child_tid) {
         put_user_ual(tid, info->param.child_tid);
+    }
+    if (info->param.parent_tid) {
+        put_user_ual(tid, info->param.parent_tid);
     }
 
     /* Set arch dependent registers to start thread. */
