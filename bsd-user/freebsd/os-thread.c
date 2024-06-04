@@ -1544,6 +1544,20 @@ abi_long do_freebsd_thr_new(CPUArchState *env,
     /* Create a new CPU instance. */
     ts = g_malloc0(sizeof(TaskState));
     init_task_state(ts);
+
+    /* Grab a mutex so that thread setup appears atomic. */
+    pthread_mutex_lock(new_freebsd_thread_lock_ptr);
+
+    /*
+     * If this is our first additional thread, we need to ensure we
+     * generate code for parallel execution and flush old translations.
+     * Do this now so that the copy gets CF_PARALLEL too.
+     */
+    if (!(cpu->tcg_cflags & CF_PARALLEL)) {
+        cpu->tcg_cflags |= CF_PARALLEL;
+        tb_flush(cpu);
+    }
+
     new_env = cpu_copy(env);
     //target_cpu_reset(new_env); /* XXX called in cpu_copy()? */
 
@@ -1556,9 +1570,6 @@ abi_long do_freebsd_thr_new(CPUArchState *env,
     ts->signal_mask = parent_ts->signal_mask;
 
     target_cpu_set_tls(new_env, info.param.tls_base);
-
-    /* Grab a mutex so that thread setup appears atomic. */
-    pthread_mutex_lock(new_freebsd_thread_lock_ptr);
 
     pthread_mutex_init(&info.mutex, NULL);
     pthread_mutex_lock(&info.mutex);
@@ -1582,16 +1593,6 @@ abi_long do_freebsd_thr_new(CPUArchState *env,
      */
     sigfillset(&sigmask);
     sigprocmask(SIG_BLOCK, &sigmask, &info.sigmask);
-
-    /*
-     * If this is our first additional thread, we need to ensure we
-     * generate code for parallel execution and flush old translations.
-     * Do this now so that the copy gets CF_PARALLEL too.
-     */
-    if (!(cpu->tcg_cflags & CF_PARALLEL)) {
-        cpu->tcg_cflags |= CF_PARALLEL;
-        tb_flush(cpu);
-    }
 
     ret = pthread_create(&info.thread, &attr, new_freebsd_thread_start, &info);
     /* XXX Free new CPU state if thread creation fails. */
