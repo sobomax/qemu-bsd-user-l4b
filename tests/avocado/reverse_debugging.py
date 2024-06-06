@@ -12,6 +12,7 @@ import logging
 
 from avocado import skipIf
 from avocado_qemu import BUILD_DIR
+from avocado.utils import datadrainer
 from avocado.utils import gdb
 from avocado.utils import process
 from avocado.utils.network.ports import find_free_port
@@ -52,6 +53,10 @@ class ReverseDebugging(LinuxKernelTest):
         if args:
             vm.add_args(*args)
         vm.launch()
+        console_drainer = datadrainer.LineLogger(vm.console_socket.fileno(),
+                                    logger=self.log.getChild('console'),
+                                    stop_check=(lambda : not vm.is_running()))
+        console_drainer.start()
         return vm
 
     @staticmethod
@@ -254,6 +259,7 @@ class ReverseDebugging_ppc64(ReverseDebugging):
         self.endian_is_le = False
         self.reverse_debugging()
 
+    # See https://gitlab.com/qemu-project/qemu/-/issues/1992
     @skipIf(os.getenv('GITLAB_CI'), 'Running on GitLab')
     def test_ppc64_powernv(self):
         """
