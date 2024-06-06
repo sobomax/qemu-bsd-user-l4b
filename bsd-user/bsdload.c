@@ -147,34 +147,34 @@ int loader_exec(const char *filename, char **argv, char **envp,
                 struct target_pt_regs *regs, struct image_info *infop,
                 struct bsd_binprm *bprm)
 {
-    char *path, fullpath[PATH_MAX];
+    char *path = NULL, fullpath[PATH_MAX];
     int retval, i;
 
     bprm->p = TARGET_PAGE_SIZE * MAX_ARG_PAGES;
-    for (i = 0; i < MAX_ARG_PAGES; i++) {       /* clear page-table */
-        bprm->page[i] = NULL;
-    }
+    bprm->page = g_malloc0(MAX_ARG_PAGES * sizeof(void *));
 
     if (strchr(filename, '/') != NULL) {
         path = realpath(filename, fullpath);
         if (path == NULL) {
             /* Failed to resolve. */
-            return -1;
+            retval = -1;
+            goto errout;
         }
         if (!is_there(path)) {
-            return -1;
+            retval = -1;
+            goto errout;
         }
     } else {
         path = g_find_program_in_path(filename);
         if (path == NULL) {
-            return -1;
+            retval = -1;
+            goto errout;
         }
     }
 
     retval = open(path, O_RDONLY);
     if (retval < 0) {
-        g_free(path);
-        return retval;
+        goto errout;
     }
 
     bprm->fullpath = path;
@@ -195,7 +195,8 @@ int loader_exec(const char *filename, char **argv, char **envp,
             retval = load_elf_binary(bprm, regs, infop);
         } else {
             fprintf(stderr, "Unknown binary format\n");
-            return -1;
+            retval = -1;
+            goto errout;
         }
     }
 
@@ -204,10 +205,12 @@ int loader_exec(const char *filename, char **argv, char **envp,
         do_init_thread(regs, infop);
         return retval;
     }
-
+errout:
+    g_free(path);
     /* Something went wrong, return the inode and free the argument pages*/
     for (i = 0 ; i < MAX_ARG_PAGES ; i++) {
         g_free(bprm->page[i]);
     }
+    g_free(bprm->page);
     return retval;
 }

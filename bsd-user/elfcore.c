@@ -544,20 +544,10 @@ static abi_ulong vma_dump_size(const struct vm_area_struct *vma)
      * and check whether it contains elf header.  If there is
      * no elf header, we dump it.
      */
-    if (vma->vma_flags & PROT_EXEC) {
-        char page[TARGET_PAGE_SIZE];
-
-        copy_from_user(page, vma->vma_start, sizeof(page));
-        if ((page[EI_MAG0] == ELFMAG0) &&
-            (page[EI_MAG1] == ELFMAG1) &&
-            (page[EI_MAG2] == ELFMAG2) &&
-            (page[EI_MAG3] == ELFMAG3)) {
-            /*
-             * Mappings are possibly from ELF binary.  Don't dump
-             * them.
-             */
-            return 0;
-        }
+    if (!(vma->vma_flags & PAGE_WRITE_ORG) &&
+        (vma->vma_flags & PAGE_EXEC) &&
+        memcmp(g2h_untagged(vma->vma_start), ELFMAG, SELFMAG) == 0) {
+        return 0;
     }
 
     return vma->vma_end - vma->vma_start;
@@ -1164,6 +1154,7 @@ static int elf_core_dump(int signr, CPUArchState *env)
     struct elf_phdr phdr;
     struct elf_note_info info;
     char corefile[PATH_MAX];
+    g_autofree char *page = g_malloc(TARGET_PAGE_SIZE);
 
     init_note_info(&info);
 
@@ -1285,7 +1276,6 @@ static int elf_core_dump(int signr, CPUArchState *env)
 
         for (addr = vma->vma_start; addr < end;
                 addr += TARGET_PAGE_SIZE) {
-            char page[TARGET_PAGE_SIZE];
             int error;
 
             /*

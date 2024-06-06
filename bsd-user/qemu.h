@@ -168,7 +168,7 @@ extern bool bsd_user_strict;
  */
 struct bsd_binprm {
         char buf[128];
-        void *page[MAX_ARG_PAGES];
+        void **page;
         abi_ulong p;
         abi_ulong stringp;
         int fd;
