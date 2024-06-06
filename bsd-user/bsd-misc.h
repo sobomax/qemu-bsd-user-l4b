@@ -99,7 +99,7 @@ static inline abi_long do_bsd_semget(abi_long key, int nsems,
 /* semop(2) */
 static inline abi_long do_bsd_semop(int semid, abi_long ptr, unsigned nsops)
 {
-    struct sembuf sops[nsops];
+    g_autofree struct sembuf *sops = g_malloc(nsops * sizeof(struct sembuf));
     struct target_sembuf *target_sembuf;
     int i;
 
