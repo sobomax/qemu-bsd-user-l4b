@@ -52,10 +52,12 @@ uint64_t cpu_ppc_load_vtb(CPUPPCState *env)
 uint32_t cpu_ppc601_load_rtcu(CPUPPCState *env)
 __attribute__ (( alias ("cpu_ppc_load_tbu") ));
 
-uint32_t cpu_ppc601_load_rtcl(CPUPPCState *env)
+#if 0
+static uint32_t cpu_ppc601_load_rtcl(CPUPPCState *env)
 {
     return cpu_ppc_load_tbl(env) & 0x3FFFFF80;
 }
+#endif
 
 /* XXX: to be fixed */
 int ppc_dcr_read (ppc_dcr_t *dcr_env, int dcrn, uint32_t *valp)
