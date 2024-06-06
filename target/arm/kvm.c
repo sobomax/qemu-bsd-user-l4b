@@ -331,6 +331,8 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
                               ARM64_SYS_REG(3, 0, 0, 7, 1));
         err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64mmfr2,
                               ARM64_SYS_REG(3, 0, 0, 7, 2));
+        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64mmfr3,
+                              ARM64_SYS_REG(3, 0, 0, 7, 3));
 
         /*
          * Note that if AArch32 support is not present in the host,
@@ -1596,11 +1598,6 @@ int kvm_arch_release_virq_post(int virq)
 int kvm_arch_msi_data_to_gsi(uint32_t data)
 {
     return (data - 32) & 0xffff;
-}
-
-bool kvm_arch_cpu_check_are_resettable(void)
-{
-    return true;
 }
 
 static void kvm_arch_get_eager_split_size(Object *obj, Visitor *v,

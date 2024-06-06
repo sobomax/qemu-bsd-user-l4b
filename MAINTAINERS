@@ -167,6 +167,7 @@ F: include/exec/target_long.h
 F: include/exec/helper*.h
 F: include/exec/helper*.h.inc
 F: include/exec/helper-info.c.inc
+F: include/exec/page-protection.h
 F: include/sysemu/cpus.h
 F: include/sysemu/tcg.h
 F: include/hw/core/tcg-cpu-ops.h
@@ -284,25 +285,12 @@ MIPS TCG CPUs
 M: Philippe Mathieu-Daudé <philmd@linaro.org>
 R: Aurelien Jarno <aurelien@aurel32.net>
 R: Jiaxun Yang <jiaxun.yang@flygoat.com>
-R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+R: Aleksandar Rikalo <arikalo@gmail.com>
 S: Odd Fixes
 F: target/mips/
 F: disas/*mips.c
 F: docs/system/cpu-models-mips.rst.inc
 F: tests/tcg/mips/
-
-NiosII TCG CPUs
-R: Chris Wulff <crwulff@gmail.com>
-R: Marek Vasut <marex@denx.de>
-S: Orphan
-F: target/nios2/
-F: hw/nios2/
-F: hw/intc/nios2_vic.c
-F: disas/nios2.c
-F: include/hw/intc/nios2_vic.h
-F: configs/devices/nios2-softmmu/default.mak
-F: tests/docker/dockerfiles/debian-nios2-cross.d/build-toolchain.sh
-F: tests/tcg/nios2/
 
 OpenRISC TCG CPUs
 M: Stafford Horne <shorne@gmail.com>
@@ -332,7 +320,7 @@ F: tests/tcg/ppc*/*
 RISC-V TCG CPUs
 M: Palmer Dabbelt <palmer@dabbelt.com>
 M: Alistair Francis <alistair.francis@wdc.com>
-M: Bin Meng <bin.meng@windriver.com>
+M: Bin Meng <bmeng.cn@gmail.com>
 R: Weiwei Li <liwei1518@gmail.com>
 R: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
 R: Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
@@ -355,6 +343,7 @@ L: qemu-riscv@nongnu.org
 S: Supported
 F: target/riscv/insn_trans/trans_xthead.c.inc
 F: target/riscv/xthead*.decode
+F: target/riscv/th_*
 F: disas/riscv-xthead*
 
 RISC-V XVentanaCondOps extension
@@ -545,7 +534,7 @@ Guest CPU Cores (Xen)
 ---------------------
 X86 Xen CPUs
 M: Stefano Stabellini <sstabellini@kernel.org>
-M: Anthony Perard <anthony.perard@citrix.com>
+M: Anthony PERARD <anthony@xenproject.org>
 M: Paul Durrant <paul@xen.org>
 L: xen-devel@lists.xenproject.org
 S: Supported
@@ -1128,6 +1117,7 @@ M: Inès Varhol <ines.varhol@telecom-paris.fr>
 L: qemu-arm@nongnu.org
 S: Maintained
 F: hw/arm/stm32l4x5_soc.c
+F: hw/char/stm32l4x5_usart.c
 F: hw/misc/stm32l4x5_exti.c
 F: hw/misc/stm32l4x5_syscfg.c
 F: hw/misc/stm32l4x5_rcc.c
@@ -1253,7 +1243,9 @@ F: configs/devices/loongarch64-softmmu/default.mak
 F: hw/loongarch/
 F: include/hw/loongarch/virt.h
 F: include/hw/intc/loongarch_*.h
+F: include/hw/intc/loongson_ipi.h
 F: hw/intc/loongarch_*.c
+F: hw/intc/loongson_ipi.c
 F: include/hw/pci-host/ls7a.h
 F: hw/rtc/ls7a_rtc.c
 F: gdb-xml/loongarch*.xml
@@ -1346,7 +1338,7 @@ F: include/hw/mips/
 
 Jazz
 M: Hervé Poussineau <hpoussin@reactos.org>
-R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+R: Aleksandar Rikalo <arikalo@gmail.com>
 S: Maintained
 F: hw/mips/jazz.c
 F: hw/display/g364fb.c
@@ -1368,7 +1360,7 @@ F: tests/avocado/linux_ssh_mips_malta.py
 F: tests/avocado/machine_mips_malta.py
 
 Mipssim
-R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+R: Aleksandar Rikalo <arikalo@gmail.com>
 S: Orphan
 F: hw/mips/mipssim.c
 F: hw/net/mipsnet.c
@@ -1387,16 +1379,18 @@ Loongson-3 virtual platforms
 M: Huacai Chen <chenhuacai@kernel.org>
 R: Jiaxun Yang <jiaxun.yang@flygoat.com>
 S: Maintained
+F: hw/intc/loongson_ipi.c
 F: hw/intc/loongson_liointc.c
 F: hw/mips/loongson3_bootp.c
 F: hw/mips/loongson3_bootp.h
 F: hw/mips/loongson3_virt.c
+F: include/hw/intc/loongson_ipi.h
 F: include/hw/intc/loongson_liointc.h
 F: tests/avocado/machine_mips_loongson3v.py
 
 Boston
 M: Paul Burton <paulburton@kernel.org>
-R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+R: Aleksandar Rikalo <arikalo@gmail.com>
 S: Odd Fixes
 F: hw/core/loader-fit.c
 F: hw/mips/boston.c
@@ -1614,7 +1608,7 @@ F: include/hw/riscv/opentitan.h
 F: include/hw/*/ibex_*.h
 
 Microchip PolarFire SoC Icicle Kit
-M: Bin Meng <bin.meng@windriver.com>
+M: Bin Meng <bmeng.cn@gmail.com>
 L: qemu-riscv@nongnu.org
 S: Supported
 F: docs/system/riscv/microchip-icicle-kit.rst
@@ -1641,7 +1635,7 @@ F: include/hw/char/shakti_uart.h
 
 SiFive Machines
 M: Alistair Francis <Alistair.Francis@wdc.com>
-M: Bin Meng <bin.meng@windriver.com>
+M: Bin Meng <bmeng.cn@gmail.com>
 M: Palmer Dabbelt <palmer@dabbelt.com>
 L: qemu-riscv@nongnu.org
 S: Supported
@@ -2137,7 +2131,7 @@ F: hw/ssi/xilinx_*
 
 SD (Secure Card)
 M: Philippe Mathieu-Daudé <philmd@linaro.org>
-M: Bin Meng <bin.meng@windriver.com>
+M: Bin Meng <bmeng.cn@gmail.com>
 L: qemu-block@nongnu.org
 S: Odd Fixes
 F: include/hw/sd/sd*
@@ -2171,6 +2165,7 @@ F: hw/vfio/*
 F: include/hw/vfio/
 F: docs/igd-assign.txt
 F: docs/devel/migration/vfio.rst
+F: qapi/vfio.json
 
 vfio-ccw
 M: Eric Farman <farman@linux.ibm.com>
@@ -2478,7 +2473,7 @@ F: tests/qtest/libqos/e1000e.*
 
 igb
 M: Akihiko Odaki <akihiko.odaki@daynix.com>
-R: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+R: Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>
 S: Maintained
 F: docs/system/devices/igb.rst
 F: hw/net/igb*
@@ -2877,7 +2872,6 @@ F: util/aio-*.h
 F: util/defer-call.c
 F: util/fdmon-*.c
 F: block/io.c
-F: migration/block*
 F: include/block/aio.h
 F: include/block/aio-wait.h
 F: include/qemu/defer-call.h
@@ -3773,7 +3767,7 @@ M: Philippe Mathieu-Daudé <philmd@linaro.org>
 R: Aurelien Jarno <aurelien@aurel32.net>
 R: Huacai Chen <chenhuacai@kernel.org>
 R: Jiaxun Yang <jiaxun.yang@flygoat.com>
-R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+R: Aleksandar Rikalo <arikalo@gmail.com>
 S: Odd Fixes
 F: tcg/mips/
 
@@ -3818,7 +3812,7 @@ F: block/vmdk.c
 
 RBD
 M: Ilya Dryomov <idryomov@gmail.com>
-R: Peter Lieven <pl@kamp.de>
+R: Peter Lieven <pl@dlhnet.de>
 L: qemu-block@nongnu.org
 S: Supported
 F: block/rbd.c
@@ -3844,7 +3838,7 @@ F: block/blkio.c
 iSCSI
 M: Ronnie Sahlberg <ronniesahlberg@gmail.com>
 M: Paolo Bonzini <pbonzini@redhat.com>
-M: Peter Lieven <pl@kamp.de>
+M: Peter Lieven <pl@dlhnet.de>
 L: qemu-block@nongnu.org
 S: Odd Fixes
 F: block/iscsi.c
@@ -3867,7 +3861,7 @@ T: git https://repo.or.cz/qemu/ericb.git nbd
 T: git https://gitlab.com/vsementsov/qemu.git block
 
 NFS
-M: Peter Lieven <pl@kamp.de>
+M: Peter Lieven <pl@dlhnet.de>
 L: qemu-block@nongnu.org
 S: Maintained
 F: block/nfs.c
@@ -4057,16 +4051,6 @@ F: block/replication.c
 F: tests/unit/test-replication.c
 F: docs/block-replication.txt
 
-PVRDMA
-M: Yuval Shaia <yuval.shaia.ml@gmail.com>
-M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-S: Odd Fixes
-F: hw/rdma/*
-F: hw/rdma/vmw/*
-F: docs/pvrdma.txt
-F: contrib/rdmacm-mux/*
-F: qapi/rdma.json
-
 Semihosting
 M: Alex Bennée <alex.bennee@linaro.org>
 S: Maintained
@@ -4252,3 +4236,8 @@ Code Coverage Tools
 M: Alex Bennée <alex.bennee@linaro.org>
 S: Odd Fixes
 F: scripts/coverage/
+
+Machine development tool
+M: Maksim Davydov <davydov-max@yandex-team.ru>
+S: Supported
+F: scripts/compare-machine-types.py

@@ -337,6 +337,13 @@ if host_arch == 'i386' and not cc.links('''
   qemu_common_flags = ['-march=i486'] + qemu_common_flags
 endif
 
+# ??? Only extremely old AMD cpus do not have cmpxchg16b.
+# If we truly care, we should simply detect this case at
+# runtime and generate the fallback to serial emulation.
+if host_arch == 'x86_64'
+  qemu_common_flags = ['-mcx16'] + qemu_common_flags
+endif
+
 if get_option('prefer_static')
   qemu_ldflags += get_option('b_pie') ? '-static-pie' : '-static'
 endif
@@ -870,7 +877,7 @@ have_xen_pci_passthrough = get_option('xen_pci_passthrough') \
 
 # When bumping glib minimum version, please check also whether to increase
 # the _WIN32_WINNT setting in osdep.h according to the value from glib
-glib_req_ver = '>=2.56.0'
+glib_req_ver = '>=2.66.0'
 glib_pc = dependency('glib-2.0', version: glib_req_ver, required: true,
                     method: 'pkg-config')
 glib_cflags = []
@@ -911,20 +918,6 @@ if not cc.compiles('''
         to the right pkg-config files for your build target.''')
 endif
 
-# Silence clang warnings triggered by glib < 2.57.2
-if not cc.compiles('''
-  #include <glib.h>
-  typedef struct Foo {
-    int i;
-  } Foo;
-  static void foo_free(Foo *f)
-  {
-    g_free(f);
-  }
-  G_DEFINE_AUTOPTR_CLEANUP_FUNC(Foo, foo_free)
-  int main(void) { return 0; }''', dependencies: glib_pc, args: ['-Wunused-function', '-Werror'])
-  glib_cflags += cc.get_supported_arguments('-Wno-unused-function')
-endif
 glib = declare_dependency(dependencies: [glib_pc, gmodule],
                           compile_args: glib_cflags,
                           version: glib_pc.version())
@@ -1859,6 +1852,34 @@ if numa.found() and not cc.links('''
   endif
 endif
 
+fdt = not_found
+fdt_opt = get_option('fdt')
+if fdt_opt == 'enabled' and get_option('wrap_mode') == 'nodownload'
+  fdt_opt = 'system'
+endif
+if fdt_opt in ['enabled', 'system'] or (fdt_opt == 'auto' and have_system)
+  fdt = cc.find_library('fdt', required: fdt_opt == 'system')
+  if fdt.found() and cc.links('''
+     #include <libfdt.h>
+     #include <libfdt_env.h>
+     int main(void) { fdt_find_max_phandle(NULL, NULL); return 0; }''',
+       dependencies: fdt)
+    fdt_opt = 'system'
+  elif fdt_opt != 'system'
+    fdt_opt = get_option('wrap_mode') == 'nodownload' ? 'disabled' : 'internal'
+    fdt = not_found
+  else
+    error('system libfdt is too old (1.5.1 or newer required)')
+  endif
+endif
+if fdt_opt == 'internal'
+  assert(not fdt.found())
+  libfdt_proj = subproject('dtc', required: true,
+                           default_options: ['tools=false',  'yaml=disabled',
+                                             'python=disabled', 'default_library=static'])
+  fdt = libfdt_proj.get_variable('libfdt_dep')
+endif
+
 rdma = not_found
 if not get_option('rdma').auto() or have_system
   libumad = cc.find_library('ibumad', required: get_option('rdma'))
@@ -2200,6 +2221,7 @@ config_host_data.set('CONFIG_BSD', host_os in bsd_oses)
 config_host_data.set('CONFIG_CAPSTONE', capstone.found())
 config_host_data.set('CONFIG_COCOA', cocoa.found())
 config_host_data.set('CONFIG_DARWIN', host_os == 'darwin')
+config_host_data.set('CONFIG_FDT', fdt.found())
 config_host_data.set('CONFIG_FUZZ', get_option('fuzzing'))
 config_host_data.set('CONFIG_GCOV', get_option('b_coverage'))
 config_host_data.set('CONFIG_LIBUDEV', libudev.found())
@@ -2351,7 +2373,7 @@ config_host_data.set('CONFIG_DEBUG_GRAPH_LOCK', get_option('debug_graph_lock'))
 config_host_data.set('CONFIG_DEBUG_MUTEX', get_option('debug_mutex'))
 config_host_data.set('CONFIG_DEBUG_STACK_USAGE', get_option('debug_stack_usage'))
 config_host_data.set('CONFIG_DEBUG_TCG', get_option('debug_tcg'))
-config_host_data.set('CONFIG_LIVE_BLOCK_MIGRATION', get_option('live_block_migration').allowed())
+config_host_data.set('CONFIG_DEBUG_REMAP', get_option('debug_remap'))
 config_host_data.set('CONFIG_QOM_CAST_DEBUG', get_option('qom_cast_debug'))
 config_host_data.set('CONFIG_REPLICATION', get_option('replication').allowed())
 
@@ -2834,37 +2856,6 @@ config_host_data.set('CONFIG_ARM_AES_BUILTIN', cc.compiles('''
     void foo(uint8x16_t *p) { *p = vaesmcq_u8(*p); }
   '''))
 
-have_pvrdma = get_option('pvrdma') \
-  .require(rdma.found(), error_message: 'PVRDMA requires OpenFabrics libraries') \
-  .require(cc.compiles(gnu_source_prefix + '''
-    #include <sys/mman.h>
-    int main(void)
-    {
-      char buf = 0;
-      void *addr = &buf;
-      addr = mremap(addr, 0, 1, MREMAP_MAYMOVE | MREMAP_FIXED);
-
-      return 0;
-    }'''), error_message: 'PVRDMA requires mremap').allowed()
-
-if have_pvrdma
-  config_host_data.set('LEGACY_RDMA_REG_MR', not cc.links('''
-    #include <infiniband/verbs.h>
-    int main(void)
-    {
-      struct ibv_mr *mr;
-      struct ibv_pd *pd = NULL;
-      size_t length = 10;
-      uint64_t iova = 0;
-      int access = 0;
-      void *addr = NULL;
-
-      mr = ibv_reg_mr_iova(pd, addr, length, iova, access);
-      ibv_dereg_mr(mr);
-      return 0;
-    }'''))
-endif
-
 if get_option('membarrier').disabled()
   have_membarrier = false
 elif host_os == 'windows'
@@ -2972,7 +2963,6 @@ disassemblers = {
   'm68k' : ['CONFIG_M68K_DIS'],
   'microblaze' : ['CONFIG_MICROBLAZE_DIS'],
   'mips' : ['CONFIG_MIPS_DIS'],
-  'nios2' : ['CONFIG_NIOS2_DIS'],
   'or1k' : ['CONFIG_OPENRISC_DIS'],
   'ppc' : ['CONFIG_PPC_DIS'],
   'riscv' : ['CONFIG_RISCV_DIS'],
@@ -2993,12 +2983,12 @@ host_kconfig = \
   (have_ivshmem ? ['CONFIG_IVSHMEM=y'] : []) + \
   (opengl.found() ? ['CONFIG_OPENGL=y'] : []) + \
   (x11.found() ? ['CONFIG_X11=y'] : []) + \
+  (fdt.found() ? ['CONFIG_FDT=y'] : []) + \
   (have_vhost_user ? ['CONFIG_VHOST_USER=y'] : []) + \
   (have_vhost_vdpa ? ['CONFIG_VHOST_VDPA=y'] : []) + \
   (have_vhost_kernel ? ['CONFIG_VHOST_KERNEL=y'] : []) + \
   (have_virtfs ? ['CONFIG_VIRTFS=y'] : []) + \
   (host_os == 'linux' ? ['CONFIG_LINUX=y'] : []) + \
-  (have_pvrdma ? ['CONFIG_PVRDMA=y'] : []) + \
   (multiprocess_allowed ? ['CONFIG_MULTIPROCESS_ALLOWED=y'] : []) + \
   (vfio_user_server_allowed ? ['CONFIG_VFIO_USER_SERVER_ALLOWED=y'] : []) + \
   (hv_balloon ? ['CONFIG_HV_BALLOON_POSSIBLE=y'] : [])
@@ -3038,7 +3028,7 @@ foreach target : target_dirs
     }
   endif
 
-  accel_kconfig = []
+  target_kconfig = []
   foreach sym: accelerators
     if sym == 'CONFIG_TCG' or target in accelerator_targets.get(sym, [])
       config_target += { sym: 'y' }
@@ -3048,23 +3038,29 @@ foreach target : target_dirs
       else
         config_target += { 'CONFIG_TCG_BUILTIN': 'y' }
       endif
-      accel_kconfig += [ sym + '=y' ]
+      target_kconfig += [ sym + '=y' ]
     endif
   endforeach
-  if accel_kconfig.length() == 0
+  if target_kconfig.length() == 0
     if default_targets
       continue
     endif
     error('No accelerator available for target @0@'.format(target))
   endif
 
-  actual_target_dirs += target
   config_target += keyval.load('configs/targets' / target + '.mak')
   config_target += { 'TARGET_' + config_target['TARGET_ARCH'].to_upper(): 'y' }
 
-  if 'TARGET_NEED_FDT' in config_target
-    fdt_required += target
+  if 'TARGET_NEED_FDT' in config_target and not fdt.found()
+    if default_targets
+      warning('Disabling ' + target + ' due to missing libfdt')
+    else
+      fdt_required += target
+    endif
+    continue
   endif
+
+  actual_target_dirs += target
 
   # Add default keys
   if 'TARGET_BASE_ARCH' not in config_target
@@ -3111,6 +3107,9 @@ foreach target : target_dirs
                                                configuration: config_target_data)}
 
   if target.endswith('-softmmu')
+    target_kconfig += 'CONFIG_' + config_target['TARGET_ARCH'].to_upper() + '=y'
+    target_kconfig += 'CONFIG_TARGET_BIG_ENDIAN=' + config_target['TARGET_BIG_ENDIAN']
+
     config_input = meson.get_external_property(target, 'default')
     config_devices_mak = target + '-config-devices.mak'
     config_devices_mak = configure_file(
@@ -3121,8 +3120,7 @@ foreach target : target_dirs
       command: [minikconf,
                 get_option('default_devices') ? '--defconfig' : '--allnoconfig',
                 config_devices_mak, '@DEPFILE@', '@INPUT@',
-                host_kconfig, accel_kconfig,
-                'CONFIG_' + config_target['TARGET_ARCH'].to_upper() + '=y'])
+                host_kconfig, target_kconfig])
 
     config_devices_data = configuration_data()
     config_devices = keyval.load(config_devices_mak)
@@ -3151,6 +3149,10 @@ genh += custom_target('config-poison.h',
                       command: [find_program('scripts/make-config-poison.sh'),
                                 target_configs_h])
 
+if fdt_required.length() > 0
+  error('fdt disabled but required by targets ' + ', '.join(fdt_required))
+endif
+
 ###############
 # Subprojects #
 ###############
@@ -3160,44 +3162,6 @@ if have_system and vfio_user_server_allowed
   libvfio_user_proj = subproject('libvfio-user', required: true)
   libvfio_user_dep = libvfio_user_proj.get_variable('libvfio_user_dep')
 endif
-
-fdt = not_found
-fdt_opt = get_option('fdt')
-if fdt_required.length() > 0 or fdt_opt == 'enabled'
-  if fdt_opt == 'disabled'
-    error('fdt disabled but required by targets ' + ', '.join(fdt_required))
-  endif
-
-  if fdt_opt in ['enabled', 'auto', 'system']
-    if get_option('wrap_mode') == 'nodownload'
-      fdt_opt = 'system'
-    endif
-    fdt = cc.find_library('fdt', required: fdt_opt == 'system')
-    if fdt.found() and cc.links('''
-       #include <libfdt.h>
-       #include <libfdt_env.h>
-       int main(void) { fdt_find_max_phandle(NULL, NULL); return 0; }''',
-         dependencies: fdt)
-      fdt_opt = 'system'
-    elif fdt_opt == 'system'
-       error('system libfdt requested, but it is too old (1.5.1 or newer required)')
-    else
-      fdt_opt = 'internal'
-      fdt = not_found
-    endif
-  endif
-  if not fdt.found()
-    assert(fdt_opt == 'internal')
-    libfdt_proj = subproject('dtc', required: true,
-                             default_options: ['tools=false',  'yaml=disabled',
-                                               'python=disabled', 'default_library=static'])
-    fdt = libfdt_proj.get_variable('libfdt_dep')
-  endif
-else
-  fdt_opt = 'disabled'
-endif
-
-config_host_data.set('CONFIG_FDT', fdt.found())
 
 vhost_user = not_found
 if host_os == 'linux' and have_vhost_user
@@ -3362,8 +3326,6 @@ if have_system
     'hw/pci',
     'hw/pci-host',
     'hw/ppc',
-    'hw/rdma',
-    'hw/rdma/vmw',
     'hw/rtc',
     'hw/s390x',
     'hw/scsi',
@@ -3399,7 +3361,6 @@ if have_system or have_user
     'target/i386/kvm',
     'target/loongarch',
     'target/mips/tcg',
-    'target/nios2',
     'target/ppc',
     'target/riscv',
     'target/s390x',
@@ -3452,8 +3413,12 @@ subdir('qom')
 subdir('authz')
 subdir('crypto')
 subdir('ui')
-subdir('hw')
 subdir('gdbstub')
+if have_system
+  subdir('hw')
+else
+  subdir('hw/core')
+endif
 
 if enable_modules
   libmodulecommon = static_library('module-common', files('module-common.c') + genh, pic: true, c_args: '-DBUILD_DSO')
@@ -3482,7 +3447,7 @@ util_ss = util_ss.apply({})
 libqemuutil = static_library('qemuutil',
                              build_by_default: false,
                              sources: util_ss.sources() + stub_ss.sources() + genh,
-                             dependencies: [util_ss.dependencies(), libm, threads, glib, socket, malloc, pixman])
+                             dependencies: [util_ss.dependencies(), libm, threads, glib, socket, malloc])
 qemuutil = declare_dependency(link_with: libqemuutil,
                               sources: genh + version_res,
                               dependencies: [event_loop_base])
@@ -3555,7 +3520,7 @@ if get_option('b_lto')
   pagevary = declare_dependency(link_with: pagevary)
 endif
 common_ss.add(pagevary)
-specific_ss.add(files('page-vary-target.c'))
+specific_ss.add(files('page-target.c', 'page-vary-target.c'))
 
 subdir('backends')
 subdir('disas')
@@ -3642,7 +3607,7 @@ foreach d, list : target_modules
         if target.endswith('-softmmu')
           config_target = config_target_mak[target]
           target_inc = [include_directories('target' / config_target['TARGET_BASE_ARCH'])]
-          c_args = ['-DNEED_CPU_H',
+          c_args = ['-DCOMPILING_PER_TARGET',
                     '-DCONFIG_TARGET="@0@-config-target.h"'.format(target),
                     '-DCONFIG_DEVICES="@0@-config-devices.h"'.format(target)]
           target_module_ss = module_ss.apply(config_target, strict: false)
@@ -3732,7 +3697,7 @@ libmigration = static_library('migration', sources: migration_files + genh,
                               name_suffix: 'fa',
                               build_by_default: false)
 migration = declare_dependency(link_with: libmigration,
-                               dependencies: [zlib, qom, io])
+                               dependencies: [qom, io])
 system_ss.add(migration)
 
 block_ss = block_ss.apply({})
@@ -3825,7 +3790,7 @@ foreach target : target_dirs
   target_base_arch = config_target['TARGET_BASE_ARCH']
   arch_srcs = [config_target_h[target]]
   arch_deps = []
-  c_args = ['-DNEED_CPU_H',
+  c_args = ['-DCOMPILING_PER_TARGET',
             '-DCONFIG_TARGET="@0@-config-target.h"'.format(target),
             '-DCONFIG_DEVICES="@0@-config-devices.h"'.format(target)]
   link_args = emulator_link_args
@@ -3901,15 +3866,23 @@ foreach target : target_dirs
 
   target_common = common_ss.apply(config_target, strict: false)
   objects = common_all.extract_objects(target_common.sources())
-  deps = target_common.dependencies()
+  arch_deps += target_common.dependencies()
 
   target_specific = specific_ss.apply(config_target, strict: false)
   arch_srcs += target_specific.sources()
   arch_deps += target_specific.dependencies()
 
+  # allow using headers from the dependencies but do not include the sources,
+  # because this emulator only needs those in "objects".  For external
+  # dependencies, the full dependency is included below in the executable.
+  lib_deps = []
+  foreach dep : arch_deps
+    lib_deps += dep.partial_dependency(compile_args: true, includes: true)
+  endforeach
+
   lib = static_library('qemu-' + target,
                  sources: arch_srcs + genh,
-                 dependencies: arch_deps,
+                 dependencies: lib_deps,
                  objects: objects,
                  include_directories: target_inc,
                  c_args: c_args,
@@ -3957,7 +3930,7 @@ foreach target : target_dirs
     emulator = executable(exe_name, exe['sources'],
                install: true,
                c_args: c_args,
-               dependencies: arch_deps + deps + exe['dependencies'],
+               dependencies: arch_deps + exe['dependencies'],
                objects: lib.extract_all_objects(recursive: true),
                link_depends: [block_syms, qemu_syms],
                link_args: link_args,
@@ -4036,7 +4009,6 @@ if have_tools
     }]
   endforeach
 
-  subdir('contrib/rdmacm-mux')
   subdir('contrib/elf2dmp')
 
   executable('qemu-edid', files('qemu-edid.c', 'hw/display/edid-generate.c'),
@@ -4314,6 +4286,9 @@ if config_all_accel.has_key('CONFIG_TCG')
   endif
   summary_info += {'TCG plugins':       get_option('plugins')}
   summary_info += {'TCG debug enabled': get_option('debug_tcg')}
+  if have_linux_user or have_bsd_user
+    summary_info += {'syscall buffer debugging support': get_option('debug_remap')}
+  endif
 endif
 summary_info += {'target list':       ' '.join(target_dirs)}
 if have_system
@@ -4333,7 +4308,6 @@ if have_block
   summary_info += {'Use block whitelist in tools': get_option('block_drv_whitelist_in_tools')}
   summary_info += {'VirtFS (9P) support':    have_virtfs}
   summary_info += {'VirtFS (9P) Proxy Helper support (deprecated)': have_virtfs_proxy_helper}
-  summary_info += {'Live block migration': config_host_data.get('CONFIG_LIVE_BLOCK_MIGRATION')}
   summary_info += {'replication support': config_host_data.get('CONFIG_REPLICATION')}
   summary_info += {'bochs support':     get_option('bochs').allowed()}
   summary_info += {'cloop support':     get_option('cloop').allowed()}
@@ -4442,8 +4416,7 @@ summary_info += {'Linux AIO support': libaio}
 summary_info += {'Linux io_uring support': linux_io_uring}
 summary_info += {'ATTR/XATTR support': libattr}
 summary_info += {'RDMA support':      rdma}
-summary_info += {'PVRDMA support':    have_pvrdma}
-summary_info += {'fdt support':       fdt_opt == 'disabled' ? false : fdt_opt}
+summary_info += {'fdt support':       fdt_opt == 'internal' ? 'internal' : fdt}
 summary_info += {'libcap-ng support': libcap_ng}
 summary_info += {'bpf support':       libbpf}
 summary_info += {'rbd support':       rbd}

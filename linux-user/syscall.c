@@ -25,6 +25,7 @@
 #include "qemu/plugin.h"
 #include "tcg/startup.h"
 #include "target_mman.h"
+#include "exec/page-protection.h"
 #include <elf.h>
 #include <endian.h>
 #include <grp.h>
@@ -1615,24 +1616,6 @@ static abi_long do_pipe(CPUArchState *cpu_env, abi_ulong pipedes,
     return get_errno(ret);
 }
 
-static inline abi_long target_to_host_ip_mreq(struct ip_mreqn *mreqn,
-                                              abi_ulong target_addr,
-                                              socklen_t len)
-{
-    struct target_ip_mreqn *target_smreqn;
-
-    target_smreqn = lock_user(VERIFY_READ, target_addr, len, 1);
-    if (!target_smreqn)
-        return -TARGET_EFAULT;
-    mreqn->imr_multiaddr.s_addr = target_smreqn->imr_multiaddr.s_addr;
-    mreqn->imr_address.s_addr = target_smreqn->imr_address.s_addr;
-    if (len == sizeof(struct target_ip_mreqn))
-        mreqn->imr_ifindex = tswapal(target_smreqn->imr_ifindex);
-    unlock_user(target_smreqn, target_addr, 0);
-
-    return 0;
-}
-
 static inline abi_long target_to_host_sockaddr(int fd, struct sockaddr *addr,
                                                abi_ulong target_addr,
                                                socklen_t len)
@@ -2067,8 +2050,6 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
 {
     abi_long ret;
     int val;
-    struct ip_mreqn *ip_mreq;
-    struct ip_mreq_source *ip_mreq_source;
 
     switch(level) {
     case SOL_TCP:
@@ -2111,19 +2092,40 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
             break;
         case IP_ADD_MEMBERSHIP:
         case IP_DROP_MEMBERSHIP:
+        {
+            struct ip_mreqn ip_mreq;
+            struct target_ip_mreqn *target_smreqn;
+
+            QEMU_BUILD_BUG_ON(sizeof(struct ip_mreq) !=
+                              sizeof(struct target_ip_mreq));
+
             if (optlen < sizeof (struct target_ip_mreq) ||
-                optlen > sizeof (struct target_ip_mreqn))
+                optlen > sizeof (struct target_ip_mreqn)) {
                 return -TARGET_EINVAL;
+            }
 
-            ip_mreq = (struct ip_mreqn *) alloca(optlen);
-            target_to_host_ip_mreq(ip_mreq, optval_addr, optlen);
-            ret = get_errno(setsockopt(sockfd, level, optname, ip_mreq, optlen));
+            target_smreqn = lock_user(VERIFY_READ, optval_addr, optlen, 1);
+            if (!target_smreqn) {
+                return -TARGET_EFAULT;
+            }
+            ip_mreq.imr_multiaddr.s_addr = target_smreqn->imr_multiaddr.s_addr;
+            ip_mreq.imr_address.s_addr = target_smreqn->imr_address.s_addr;
+            if (optlen == sizeof(struct target_ip_mreqn)) {
+                ip_mreq.imr_ifindex = tswapal(target_smreqn->imr_ifindex);
+                optlen = sizeof(struct ip_mreqn);
+            }
+            unlock_user(target_smreqn, optval_addr, 0);
+
+            ret = get_errno(setsockopt(sockfd, level, optname, &ip_mreq, optlen));
             break;
-
+        }
         case IP_BLOCK_SOURCE:
         case IP_UNBLOCK_SOURCE:
         case IP_ADD_SOURCE_MEMBERSHIP:
         case IP_DROP_SOURCE_MEMBERSHIP:
+        {
+            struct ip_mreq_source *ip_mreq_source;
+
             if (optlen != sizeof (struct target_ip_mreq_source))
                 return -TARGET_EINVAL;
 
@@ -2134,7 +2136,7 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
             ret = get_errno(setsockopt(sockfd, level, optname, ip_mreq_source, optlen));
             unlock_user (ip_mreq_source, optval_addr, 0);
             break;
-
+        }
         default:
             goto unimplemented;
         }
@@ -2277,18 +2279,13 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
         switch (optname) {
         case ALG_SET_KEY:
         {
-            char *alg_key = g_malloc(optlen);
-
+            char *alg_key = lock_user(VERIFY_READ, optval_addr, optlen, 1);
             if (!alg_key) {
-                return -TARGET_ENOMEM;
-            }
-            if (copy_from_user(alg_key, optval_addr, optlen)) {
-                g_free(alg_key);
                 return -TARGET_EFAULT;
             }
             ret = get_errno(setsockopt(sockfd, level, optname,
                                        alg_key, optlen));
-            g_free(alg_key);
+            unlock_user(alg_key, optval_addr, optlen);
             break;
         }
         case ALG_SET_AEAD_AUTHSIZE:
@@ -2305,12 +2302,10 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
     case TARGET_SOL_SOCKET:
         switch (optname) {
         case TARGET_SO_RCVTIMEO:
+        case TARGET_SO_SNDTIMEO:
         {
                 struct timeval tv;
 
-                optname = SO_RCVTIMEO;
-
-set_timeout:
                 if (optlen != sizeof(struct target_timeval)) {
                     return -TARGET_EINVAL;
                 }
@@ -2319,13 +2314,12 @@ set_timeout:
                     return -TARGET_EFAULT;
                 }
 
-                ret = get_errno(setsockopt(sockfd, SOL_SOCKET, optname,
+                ret = get_errno(setsockopt(sockfd, SOL_SOCKET,
+                                optname == TARGET_SO_RCVTIMEO ?
+                                    SO_RCVTIMEO : SO_SNDTIMEO,
                                 &tv, sizeof(tv)));
                 return ret;
         }
-        case TARGET_SO_SNDTIMEO:
-                optname = SO_SNDTIMEO;
-                goto set_timeout;
         case TARGET_SO_ATTACH_FILTER:
         {
                 struct target_sock_fprog *tfprog;
@@ -6469,7 +6463,7 @@ static abi_long do_prctl(CPUArchState *env, abi_long option, abi_long arg2,
 
     case PR_GET_TID_ADDRESS:
         {
-            TaskState *ts = env_cpu(env)->opaque;
+            TaskState *ts = get_task_state(env_cpu(env));
             return put_user_ual(ts->child_tidptr, arg2);
         }
 
@@ -6589,8 +6583,8 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
          * generate code for parallel execution and flush old translations.
          * Do this now so that the copy gets CF_PARALLEL too.
          */
-        if (!(cpu->tcg_cflags & CF_PARALLEL)) {
-            cpu->tcg_cflags |= CF_PARALLEL;
+        if (!tcg_cflags_has(cpu, CF_PARALLEL)) {
+            tcg_cflags_set(cpu, CF_PARALLEL);
             tb_flush(cpu);
         }
 
@@ -8130,7 +8124,7 @@ static int open_self_maps_2(void *opaque, target_ulong guest_start,
 static int open_self_maps_1(CPUArchState *env, int fd, bool smaps)
 {
     struct open_self_maps_data d = {
-        .ts = env_cpu(env)->opaque,
+        .ts = get_task_state(env_cpu(env)),
         .host_maps = read_self_maps(),
         .fd = fd,
         .smaps = smaps

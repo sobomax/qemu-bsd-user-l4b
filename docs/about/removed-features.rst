@@ -505,6 +505,11 @@ configurations (e.g. -smp 8,sockets=0) is removed since 9.0, users have
 to ensure that all the topology members described with -smp are greater
 than zero.
 
+``-global migration.decompress-error-check`` (removed in 9.1)
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Removed along with the ``compression`` migration capability.
+
 User-mode emulator command line arguments
 -----------------------------------------
 
@@ -614,6 +619,58 @@ was superseded by ``sections``.
 Member ``section-size`` in the return value of ``query-sgx-capabilities``
 was superseded by ``sections``.
 
+``query-migrate`` return value member ``skipped`` (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Member ``skipped`` of the ``MigrationStats`` struct hasn't been used
+for more than 10 years. Removed with no replacement.
+
+``migrate`` command option ``inc`` (removed in 9.1)
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use blockdev-mirror with NBD instead. See "QMP invocation for live
+storage migration with ``blockdev-mirror`` + NBD" in
+docs/interop/live-block-operations.rst for a detailed explanation.
+
+``migrate`` command option ``blk`` (removed in 9.1)
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use blockdev-mirror with NBD instead. See "QMP invocation for live
+storage migration with ``blockdev-mirror`` + NBD" in
+docs/interop/live-block-operations.rst for a detailed explanation.
+
+``migrate-set-capabilities`` ``block`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Block migration has been removed. For a replacement, see "QMP
+invocation for live storage migration with ``blockdev-mirror`` + NBD"
+in docs/interop/live-block-operations.rst.
+
+``migrate-set-parameter`` ``compress-level`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use ``multifd-zlib-level`` or ``multifd-zstd-level`` instead.
+
+``migrate-set-parameter`` ``compress-threads`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use ``multifd-channels`` instead.
+
+``migrate-set-parameter`` ``compress-wait-thread`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Removed with no replacement.
+
+``migrate-set-parameter`` ``decompress-threads`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use ``multifd-channels`` instead.
+
+``migrate-set-capability`` ``compress`` option (removed in 9.1)
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use ``multifd-compression`` instead.
+
 Human Monitor Protocol (HMP) commands
 -------------------------------------
 
@@ -673,6 +730,52 @@ This command didn't produce any output already. Removed with no replacement.
 
 The ``singlestep`` command has been replaced by the ``one-insn-per-tb``
 command, which has the same behaviour but a less misleading name.
+
+``migrate`` command ``-i`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use blockdev-mirror with NBD instead. See "QMP invocation for live
+storage migration with ``blockdev-mirror`` + NBD" in
+docs/interop/live-block-operations.rst for a detailed explanation.
+
+``migrate`` command ``-b`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use blockdev-mirror with NBD instead. See "QMP invocation for live
+storage migration with ``blockdev-mirror`` + NBD" in
+docs/interop/live-block-operations.rst for a detailed explanation.
+
+``migrate_set_capability`` ``block`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Block migration has been removed. For a replacement, see "QMP
+invocation for live storage migration with ``blockdev-mirror`` + NBD"
+in docs/interop/live-block-operations.rst.
+
+``migrate_set_parameter`` ``compress-level`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use ``multifd-zlib-level`` or ``multifd-zstd-level`` instead.
+
+``migrate_set_parameter`` ``compress-threads`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use ``multifd-channels`` instead.
+
+``migrate_set_parameter`` ``compress-wait-thread`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Removed with no replacement.
+
+``migrate_set_parameter`` ``decompress-threads`` option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use ``multifd-channels`` instead.
+
+``migrate_set_capability`` ``compress`` option (removed in 9.1)
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Use ``multifd-compression`` instead.
 
 Host Architectures
 ------------------
@@ -756,6 +859,12 @@ x86 ``Icelake-Client`` CPU (removed in 7.1)
 
 There isn't ever Icelake Client CPU, it is some wrong and imaginary one.
 Use ``Icelake-Server`` instead.
+
+Nios II CPU (removed in 9.1)
+''''''''''''''''''''''''''''
+
+QEMU Nios II architecture was orphan; Intel has EOL'ed the Nios II
+processor IP (see `Intel discontinuance notification`_).
 
 System accelerators
 -------------------
@@ -841,6 +950,11 @@ ppc ``taihu`` machine (removed in 7.2)
 This machine was removed because it was partially emulated and 405
 machines are very similar. Use the ``ref405ep`` machine instead.
 
+Nios II ``10m50-ghrd`` and ``nios2-generic-nommu`` machines (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+The Nios II architecture was orphan.
+
 linux-user mode CPUs
 --------------------
 
@@ -860,6 +974,11 @@ The ``ppc64abi32`` architecture has a number of issues which regularly
 tripped up the CI testing and was suspected to be quite broken. For that
 reason the maintainers strongly suspected no one actually used it.
 
+``nios2`` CPU (removed in 9.1)
+''''''''''''''''''''''''''''''
+
+QEMU Nios II architecture was orphan; Intel has EOL'ed the Nios II
+processor IP (see `Intel discontinuance notification`_).
 
 TCG introspection features
 --------------------------
@@ -909,6 +1028,10 @@ contains native support for this feature and thus use of the option
 ROM approach was obsolete. The native SeaBIOS support can be activated
 by using ``-machine graphics=off``.
 
+``pvrdma`` and the RDMA subsystem (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''
+
+The 'pvrdma' device and the whole RDMA subsystem have been removed.
 
 Related binaries
 ----------------
@@ -1006,3 +1129,4 @@ stable for some time and is now widely used.
 The command line and feature set is very close to the removed
 C implementation.
 
+.. _Intel discontinuance notification: https://www.intel.com/content/www/us/en/content-details/781327/intel-is-discontinuing-ip-ordering-codes-listed-in-pdn2312-for-nios-ii-ip.html

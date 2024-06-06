@@ -75,6 +75,7 @@
 #include "hw/virtio/vhost-scsi-common.h"
 
 #include "exec/ram_addr.h"
+#include "exec/confidential-guest-support.h"
 #include "hw/usb.h"
 #include "qemu/config-file.h"
 #include "qemu/error-report.h"
@@ -87,7 +88,6 @@
 #include "hw/ppc/spapr_tpm_proxy.h"
 #include "hw/ppc/spapr_nvdimm.h"
 #include "hw/ppc/spapr_numa.h"
-#include "hw/ppc/pef.h"
 
 #include "monitor/monitor.h"
 
@@ -351,6 +351,32 @@ static void spapr_dt_pa_features(SpaprMachineState *spapr,
     }
 
     _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
+}
+
+static void spapr_dt_pi_features(SpaprMachineState *spapr,
+                                 PowerPCCPU *cpu,
+                                 void *fdt, int offset)
+{
+    uint8_t pi_features[] = { 1, 0,
+        0x00 };
+
+    if (kvm_enabled() && ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00,
+                                          0, cpu->compat_pvr)) {
+        /*
+         * POWER9 and later CPUs with KVM run in LPAR-per-thread mode where
+         * all threads are essentially independent CPUs, and msgsndp does not
+         * work (because it is physically-addressed) and therefore is
+         * emulated by KVM, so disable it here to ensure XIVE will be used.
+         * This is both KVM and CPU implementation-specific behaviour so a KVM
+         * cap would be cleanest, but for now this works. If KVM ever permits
+         * native msgsndp execution by guests, a cap could be added at that
+         * time.
+         */
+        pi_features[2] |= 0x08; /* 4: No msgsndp */
+    }
+
+    _FDT((fdt_setprop(fdt, offset, "ibm,pi-features", pi_features,
+                      sizeof(pi_features))));
 }
 
 static hwaddr spapr_node0_size(MachineState *machine)
@@ -814,6 +840,8 @@ static void spapr_dt_cpu(CPUState *cs, void *fdt, int offset,
     }
 
     spapr_dt_pa_features(spapr, cpu, fdt, offset);
+
+    spapr_dt_pi_features(spapr, cpu, fdt, offset);
 
     _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
                            cs->cpu_index / vcpus_per_socket)));
@@ -1715,7 +1743,9 @@ static void spapr_machine_reset(MachineState *machine, ShutdownCause reason)
         qemu_guest_getrandom_nofail(spapr->fdt_rng_seed, 32);
     }
 
-    pef_kvm_reset(machine->cgs, &error_fatal);
+    if (machine->cgs) {
+        confidential_guest_kvm_reset(machine->cgs, &error_fatal);
+    }
     spapr_caps_apply(spapr);
     spapr_nested_reset(spapr);
 
@@ -2172,7 +2202,7 @@ static const VMStateDescription vmstate_spapr = {
     }
 };
 
-static int htab_save_setup(QEMUFile *f, void *opaque)
+static int htab_save_setup(QEMUFile *f, void *opaque, Error **errp)
 {
     SpaprMachineState *spapr = opaque;
 
@@ -2841,7 +2871,9 @@ static void spapr_machine_init(MachineState *machine)
     /*
      * if Secure VM (PEF) support is configured, then initialize it
      */
-    pef_kvm_init(machine->cgs, &error_fatal);
+    if (machine->cgs) {
+        confidential_guest_kvm_init(machine->cgs, &error_fatal);
+    }
 
     msi_nonbroken = true;
 
@@ -4806,14 +4838,25 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
     type_init(spapr_machine_register_##suffix)
 
 /*
- * pseries-9.0
+ * pseries-9.1
  */
-static void spapr_machine_9_0_class_options(MachineClass *mc)
+static void spapr_machine_9_1_class_options(MachineClass *mc)
 {
     /* Defaults for the latest behaviour inherited from the base class */
 }
 
-DEFINE_SPAPR_MACHINE(9_0, "9.0", true);
+DEFINE_SPAPR_MACHINE(9_1, "9.1", true);
+
+/*
+ * pseries-9.0
+ */
+static void spapr_machine_9_0_class_options(MachineClass *mc)
+{
+    spapr_machine_9_1_class_options(mc);
+    compat_props_add(mc->compat_props, hw_compat_9_0, hw_compat_9_0_len);
+}
+
+DEFINE_SPAPR_MACHINE(9_0, "9.0", false);
 
 /*
  * pseries-8.2

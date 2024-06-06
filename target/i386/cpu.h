@@ -24,14 +24,12 @@
 #include "cpu-qom.h"
 #include "kvm/hyperv-proto.h"
 #include "exec/cpu-defs.h"
+#include "hw/i386/topology.h"
 #include "qapi/qapi-types-common.h"
 #include "qemu/cpu-float.h"
 #include "qemu/timer.h"
 
 #define XEN_NR_VIRQS 24
-
-/* The x86 has a strong memory model with some store-after-load re-ordering */
-#define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
 
 #define KVM_HAVE_MCE_INJECTION 1
 
@@ -261,6 +259,7 @@ typedef enum X86Seg {
 #define CR4_SMAP_MASK   (1U << 21)
 #define CR4_PKE_MASK   (1U << 22)
 #define CR4_PKS_MASK   (1U << 24)
+#define CR4_LAM_SUP_MASK (1U << 28)
 
 #define CR4_RESERVED_MASK \
 (~(target_ulong)(CR4_VME_MASK | CR4_PVI_MASK | CR4_TSD_MASK \
@@ -269,7 +268,8 @@ typedef enum X86Seg {
                 | CR4_OSFXSR_MASK | CR4_OSXMMEXCPT_MASK | CR4_UMIP_MASK \
                 | CR4_LA57_MASK \
                 | CR4_FSGSBASE_MASK | CR4_PCIDE_MASK | CR4_OSXSAVE_MASK \
-                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK))
+                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK \
+                | CR4_LAM_SUP_MASK))
 
 #define DR6_BD          (1 << 13)
 #define DR6_BS          (1 << 14)
@@ -819,8 +819,6 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
 #define CPUID_7_0_EBX_SMAP              (1U << 20)
 /* AVX-512 Integer Fused Multiply Add */
 #define CPUID_7_0_EBX_AVX512IFMA        (1U << 21)
-/* Persistent Commit */
-#define CPUID_7_0_EBX_PCOMMIT           (1U << 22)
 /* Flush a Cache Line Optimized */
 #define CPUID_7_0_EBX_CLFLUSHOPT        (1U << 23)
 /* Cache Line Write Back */
@@ -932,6 +930,8 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
 #define CPUID_7_1_EAX_AMX_FP16          (1U << 21)
 /* Support for VPMADD52[H,L]UQ */
 #define CPUID_7_1_EAX_AVX_IFMA          (1U << 23)
+/* Linear Address Masking */
+#define CPUID_7_1_EAX_LAM               (1U << 26)
 
 /* Support for VPDPB[SU,UU,SS]D[,S] */
 #define CPUID_7_1_EDX_AVX_VNNI_INT8     (1U << 4)
@@ -1016,10 +1016,16 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
 #define CPUID_MWAIT_EMX     (1U << 0) /* enumeration supported */
 
 /* CPUID[0xB].ECX level types */
-#define CPUID_TOPOLOGY_LEVEL_INVALID  (0U << 8)
-#define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
-#define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
-#define CPUID_TOPOLOGY_LEVEL_DIE      (5U << 8)
+#define CPUID_B_ECX_TOPO_LEVEL_INVALID  0
+#define CPUID_B_ECX_TOPO_LEVEL_SMT      1
+#define CPUID_B_ECX_TOPO_LEVEL_CORE     2
+
+/* COUID[0x1F].ECX level types */
+#define CPUID_1F_ECX_TOPO_LEVEL_INVALID  CPUID_B_ECX_TOPO_LEVEL_INVALID
+#define CPUID_1F_ECX_TOPO_LEVEL_SMT      CPUID_B_ECX_TOPO_LEVEL_SMT
+#define CPUID_1F_ECX_TOPO_LEVEL_CORE     CPUID_B_ECX_TOPO_LEVEL_CORE
+#define CPUID_1F_ECX_TOPO_LEVEL_MODULE   3
+#define CPUID_1F_ECX_TOPO_LEVEL_DIE      5
 
 /* MSR Feature Bits */
 #define MSR_ARCH_CAP_RDCL_NO            (1U << 0)
@@ -1419,22 +1425,33 @@ typedef struct {
  */
 #define UNASSIGNED_APIC_ID 0xFFFFFFFF
 
-typedef union X86LegacyXSaveArea {
-    struct {
-        uint16_t fcw;
-        uint16_t fsw;
-        uint8_t ftw;
-        uint8_t reserved;
-        uint16_t fpop;
-        uint64_t fpip;
-        uint64_t fpdp;
-        uint32_t mxcsr;
-        uint32_t mxcsr_mask;
-        FPReg fpregs[8];
-        uint8_t xmm_regs[16][16];
+typedef struct X86LegacyXSaveArea {
+    uint16_t fcw;
+    uint16_t fsw;
+    uint8_t ftw;
+    uint8_t reserved;
+    uint16_t fpop;
+    union {
+        struct {
+            uint64_t fpip;
+            uint64_t fpdp;
+        };
+        struct {
+            uint32_t fip;
+            uint32_t fcs;
+            uint32_t foo;
+            uint32_t fos;
+        };
     };
-    uint8_t data[512];
+    uint32_t mxcsr;
+    uint32_t mxcsr_mask;
+    FPReg fpregs[8];
+    uint8_t xmm_regs[16][16];
+    uint32_t hw_reserved[12];
+    uint32_t sw_reserved[12];
 } X86LegacyXSaveArea;
+
+QEMU_BUILD_BUG_ON(sizeof(X86LegacyXSaveArea) != 512);
 
 typedef struct X86XSaveHeader {
     uint64_t xstate_bv;
@@ -1583,6 +1600,13 @@ typedef struct CPUCacheInfo {
      * address bits.  CPUID[4].EDX[bit 2].
      */
     bool complex_indexing;
+
+    /*
+     * Cache Topology. The level that cache is shared in.
+     * Used to encode CPUID[4].EAX[bits 25:14] or
+     * CPUID[0x8000001D].EAX[bits 25:14].
+     */
+    enum CPUTopoLevel share_level;
 } CPUCacheInfo;
 
 
@@ -1892,6 +1916,12 @@ typedef struct CPUArchState {
 
     /* Number of dies within this CPU package. */
     unsigned nr_dies;
+
+    /* Number of modules within one die. */
+    unsigned nr_modules;
+
+    /* Bitmap of available CPU topology levels for this CPU. */
+    DECLARE_BITMAP(avail_cpu_topo, CPU_TOPO_LEVEL_MAX);
 } CPUX86State;
 
 struct kvm_msrs;
@@ -1993,9 +2023,20 @@ struct ArchCPU {
     bool enable_l3_cache;
 
     /* Compatibility bits for old machine types.
+     * If true present L1 cache as per-thread, not per-core.
+     */
+    bool l1_cache_per_core;
+
+    /* Compatibility bits for old machine types.
      * If true present the old cache topology information
      */
     bool legacy_cache;
+
+    /* Compatibility bits for old machine types.
+     * If true decode the CPUID Function 0x8000001E_ECX to support multiple
+     * nodes per processor
+     */
+    bool legacy_multi_node;
 
     /* Compatibility bits for old machine types: */
     bool enable_cpuid_0xb;
@@ -2027,6 +2068,14 @@ struct ArchCPU {
     /* Number of physical address bits supported */
     uint32_t phys_bits;
 
+    /*
+     * Number of guest physical address bits available. Usually this is
+     * identical to host physical address bits. With NPT or EPT 4-level
+     * paging, guest physical address space might be restricted to 48 bits
+     * even if the host cpu supports more physical address bits.
+     */
+    uint32_t guest_phys_bits;
+
     /* in order to simplify APIC support, we leave this pointer to the
        user */
     struct DeviceState *apic_state;
@@ -2038,6 +2087,7 @@ struct ArchCPU {
     int32_t node_id; /* NUMA node this CPU belongs to */
     int32_t socket_id;
     int32_t die_id;
+    int32_t module_id;
     int32_t core_id;
     int32_t thread_id;
 
@@ -2216,15 +2266,17 @@ int cpu_x86_get_descr_debug(CPUX86State *env, unsigned int selector,
 /* used for debug or cpu save/restore */
 
 /* cpu-exec.c */
-/* the following helpers are only usable in user mode simulation as
-   they can trigger unexpected exceptions */
+/*
+ * The following helpers are only usable in user mode simulation.
+ * The host pointers should come from lock_user().
+ */
 void cpu_x86_load_seg(CPUX86State *s, X86Seg seg_reg, int selector);
-void cpu_x86_fsave(CPUX86State *s, target_ulong ptr, int data32);
-void cpu_x86_frstor(CPUX86State *s, target_ulong ptr, int data32);
-void cpu_x86_fxsave(CPUX86State *s, target_ulong ptr);
-void cpu_x86_fxrstor(CPUX86State *s, target_ulong ptr);
-void cpu_x86_xsave(CPUX86State *s, target_ulong ptr);
-void cpu_x86_xrstor(CPUX86State *s, target_ulong ptr);
+void cpu_x86_fsave(CPUX86State *s, void *host, size_t len);
+void cpu_x86_frstor(CPUX86State *s, void *host, size_t len);
+void cpu_x86_fxsave(CPUX86State *s, void *host, size_t len);
+void cpu_x86_fxrstor(CPUX86State *s, void *host, size_t len);
+void cpu_x86_xsave(CPUX86State *s, void *host, size_t len, uint64_t rbfm);
+bool cpu_x86_xrstor(CPUX86State *s, void *host, size_t len, uint64_t rbfm);
 
 /* cpu.c */
 void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
@@ -2551,6 +2603,9 @@ static inline uint64_t cr4_reserved_bits(CPUX86State *env)
     }
     if (!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_PKS)) {
         reserved_bits |= CR4_PKS_MASK;
+    }
+    if (!(env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_LAM)) {
+        reserved_bits |= CR4_LAM_SUP_MASK;
     }
     return reserved_bits;
 }

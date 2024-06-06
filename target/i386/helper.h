@@ -22,8 +22,8 @@ DEF_HELPER_FLAGS_5(bndstx32, TCG_CALL_NO_WG, void, env, tl, tl, i64, i64)
 DEF_HELPER_FLAGS_5(bndstx64, TCG_CALL_NO_WG, void, env, tl, tl, i64, i64)
 DEF_HELPER_1(bnd_jmp, void, env)
 
-DEF_HELPER_2(aam, void, env, int)
-DEF_HELPER_2(aad, void, env, int)
+DEF_HELPER_FLAGS_2(aam, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+DEF_HELPER_FLAGS_2(aad, TCG_CALL_NO_RWG_SE, tl, tl, tl)
 DEF_HELPER_1(aaa, void, env)
 DEF_HELPER_1(aas, void, env)
 DEF_HELPER_1(daa, void, env)
@@ -206,16 +206,5 @@ DEF_HELPER_1(emms, void, env)
 #include "tcg/ops_sse_header.h.inc"
 #define SHIFT 2
 #include "tcg/ops_sse_header.h.inc"
-
-DEF_HELPER_3(rclb, tl, env, tl, tl)
-DEF_HELPER_3(rclw, tl, env, tl, tl)
-DEF_HELPER_3(rcll, tl, env, tl, tl)
-DEF_HELPER_3(rcrb, tl, env, tl, tl)
-DEF_HELPER_3(rcrw, tl, env, tl, tl)
-DEF_HELPER_3(rcrl, tl, env, tl, tl)
-#ifdef TARGET_X86_64
-DEF_HELPER_3(rclq, tl, env, tl, tl)
-DEF_HELPER_3(rcrq, tl, env, tl, tl)
-#endif
 
 DEF_HELPER_1(rdrand, tl, env)

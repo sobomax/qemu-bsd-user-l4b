@@ -158,13 +158,13 @@ build-system-centos:
     - .native_build_job_template
     - .native_build_artifact_template
   needs:
-    job: amd64-centos8-container
+    job: amd64-centos9-container
   variables:
-    IMAGE: centos8
+    IMAGE: centos9
     CONFIGURE_ARGS: --disable-nettle --enable-gcrypt --enable-vfio-user-server
       --enable-modules --enable-trace-backends=dtrace --enable-docs
     TARGETS: ppc64-softmmu or1k-softmmu s390x-softmmu
-      x86_64-softmmu rx-softmmu sh4-softmmu nios2-softmmu
+      x86_64-softmmu rx-softmmu sh4-softmmu
     MAKE_CHECK_ARGS: check-build
 
 # Previous QEMU release. Used for cross-version migration tests.
@@ -242,7 +242,7 @@ check-system-centos:
     - job: build-system-centos
       artifacts: true
   variables:
-    IMAGE: centos8
+    IMAGE: centos9
     MAKE_CHECK_ARGS: check
 
 avocado-system-centos:
@@ -251,10 +251,10 @@ avocado-system-centos:
     - job: build-system-centos
       artifacts: true
   variables:
-    IMAGE: centos8
+    IMAGE: centos9
     MAKE_CHECK_ARGS: check-avocado
     AVOCADO_TAGS: arch:ppc64 arch:or1k arch:s390x arch:x86_64 arch:rx
-      arch:sh4 arch:nios2
+      arch:sh4
 
 build-system-opensuse:
   extends:
@@ -327,9 +327,9 @@ avocado-system-flaky:
 build-tcg-disabled:
   extends: .native_build_job_template
   needs:
-    job: amd64-centos8-container
+    job: amd64-centos9-container
   variables:
-    IMAGE: centos8
+    IMAGE: centos9
   script:
     - mkdir build
     - cd build
@@ -342,7 +342,7 @@ build-tcg-disabled:
     - cd tests/qemu-iotests/
     - ./check -raw 001 002 003 004 005 008 009 010 011 012 021 025 032 033 048
             052 063 077 086 101 104 106 113 148 150 151 152 157 159 160 163
-            170 171 183 184 192 194 208 221 226 227 236 253 277 image-fleecing
+            170 171 184 192 194 208 221 226 227 236 253 277 image-fleecing
     - ./check -qcow2 028 051 056 057 058 065 068 082 085 091 095 096 102 122
             124 132 139 142 144 145 151 152 155 157 165 194 196 200 202
             208 209 216 218 227 234 246 247 248 250 254 255 257 258
@@ -575,6 +575,9 @@ tsan-build:
     CONFIGURE_ARGS: --enable-tsan --cc=clang --cxx=clang++
           --enable-trace-backends=ust --disable-slirp
     TARGETS: x86_64-softmmu ppc64-softmmu riscv64-softmmu x86_64-linux-user
+    # Remove when we switch to a distro with clang >= 18
+    # https://github.com/google/sanitizers/issues/1716
+    MAKE: setarch -R make
 
 # gcov is a GCC features
 gcov:
@@ -648,12 +651,15 @@ build-tci:
     - make check-tcg
 
 # Check our reduced build configurations
+# requires libfdt: aarch64, arm, loongarch64, microblaze, microblazeel,
+#   or1k, ppc64, riscv32, riscv64, rx
+# fails qtest without boards: i386, x86_64
 build-without-defaults:
   extends: .native_build_job_template
   needs:
-    job: amd64-centos8-container
+    job: amd64-centos9-container
   variables:
-    IMAGE: centos8
+    IMAGE: centos9
     CONFIGURE_ARGS:
       --without-default-devices
       --without-default-features
@@ -661,8 +667,11 @@ build-without-defaults:
       --disable-pie
       --disable-qom-cast-debug
       --disable-strip
-    TARGETS: avr-softmmu s390x-softmmu sh4-softmmu
-      sparc64-softmmu hexagon-linux-user i386-linux-user s390x-linux-user
+    TARGETS: alpha-softmmu avr-softmmu cris-softmmu hppa-softmmu m68k-softmmu
+      mips-softmmu mips64-softmmu mipsel-softmmu mips64el-softmmu
+      ppc-softmmu s390x-softmmu sh4-softmmu sh4eb-softmmu sparc-softmmu
+      sparc64-softmmu tricore-softmmu xtensa-softmmu xtensaeb-softmmu
+      hexagon-linux-user i386-linux-user s390x-linux-user
     MAKE_CHECK_ARGS: check
 
 build-libvhost-user:

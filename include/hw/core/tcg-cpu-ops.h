@@ -10,7 +10,11 @@
 #ifndef TCG_CPU_OPS_H
 #define TCG_CPU_OPS_H
 
-#include "hw/core/cpu.h"
+#include "exec/breakpoint.h"
+#include "exec/hwaddr.h"
+#include "exec/memattrs.h"
+#include "exec/mmu-access-type.h"
+#include "exec/vaddr.h"
 
 struct TCGCPUOps {
     /**
@@ -49,7 +53,6 @@ struct TCGCPUOps {
     /** @debug_excp_handler: Callback for handling debug exceptions */
     void (*debug_excp_handler)(CPUState *cpu);
 
-#ifdef NEED_CPU_H
 #ifdef CONFIG_USER_ONLY
     /**
      * @fake_user_interrupt: Callback for 'fake exception' handling.
@@ -112,8 +115,19 @@ struct TCGCPUOps {
     void (*do_interrupt)(CPUState *cpu);
     /** @cpu_exec_interrupt: Callback for processing interrupts in cpu_exec */
     bool (*cpu_exec_interrupt)(CPUState *cpu, int interrupt_request);
-    /** @cpu_exec_halt: Callback for handling halt in cpu_exec */
-    void (*cpu_exec_halt)(CPUState *cpu);
+    /**
+     * @cpu_exec_halt: Callback for handling halt in cpu_exec.
+     *
+     * The target CPU should do any special processing here that it needs
+     * to do when the CPU is in the halted state.
+     *
+     * Return true to indicate that the CPU should now leave halt, false
+     * if it should remain in the halted state.
+     *
+     * If this method is not provided, the default is to do nothing, and
+     * to leave halt if cpu_has_work() returns true.
+     */
+    bool (*cpu_exec_halt)(CPUState *cpu);
     /**
      * @tlb_fill: Handle a softmmu tlb miss
      *
@@ -174,8 +188,6 @@ struct TCGCPUOps {
      */
     bool (*need_replay_interrupt)(int interrupt_request);
 #endif /* !CONFIG_USER_ONLY */
-#endif /* NEED_CPU_H */
-
 };
 
 #if defined(CONFIG_USER_ONLY)

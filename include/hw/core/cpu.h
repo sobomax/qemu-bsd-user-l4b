@@ -22,10 +22,13 @@
 
 #include "hw/qdev-core.h"
 #include "disas/dis-asm.h"
+#include "exec/breakpoint.h"
 #include "exec/hwaddr.h"
 #include "exec/vaddr.h"
 #include "exec/memattrs.h"
+#include "exec/mmu-access-type.h"
 #include "exec/tlb-common.h"
+#include "qapi/qapi-types-machine.h"
 #include "qapi/qapi-types-run-state.h"
 #include "qemu/bitmap.h"
 #include "qemu/rcu_queue.h"
@@ -80,14 +83,13 @@ DECLARE_CLASS_CHECKERS(CPUClass, CPU,
     typedef struct ArchCPU CpuInstanceType; \
     OBJECT_DECLARE_TYPE(ArchCPU, CpuClassType, CPU_MODULE_OBJ_NAME);
 
-typedef enum MMUAccessType {
-    MMU_DATA_LOAD  = 0,
-    MMU_DATA_STORE = 1,
-    MMU_INST_FETCH = 2
-#define MMU_ACCESS_COUNT 3
-} MMUAccessType;
-
 typedef struct CPUWatchpoint CPUWatchpoint;
+
+/* see physmem.c */
+struct CPUAddressSpace;
+
+/* see accel/tcg/tb-jmp-cache.h */
+struct CPUJumpCache;
 
 /* see accel-cpu.h */
 struct AccelCPUClass;
@@ -343,30 +345,23 @@ typedef union IcountDecr {
     } u16;
 } IcountDecr;
 
-/*
- * Elements of CPUState most efficiently accessed from CPUArchState,
- * via small negative offsets.
+/**
+ * CPUNegativeOffsetState: Elements of CPUState most efficiently accessed
+ *                         from CPUArchState, via small negative offsets.
+ * @can_do_io: True if memory-mapped IO is allowed.
+ * @plugin_mem_cbs: active plugin memory callbacks
  */
 typedef struct CPUNegativeOffsetState {
     CPUTLB tlb;
+#ifdef CONFIG_PLUGIN
+    /*
+     * The callback pointer are accessed via TCG (see gen_empty_mem_helper).
+     */
+    GArray *plugin_mem_cbs;
+#endif
     IcountDecr icount_decr;
     bool can_do_io;
 } CPUNegativeOffsetState;
-
-typedef struct CPUBreakpoint {
-    vaddr pc;
-    int flags; /* BP_* */
-    QTAILQ_ENTRY(CPUBreakpoint) entry;
-} CPUBreakpoint;
-
-struct CPUWatchpoint {
-    vaddr vaddr;
-    vaddr len;
-    vaddr hitaddr;
-    MemTxAttrs hitattrs;
-    int flags; /* BP_* */
-    QTAILQ_ENTRY(CPUWatchpoint) entry;
-};
 
 struct KVMState;
 struct kvm_run;
@@ -420,7 +415,6 @@ struct qemu_work_item;
  * @crash_occurred: Indicates the OS reported a crash (panic) for this CPU
  * @singlestep_enabled: Flags for single-stepping.
  * @icount_extra: Instructions until next timer event.
- * @neg.can_do_io: True if memory-mapped IO is allowed.
  * @cpu_ases: Pointer to array of CPUAddressSpaces (which define the
  *            AddressSpaces this CPU has)
  * @num_ases: number of CPUAddressSpaces in @cpu_ases
@@ -436,7 +430,6 @@ struct qemu_work_item;
  * @kvm_fd: vCPU file descriptor for KVM.
  * @work_mutex: Lock to prevent multiple access to @work_list.
  * @work_list: List of pending asynchronous work.
- * @plugin_mem_cbs: active plugin memory callbacks
  * @plugin_state: per-CPU plugin state
  * @ignore_memory_transaction_failures: Cached copy of the MachineState
  *    flag of the same name: allows the board to suppress calling of the
@@ -492,12 +485,12 @@ struct CPUState {
     QemuMutex work_mutex;
     QSIMPLEQ_HEAD(, qemu_work_item) work_list;
 
-    CPUAddressSpace *cpu_ases;
+    struct CPUAddressSpace *cpu_ases;
     int num_ases;
     AddressSpace *as;
     MemoryRegion *memory;
 
-    CPUJumpCache *tb_jmp_cache;
+    struct CPUJumpCache *tb_jmp_cache;
 
     GArray *gdb_regs;
     int gdb_num_regs;
@@ -525,16 +518,12 @@ struct CPUState {
     uint32_t kvm_fetch_index;
     uint64_t dirty_pages;
     int kvm_vcpu_stats_fd;
+    bool vcpu_dirty;
 
     /* Use by accel-block: CPU is executing an ioctl() */
     QemuLockCnt in_ioctl_lock;
 
 #ifdef CONFIG_PLUGIN
-    /*
-     * The callback pointer stays in the main CPUState as it is
-     * accessed via TCG (see gen_empty_mem_helper).
-     */
-    GArray *plugin_mem_cbs;
     CPUPluginState *plugin_state;
 #endif
 
@@ -546,8 +535,6 @@ struct CPUState {
     int32_t exception_index;
 
     AccelCPUState *accel;
-    /* shared by kvm and hvf */
-    bool vcpu_dirty;
 
     /* Used to keep track of an outstanding cpu throttle thread for migration
      * autoconverge
@@ -1133,23 +1120,6 @@ void cpu_watchpoint_remove_all(CPUState *cpu, int mask);
 #endif
 
 /**
- * cpu_plugin_mem_cbs_enabled() - are plugin memory callbacks enabled?
- * @cs: CPUState pointer
- *
- * The memory callbacks are installed if a plugin has instrumented an
- * instruction for memory. This can be useful to know if you want to
- * force a slow path for a series of memory accesses.
- */
-static inline bool cpu_plugin_mem_cbs_enabled(const CPUState *cpu)
-{
-#ifdef CONFIG_PLUGIN
-    return !!cpu->plugin_mem_cbs;
-#else
-    return false;
-#endif
-}
-
-/**
  * cpu_get_address_space:
  * @cpu: CPU to get address space from
  * @asidx: index identifying which address space to get
@@ -1169,20 +1139,9 @@ bool cpu_exec_realizefn(CPUState *cpu, Error **errp);
 void cpu_exec_unrealizefn(CPUState *cpu);
 void cpu_exec_reset_hold(CPUState *cpu);
 
-/**
- * target_words_bigendian:
- * Returns true if the (default) endianness of the target is big endian,
- * false otherwise. Note that in target-specific code, you can use
- * TARGET_BIG_ENDIAN directly instead. On the other hand, common
- * code should normally never need to know about the endianness of the
- * target, so please do *not* use this function unless you know very well
- * what you are doing!
- */
-bool target_words_bigendian(void);
-
 const char *target_name(void);
 
-#ifdef NEED_CPU_H
+#ifdef COMPILING_PER_TARGET
 
 #ifndef CONFIG_USER_ONLY
 
@@ -1197,7 +1156,7 @@ extern const VMStateDescription vmstate_cpu_common;
 }
 #endif /* !CONFIG_USER_ONLY */
 
-#endif /* NEED_CPU_H */
+#endif /* COMPILING_PER_TARGET */
 
 #define UNASSIGNED_CPU_INDEX -1
 #define UNASSIGNED_CLUSTER_INDEX -1

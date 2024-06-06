@@ -22,6 +22,7 @@
 
 #include "target_arch_elf.h"
 #include "elf.h"
+#include "user/tswap-target.h"
 
 #include "bsd-proc.h"
 

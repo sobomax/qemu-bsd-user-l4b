@@ -32,11 +32,13 @@
 #include "exec/gdbstub.h"
 #include "gdbstub/syscalls.h"
 #ifdef CONFIG_USER_ONLY
+#include "accel/tcg/vcpu-state.h"
 #include "gdbstub/user.h"
 #else
 #include "hw/cpu/cluster.h"
 #include "hw/boards.h"
 #endif
+#include "hw/core/cpu.h"
 
 #include "sysemu/hw_accel.h"
 #include "sysemu/runstate.h"
@@ -1660,7 +1662,7 @@ static void handle_query_supported(GArray *params, void *user_ctx)
 
 #if defined(CONFIG_USER_ONLY)
 #if defined(CONFIG_LINUX)
-    if (gdbserver_state.c_cpu->opaque) {
+    if (get_task_state(gdbserver_state.c_cpu)) {
         g_string_append(gdbserver_state.str_buf, ";qXfer:auxv:read+");
     }
     g_string_append(gdbserver_state.str_buf, ";QCatchSyscalls+");

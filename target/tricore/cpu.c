@@ -47,7 +47,7 @@ static vaddr tricore_cpu_get_pc(CPUState *cs)
 static void tricore_cpu_synchronize_from_tb(CPUState *cs,
                                             const TranslationBlock *tb)
 {
-    tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+    tcg_debug_assert(!tcg_cflags_has(cs, CF_PCREL));
     cpu_env(cs)->PC = tb->pc;
 }
 
@@ -58,13 +58,13 @@ static void tricore_restore_state_to_opc(CPUState *cs,
     cpu_env(cs)->PC = data[0];
 }
 
-static void tricore_cpu_reset_hold(Object *obj)
+static void tricore_cpu_reset_hold(Object *obj, ResetType type)
 {
     CPUState *cs = CPU(obj);
     TriCoreCPUClass *tcc = TRICORE_CPU_GET_CLASS(obj);
 
     if (tcc->parent_phases.hold) {
-        tcc->parent_phases.hold(obj);
+        tcc->parent_phases.hold(obj, type);
     }
 
     cpu_state_reset(cpu_env(cs));

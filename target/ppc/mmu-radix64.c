@@ -20,6 +20,7 @@
 #include "qemu/osdep.h"
 #include "cpu.h"
 #include "exec/exec-all.h"
+#include "exec/page-protection.h"
 #include "qemu/error-report.h"
 #include "sysemu/kvm.h"
 #include "kvm_ppc.h"
@@ -184,7 +185,6 @@ static bool ppc_radix64_check_prot(PowerPCCPU *cpu, MMUAccessType access_type,
                                    int mmu_idx, bool partition_scoped)
 {
     CPUPPCState *env = &cpu->env;
-    int need_prot;
 
     /* Check Page Attributes (pte58:59) */
     if ((pte & R_PTE_ATT) == R_PTE_ATT_NI_IO && access_type == MMU_INST_FETCH) {
@@ -209,8 +209,8 @@ static bool ppc_radix64_check_prot(PowerPCCPU *cpu, MMUAccessType access_type,
     }
 
     /* Check if requested access type is allowed */
-    need_prot = prot_for_access_type(access_type);
-    if (need_prot & ~*prot) { /* Page Protected for that Access */
+    if (!check_prot_access_type(*prot, access_type)) {
+        /* Page Protected for that Access */
         *fault_cause |= access_type == MMU_INST_FETCH ? SRR1_NOEXEC_GUARD :
                                                         DSISR_PROTFAULT;
         return true;
@@ -677,9 +677,7 @@ static bool ppc_radix64_xlate_impl(PowerPCCPU *cpu, vaddr eaddr,
 
     /* Get Partition Table */
     if (cpu->vhyp) {
-        PPCVirtualHypervisorClass *vhc;
-        vhc = PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-        if (!vhc->get_pate(cpu->vhyp, cpu, lpid, &pate)) {
+        if (!cpu->vhyp_class->get_pate(cpu->vhyp, cpu, lpid, &pate)) {
             if (guest_visible) {
                 ppc_radix64_raise_hsi(cpu, access_type, eaddr, eaddr,
                                       DSISR_R_BADCONFIG);

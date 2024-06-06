@@ -20,7 +20,7 @@
 #include "qemu/accel.h"
 #include "qom/object.h"
 
-#ifdef NEED_CPU_H
+#ifdef COMPILING_PER_TARGET
 # ifdef CONFIG_KVM
 #  include <linux/kvm.h>
 #  define CONFIG_KVM_IS_POSSIBLE
@@ -210,7 +210,7 @@ bool kvm_arm_supports_user_irq(void);
 int kvm_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
 int kvm_on_sigbus(int code, void *addr);
 
-#ifdef NEED_CPU_H
+#ifdef COMPILING_PER_TARGET
 #include "cpu.h"
 
 void kvm_flush_coalesced_mmio_buffer(void);
@@ -224,7 +224,7 @@ void kvm_flush_coalesced_mmio_buffer(void);
  * calling down to kvm_arch_update_guest_debug after the generic
  * fields have been set.
  */
-#ifdef KVM_CAP_SET_GUEST_DEBUG
+#ifdef TARGET_KVM_HAVE_GUEST_DEBUG
 int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap);
 #else
 static inline int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap)
@@ -435,7 +435,7 @@ void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
 int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
                                        hwaddr *phys_addr);
 
-#endif /* NEED_CPU_H */
+#endif /* COMPILING_PER_TARGET */
 
 void kvm_cpu_synchronize_state(CPUState *cpu);
 
@@ -470,10 +470,11 @@ static inline void kvm_irqchip_commit_route_changes(KVMRouteChange *c)
     }
 }
 
+int kvm_irqchip_get_virq(KVMState *s);
 void kvm_irqchip_release_virq(KVMState *s, int virq);
 
-int kvm_irqchip_add_adapter_route(KVMState *s, AdapterInfo *adapter);
-int kvm_irqchip_add_hv_sint_route(KVMState *s, uint32_t vcpu, uint32_t sint);
+void kvm_add_routing_entry(KVMState *s,
+                           struct kvm_irq_routing_entry *entry);
 
 int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
                                        EventNotifier *rn, int virq);
@@ -525,23 +526,23 @@ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
 /* Notify resamplefd for EOI of specific interrupts. */
 void kvm_resample_fd_notify(int gsi);
 
-/**
- * kvm_cpu_check_are_resettable - return whether CPUs can be reset
- *
- * Returns: true: CPUs are resettable
- *          false: CPUs are not resettable
- */
-bool kvm_cpu_check_are_resettable(void);
-
-bool kvm_arch_cpu_check_are_resettable(void);
-
 bool kvm_dirty_ring_enabled(void);
 
 uint32_t kvm_dirty_ring_size(void);
+
+void kvm_mark_guest_state_protected(void);
 
 /**
  * kvm_hwpoisoned_mem - indicate if there is any hwpoisoned page
  * reported for the VM.
  */
 bool kvm_hwpoisoned_mem(void);
+
+int kvm_create_guest_memfd(uint64_t size, uint64_t flags, Error **errp);
+
+int kvm_set_memory_attributes_private(hwaddr start, uint64_t size);
+int kvm_set_memory_attributes_shared(hwaddr start, uint64_t size);
+
+int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private);
+
 #endif

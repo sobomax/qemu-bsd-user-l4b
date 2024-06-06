@@ -12,7 +12,6 @@
 #include "hw/boards.h"
 #include "hw/intc/intc.h"
 #include "hw/mem/memory-device.h"
-#include "hw/rdma/rdma.h"
 #include "qapi/error.h"
 #include "qapi/qapi-builtin-visit.h"
 #include "qapi/qapi-commands-machine.h"
@@ -65,7 +64,8 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
     return head;
 }
 
-MachineInfoList *qmp_query_machines(Error **errp)
+MachineInfoList *qmp_query_machines(bool has_compat_props, bool compat_props,
+                                    Error **errp)
 {
     GSList *el, *machines = object_class_get_list(TYPE_MACHINE, false);
     MachineInfoList *mach_list = NULL;
@@ -95,6 +95,26 @@ MachineInfoList *qmp_query_machines(Error **errp)
         }
         if (mc->default_ram_id) {
             info->default_ram_id = g_strdup(mc->default_ram_id);
+        }
+
+        if (compat_props && mc->compat_props) {
+            int i;
+            info->compat_props = NULL;
+            CompatPropertyList **tail = &(info->compat_props);
+            info->has_compat_props = true;
+
+            for (i = 0; i < mc->compat_props->len; i++) {
+                GlobalProperty *mt_prop = g_ptr_array_index(mc->compat_props,
+                                                            i);
+                CompatProperty *prop;
+
+                prop = g_malloc0(sizeof(*prop));
+                prop->qom_type = g_strdup(mt_prop->driver);
+                prop->property = g_strdup(mt_prop->property);
+                prop->value = g_strdup(mt_prop->value);
+
+                QAPI_LIST_APPEND(tail, prop);
+            }
         }
 
         QAPI_LIST_PREPEND(mach_list, info);
@@ -289,37 +309,6 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
         mem_info->plugged_memory != (uint64_t)-1;
 
     return mem_info;
-}
-
-static int qmp_x_query_rdma_foreach(Object *obj, void *opaque)
-{
-    RdmaProvider *rdma;
-    RdmaProviderClass *k;
-    GString *buf = opaque;
-
-    if (object_dynamic_cast(obj, INTERFACE_RDMA_PROVIDER)) {
-        rdma = RDMA_PROVIDER(obj);
-        k = RDMA_PROVIDER_GET_CLASS(obj);
-        if (k->format_statistics) {
-            k->format_statistics(rdma, buf);
-        } else {
-            g_string_append_printf(buf,
-                                   "RDMA statistics not available for %s.\n",
-                                   object_get_typename(obj));
-        }
-    }
-
-    return 0;
-}
-
-HumanReadableText *qmp_x_query_rdma(Error **errp)
-{
-    g_autoptr(GString) buf = g_string_new("");
-
-    object_child_foreach_recursive(object_get_root(),
-                                   qmp_x_query_rdma_foreach, buf);
-
-    return human_readable_text_from_str(buf);
 }
 
 HumanReadableText *qmp_x_query_ramblock(Error **errp)

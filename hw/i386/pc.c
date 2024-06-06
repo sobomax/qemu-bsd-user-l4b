@@ -78,6 +78,14 @@
     { "qemu64-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v, },\
     { "athlon-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v, },
 
+GlobalProperty pc_compat_9_0[] = {
+    { TYPE_X86_CPU, "x-l1-cache-per-thread", "false" },
+    { TYPE_X86_CPU, "guest-phys-bits", "0" },
+    { "sev-guest", "legacy-vm-type", "true" },
+    { TYPE_X86_CPU, "legacy-multi-node", "on" },
+};
+const size_t pc_compat_9_0_len = G_N_ELEMENTS(pc_compat_9_0);
+
 GlobalProperty pc_compat_8_2[] = {};
 const size_t pc_compat_8_2_len = G_N_ELEMENTS(pc_compat_8_2);
 
@@ -433,16 +441,19 @@ static void pc_boot_set(void *opaque, const char *boot_device, Error **errp)
 
 static void pc_cmos_init_floppy(MC146818RtcState *rtc_state, ISADevice *floppy)
 {
-    int val, nb, i;
+    int val, nb;
     FloppyDriveType fd_type[2] = { FLOPPY_DRIVE_TYPE_NONE,
                                    FLOPPY_DRIVE_TYPE_NONE };
 
+#ifdef CONFIG_FDC_ISA
     /* floppy type */
     if (floppy) {
-        for (i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             fd_type[i] = isa_fdc_get_drive_type(floppy, i);
         }
     }
+#endif
+
     val = (cmos_get_fd_drive_type(fd_type[0]) << 4) |
         cmos_get_fd_drive_type(fd_type[1]);
     mc146818rtc_set_cmos_data(rtc_state, 0x10, val);
@@ -1126,7 +1137,7 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl,
     int i;
     DriveInfo *fd[MAX_FD];
     qemu_irq *a20_line;
-    ISADevice *fdc, *i8042, *port92, *vmmouse;
+    ISADevice *i8042, *port92, *vmmouse;
 
     serial_hds_isa_init(isa_bus, 0, MAX_ISA_SERIAL_PORTS);
     parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
@@ -1136,11 +1147,13 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl,
         create_fdctrl |= !!fd[i];
     }
     if (create_fdctrl) {
-        fdc = isa_new(TYPE_ISA_FDC);
+#ifdef CONFIG_FDC_ISA
+        ISADevice *fdc = isa_new(TYPE_ISA_FDC);
         if (fdc) {
             isa_realize_and_unref(fdc, isa_bus, &error_fatal);
             isa_fdc_init_drives(fdc, fd);
         }
+#endif
     }
 
     if (!create_i8042) {
@@ -1238,7 +1251,6 @@ void pc_basic_device_init(struct PCMachineState *pcms,
             pci_create_simple(pcms->pcibus, -1, "xen-platform");
         }
         xen_bus_init();
-        xen_be_init();
     }
 #endif
 
@@ -1805,6 +1817,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
     pcmc->has_reserved_memory = true;
     pcmc->enforce_aligned_dimm = true;
     pcmc->enforce_amd_1tb_hole = true;
+    pcmc->isa_bios_alias = true;
     /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K reported
      * to be used at the moment, 32K should be enough for a while.  */
     pcmc->acpi_data_size = 0x20000 + 0x8000;
@@ -1815,9 +1828,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
     assert(!mc->get_hotplug_handler);
     mc->get_hotplug_handler = pc_get_hotplug_handler;
     mc->hotplug_allowed = pc_hotplug_allowed;
-    mc->cpu_index_to_instance_props = x86_cpu_index_to_props;
-    mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
-    mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
     mc->auto_enable_numa_with_memhp = true;
     mc->auto_enable_numa_with_memdev = true;
     mc->has_hotpluggable_cpus = true;
@@ -1833,6 +1843,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
     mc->nvdimm_supported = true;
     mc->smp_props.dies_supported = true;
+    mc->smp_props.modules_supported = true;
     mc->default_ram_id = "pc.ram";
     pcmc->default_smbios_ep_type = SMBIOS_ENTRY_POINT_TYPE_AUTO;
 

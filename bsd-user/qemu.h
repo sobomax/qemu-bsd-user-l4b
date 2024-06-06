@@ -25,16 +25,11 @@
 #include "exec/exec-all.h"
 #include "trace/trace-bsd_user.h"
 
-#undef DEBUG_REMAP
-#ifdef DEBUG_REMAP
-#include <stdio.h>
-#endif /* DEBUG_REMAP */
-
-#include "exec/user/abitypes.h"
+#include "user/abitypes.h"
 
 extern char **environ;
 
-#include "exec/user/thunk.h"
+#include "user/thunk.h"
 #include "target_arch.h"
 #include "syscall_defs.h"
 #include "target_syscall.h"
@@ -42,7 +37,9 @@ extern char **environ;
 #include "target_os_signal.h"
 #include "hostdep.h"
 #include "exec/gdbstub.h"
+#include "exec/page-protection.h"
 #include "qemu/clang-tsa.h"
+#include "accel/tcg/vcpu-state.h"
 
 #include "qemu-os.h"
 /*
@@ -95,7 +92,7 @@ struct current_syscall {
 /*
  * NOTE: we force a big alignment so that the stack stored after is aligned too
  */
-typedef struct TaskState {
+struct TaskState {
     pid_t ts_tid;     /* tid (or pid) of this task */
 
     struct image_info *info;
@@ -505,7 +502,7 @@ static inline void *lock_user(int type, abi_ulong guest_addr, long len,
     if (!access_ok(type, guest_addr, len)) {
         return NULL;
     }
-#ifdef DEBUG_REMAP
+#ifdef CONFIG_DEBUG_REMAP
     {
         void *addr;
         addr = g_malloc(len);
@@ -529,7 +526,7 @@ static inline void unlock_user(void *host_ptr, abi_ulong guest_addr,
                                long len)
 {
 
-#ifdef DEBUG_REMAP
+#ifdef CONFIG_DEBUG_REMAP
     if (!host_ptr) {
         return;
     }

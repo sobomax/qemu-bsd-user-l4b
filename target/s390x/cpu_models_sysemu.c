@@ -206,6 +206,14 @@ static void cpu_info_from_model(CpuModelInfo *info, const S390CPUModel *model,
     } else {
         info->props = QOBJECT(qdict);
     }
+
+    /* features flagged as deprecated */
+    bitmap_zero(bitmap, S390_FEAT_MAX);
+    s390_get_deprecated_features(bitmap);
+
+    bitmap_and(bitmap, bitmap, model->def->full_feat, S390_FEAT_MAX);
+    s390_feat_bitmap_to_ascii(bitmap, &info->deprecated_props, list_add_feat);
+    info->has_deprecated_props = !!info->deprecated_props;
 }
 
 CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
@@ -389,7 +397,6 @@ CpuModelBaselineInfo *qmp_query_cpu_model_baseline(CpuModelInfo *infoa,
 
 void apply_cpu_model(const S390CPUModel *model, Error **errp)
 {
-    Error *err = NULL;
     static S390CPUModel applied_model;
     static bool applied;
 
@@ -405,9 +412,7 @@ void apply_cpu_model(const S390CPUModel *model, Error **errp)
     }
 
     if (kvm_enabled()) {
-        kvm_s390_apply_cpu_model(model, &err);
-        if (err) {
-            error_propagate(errp, err);
+        if (!kvm_s390_apply_cpu_model(model, errp)) {
             return;
         }
     }

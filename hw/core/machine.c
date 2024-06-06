@@ -33,10 +33,17 @@
 #include "hw/virtio/virtio-iommu.h"
 #include "audio/audio.h"
 
+GlobalProperty hw_compat_9_0[] = {
+    {"arm-cpu", "backcompat-cntfrq", "true" },
+    {"vfio-pci", "skip-vsc-check", "false" },
+};
+const size_t hw_compat_9_0_len = G_N_ELEMENTS(hw_compat_9_0);
+
 GlobalProperty hw_compat_8_2[] = {
     { "migration", "zero-page-detection", "legacy"},
     { TYPE_VIRTIO_IOMMU_PCI, "granule", "4k" },
     { TYPE_VIRTIO_IOMMU_PCI, "aw-bits", "64" },
+    { "virtio-gpu-device", "x-scanout-vmstate-version", "1" },
 };
 const size_t hw_compat_8_2_len = G_N_ELEMENTS(hw_compat_8_2);
 
@@ -45,15 +52,15 @@ GlobalProperty hw_compat_8_1[] = {
     { "ramfb", "x-migrate", "off" },
     { "vfio-pci-nohotplug", "x-ramfb-migrate", "off" },
     { "igb", "x-pcie-flr-init", "off" },
+    { TYPE_VIRTIO_NET, "host_uso", "off"},
+    { TYPE_VIRTIO_NET, "guest_uso4", "off"},
+    { TYPE_VIRTIO_NET, "guest_uso6", "off"},
 };
 const size_t hw_compat_8_1_len = G_N_ELEMENTS(hw_compat_8_1);
 
 GlobalProperty hw_compat_8_0[] = {
     { "migration", "multifd-flush-after-each-section", "on"},
     { TYPE_PCI_DEVICE, "x-pcie-ari-nextfn-1", "on" },
-    { TYPE_VIRTIO_NET, "host_uso", "off"},
-    { TYPE_VIRTIO_NET, "guest_uso4", "off"},
-    { TYPE_VIRTIO_NET, "guest_uso6", "off"},
 };
 const size_t hw_compat_8_0_len = G_N_ELEMENTS(hw_compat_8_0);
 
@@ -187,7 +194,6 @@ GlobalProperty hw_compat_3_0[] = {};
 const size_t hw_compat_3_0_len = G_N_ELEMENTS(hw_compat_3_0);
 
 GlobalProperty hw_compat_2_12[] = {
-    { "migration", "decompress-error-check", "off" },
     { "hda-audio", "use-timer", "false" },
     { "cirrus-vga", "global-vmstate", "true" },
     { "VGA", "global-vmstate", "true" },
@@ -797,6 +803,11 @@ void machine_set_cpu_numa_node(MachineState *machine,
             return;
         }
 
+        if (props->has_module_id && !slot->props.has_module_id) {
+            error_setg(errp, "module-id is not supported");
+            return;
+        }
+
         if (props->has_cluster_id && !slot->props.has_cluster_id) {
             error_setg(errp, "cluster-id is not supported");
             return;
@@ -818,6 +829,11 @@ void machine_set_cpu_numa_node(MachineState *machine,
         }
 
         if (props->has_core_id && props->core_id != slot->props.core_id) {
+                continue;
+        }
+
+        if (props->has_module_id &&
+            props->module_id != slot->props.module_id) {
                 continue;
         }
 
@@ -878,6 +894,7 @@ static void machine_get_smp(Object *obj, Visitor *v, const char *name,
         .has_sockets = true, .sockets = ms->smp.sockets,
         .has_dies = true, .dies = ms->smp.dies,
         .has_clusters = true, .clusters = ms->smp.clusters,
+        .has_modules = true, .modules = ms->smp.modules,
         .has_cores = true, .cores = ms->smp.cores,
         .has_threads = true, .threads = ms->smp.threads,
         .has_maxcpus = true, .maxcpus = ms->smp.max_cpus,
@@ -1154,6 +1171,7 @@ static void machine_initfn(Object *obj)
     ms->smp.sockets = 1;
     ms->smp.dies = 1;
     ms->smp.clusters = 1;
+    ms->smp.modules = 1;
     ms->smp.cores = 1;
     ms->smp.threads = 1;
 
@@ -1198,6 +1216,11 @@ bool machine_mem_merge(MachineState *machine)
     return machine->mem_merge;
 }
 
+bool machine_require_guest_memfd(MachineState *machine)
+{
+    return machine->require_guest_memfd;
+}
+
 static char *cpu_slot_to_string(const CPUArchId *cpu)
 {
     GString *s = g_string_new(NULL);
@@ -1215,6 +1238,12 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
             g_string_append_printf(s, ", ");
         }
         g_string_append_printf(s, "cluster-id: %"PRId64, cpu->props.cluster_id);
+    }
+    if (cpu->props.has_module_id) {
+        if (s->len) {
+            g_string_append_printf(s, ", ");
+        }
+        g_string_append_printf(s, "module-id: %"PRId64, cpu->props.module_id);
     }
     if (cpu->props.has_core_id) {
         if (s->len) {

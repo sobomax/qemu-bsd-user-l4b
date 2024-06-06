@@ -14,6 +14,7 @@
 #include "qemu/osdep.h"
 #include "qapi/error.h"
 #include "exec/ram_addr.h"
+#include "exec/confidential-guest-support.h"
 #include "hw/s390x/s390-virtio-hcall.h"
 #include "hw/s390x/sclp.h"
 #include "hw/s390x/s390_flic.h"
@@ -48,22 +49,6 @@
 #include "hw/s390x/cpu-topology.h"
 
 static Error *pv_mig_blocker;
-
-S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
-{
-    static MachineState *ms;
-
-    if (!ms) {
-        ms = MACHINE(qdev_get_machine());
-        g_assert(ms->possible_cpus);
-    }
-
-    /* CPU address corresponds to the core_id and the index */
-    if (cpu_addr >= ms->possible_cpus->len) {
-        return NULL;
-    }
-    return S390_CPU(ms->possible_cpus->cpus[cpu_addr].cpu);
-}
 
 static S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id,
                               Error **errp)
@@ -236,23 +221,31 @@ static void s390_create_virtio_net(BusState *bus, const char *name)
     }
 }
 
-static void s390_create_sclpconsole(const char *type, Chardev *chardev)
+static void s390_create_sclpconsole(SCLPDevice *sclp,
+                                    const char *type, Chardev *chardev)
 {
+    SCLPEventFacility *ef = sclp->event_facility;
+    BusState *ev_fac_bus = sclp_get_event_facility_bus(ef);
     DeviceState *dev;
 
     dev = qdev_new(type);
+    object_property_add_child(OBJECT(ef), type, OBJECT(dev));
     qdev_prop_set_chr(dev, "chardev", chardev);
-    qdev_realize_and_unref(dev, sclp_get_event_facility_bus(), &error_fatal);
+    qdev_realize_and_unref(dev, ev_fac_bus, &error_fatal);
 }
 
 static void ccw_init(MachineState *machine)
 {
     MachineClass *mc = MACHINE_GET_CLASS(machine);
+    S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
     int ret;
     VirtualCssBus *css_bus;
     DeviceState *dev;
 
-    s390_sclp_init();
+    ms->sclp = SCLP(object_new(TYPE_SCLP));
+    object_property_add_child(OBJECT(machine), TYPE_SCLP, OBJECT(ms->sclp));
+    qdev_realize_and_unref(DEVICE(ms->sclp), NULL, &error_fatal);
+
     /* init memory + setup max page size. Required for the CPU model */
     s390_memory_init(machine->ram);
 
@@ -260,7 +253,9 @@ static void ccw_init(MachineState *machine)
     s390_init_cpus(machine);
 
     /* Need CPU model to be determined before we can set up PV */
-    s390_pv_init(machine->cgs, &error_fatal);
+    if (machine->cgs) {
+        confidential_guest_kvm_init(machine->cgs, &error_fatal);
+    }
 
     s390_flic_init();
 
@@ -288,21 +283,19 @@ static void ccw_init(MachineState *machine)
     s390_enable_css_support(s390_cpu_addr2state(0));
 
     ret = css_create_css_image(VIRTUAL_CSSID, true);
-
     assert(ret == 0);
-    if (css_migration_enabled()) {
-        css_register_vmstate();
-    }
+
+    css_register_vmstate();
 
     /* Create VirtIO network adapters */
     s390_create_virtio_net(BUS(css_bus), mc->default_nic);
 
     /* init consoles */
     if (serial_hd(0)) {
-        s390_create_sclpconsole("sclpconsole", serial_hd(0));
+        s390_create_sclpconsole(ms->sclp, "sclpconsole", serial_hd(0));
     }
     if (serial_hd(1)) {
-        s390_create_sclpconsole("sclplmconsole", serial_hd(1));
+        s390_create_sclpconsole(ms->sclp, "sclplmconsole", serial_hd(1));
     }
 
     /* init the TOD clock */
@@ -754,7 +747,6 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
 
     s390mc->ri_allowed = true;
     s390mc->cpu_model_allowed = true;
-    s390mc->css_migration_enabled = true;
     s390mc->hpage_1m_allowed = true;
     s390mc->max_threads = 1;
     mc->init = ccw_init;
@@ -824,11 +816,6 @@ static const TypeInfo ccw_machine_info = {
     },
 };
 
-bool css_migration_enabled(void)
-{
-    return get_machine_class()->css_migration_enabled;
-}
-
 #define DEFINE_CCW_MACHINE(suffix, verstr, latest)                            \
     static void ccw_machine_##suffix##_class_init(ObjectClass *oc,            \
                                                   void *data)                 \
@@ -859,14 +846,26 @@ bool css_migration_enabled(void)
     }                                                                         \
     type_init(ccw_machine_register_##suffix)
 
+static void ccw_machine_9_1_instance_options(MachineState *machine)
+{
+}
+
+static void ccw_machine_9_1_class_options(MachineClass *mc)
+{
+}
+DEFINE_CCW_MACHINE(9_1, "9.1", true);
+
 static void ccw_machine_9_0_instance_options(MachineState *machine)
 {
+    ccw_machine_9_1_instance_options(machine);
 }
 
 static void ccw_machine_9_0_class_options(MachineClass *mc)
 {
+    ccw_machine_9_1_class_options(mc);
+    compat_props_add(mc->compat_props, hw_compat_9_0, hw_compat_9_0_len);
 }
-DEFINE_CCW_MACHINE(9_0, "9.0", true);
+DEFINE_CCW_MACHINE(9_0, "9.0", false);
 
 static void ccw_machine_8_2_instance_options(MachineState *machine)
 {
@@ -1172,15 +1171,15 @@ static void ccw_machine_2_9_instance_options(MachineState *machine)
 
 static void ccw_machine_2_9_class_options(MachineClass *mc)
 {
-    S390CcwMachineClass *s390mc = S390_CCW_MACHINE_CLASS(mc);
     static GlobalProperty compat[] = {
         { TYPE_S390_STATTRIB, "migration-enabled", "off", },
+        { TYPE_S390_FLIC_COMMON, "migration-enabled", "off", },
     };
 
     ccw_machine_2_10_class_options(mc);
     compat_props_add(mc->compat_props, hw_compat_2_9, hw_compat_2_9_len);
     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-    s390mc->css_migration_enabled = false;
+    css_migration_enabled = false;
 }
 DEFINE_CCW_MACHINE(2_9, "2.9", false);
 

@@ -55,7 +55,7 @@ static int avr_cpu_mmu_index(CPUState *cs, bool ifetch)
 static void avr_cpu_synchronize_from_tb(CPUState *cs,
                                         const TranslationBlock *tb)
 {
-    tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+    tcg_debug_assert(!tcg_cflags_has(cs, CF_PCREL));
     cpu_env(cs)->pc_w = tb->pc / 2; /* internally PC points to words */
 }
 
@@ -66,7 +66,7 @@ static void avr_restore_state_to_opc(CPUState *cs,
     cpu_env(cs)->pc_w = data[0];
 }
 
-static void avr_cpu_reset_hold(Object *obj)
+static void avr_cpu_reset_hold(Object *obj, ResetType type)
 {
     CPUState *cs = CPU(obj);
     AVRCPU *cpu = AVR_CPU(cs);
@@ -74,7 +74,7 @@ static void avr_cpu_reset_hold(Object *obj)
     CPUAVRState *env = &cpu->env;
 
     if (mcc->parent_phases.hold) {
-        mcc->parent_phases.hold(obj);
+        mcc->parent_phases.hold(obj, type);
     }
 
     env->pc_w = 0;

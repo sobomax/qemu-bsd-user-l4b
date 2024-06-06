@@ -47,7 +47,7 @@ static void superh_cpu_synchronize_from_tb(CPUState *cs,
 {
     SuperHCPU *cpu = SUPERH_CPU(cs);
 
-    tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+    tcg_debug_assert(!tcg_cflags_has(cs, CF_PCREL));
     cpu->env.pc = tb->pc;
     cpu->env.flags = tb->flags & TB_FLAG_ENVFLAGS_MASK;
 }
@@ -74,7 +74,7 @@ static bool superh_io_recompile_replay_branch(CPUState *cs,
     CPUSH4State *env = cpu_env(cs);
 
     if ((env->flags & (TB_FLAG_DELAY_SLOT | TB_FLAG_DELAY_SLOT_COND))
-        && !(cs->tcg_cflags & CF_PCREL) && env->pc != tb->pc) {
+        && !tcg_cflags_has(cs, CF_PCREL) && env->pc != tb->pc) {
         env->pc -= 2;
         env->flags &= ~(TB_FLAG_DELAY_SLOT | TB_FLAG_DELAY_SLOT_COND);
         return true;
@@ -103,14 +103,14 @@ static int sh4_cpu_mmu_index(CPUState *cs, bool ifetch)
     }
 }
 
-static void superh_cpu_reset_hold(Object *obj)
+static void superh_cpu_reset_hold(Object *obj, ResetType type)
 {
     CPUState *cs = CPU(obj);
     SuperHCPUClass *scc = SUPERH_CPU_GET_CLASS(obj);
     CPUSH4State *env = cpu_env(cs);
 
     if (scc->parent_phases.hold) {
-        scc->parent_phases.hold(obj);
+        scc->parent_phases.hold(obj, type);
     }
 
     memset(env, 0, offsetof(CPUSH4State, end_reset_fields));

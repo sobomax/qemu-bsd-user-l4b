@@ -92,7 +92,7 @@ void G_NORETURN do_raise_exception(CPULoongArchState *env,
 {
     CPUState *cs = env_cpu(env);
 
-    qemu_log_mask(CPU_LOG_INT, "%s: expection: %d (%s)\n",
+    qemu_log_mask(CPU_LOG_INT, "%s: exception: %d (%s)\n",
                   __func__,
                   exception,
                   loongarch_exception_name(exception));
@@ -336,7 +336,7 @@ static bool loongarch_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 static void loongarch_cpu_synchronize_from_tb(CPUState *cs,
                                               const TranslationBlock *tb)
 {
-    tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+    tcg_debug_assert(!tcg_cflags_has(cs, CF_PCREL));
     set_pc(cpu_env(cs), tb->pc);
 }
 
@@ -495,17 +495,19 @@ static void loongarch_max_initfn(Object *obj)
     loongarch_la464_initfn(obj);
 }
 
-static void loongarch_cpu_reset_hold(Object *obj)
+static void loongarch_cpu_reset_hold(Object *obj, ResetType type)
 {
     CPUState *cs = CPU(obj);
     LoongArchCPUClass *lacc = LOONGARCH_CPU_GET_CLASS(obj);
     CPULoongArchState *env = cpu_env(cs);
 
     if (lacc->parent_phases.hold) {
-        lacc->parent_phases.hold(obj);
+        lacc->parent_phases.hold(obj, type);
     }
 
+#ifdef CONFIG_TCG
     env->fcsr0_mask = FCSR0_M1 | FCSR0_M2 | FCSR0_M3;
+#endif
     env->fcsr0 = 0x0;
 
     int n;
@@ -550,7 +552,9 @@ static void loongarch_cpu_reset_hold(Object *obj)
 
 #ifndef CONFIG_USER_ONLY
     env->pc = 0x1c000000;
+#ifdef CONFIG_TCG
     memset(env->tlb, 0, sizeof(env->tlb));
+#endif
     if (kvm_enabled()) {
         kvm_arch_reset_vcpu(env);
     }
@@ -641,16 +645,10 @@ static void loongarch_set_lasx(Object *obj, bool value, Error **errp)
 
 void loongarch_cpu_post_init(Object *obj)
 {
-    LoongArchCPU *cpu = LOONGARCH_CPU(obj);
-
-    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, LSX)) {
-        object_property_add_bool(obj, "lsx", loongarch_get_lsx,
-                                 loongarch_set_lsx);
-    }
-    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, LASX)) {
-        object_property_add_bool(obj, "lasx", loongarch_get_lasx,
-                                 loongarch_set_lasx);
-    }
+    object_property_add_bool(obj, "lsx", loongarch_get_lsx,
+                             loongarch_set_lsx);
+    object_property_add_bool(obj, "lasx", loongarch_get_lasx,
+                             loongarch_set_lasx);
 }
 
 static void loongarch_cpu_init(Object *obj)
@@ -686,8 +684,7 @@ void loongarch_cpu_dump_state(CPUState *cs, FILE *f, int flags)
     int i;
 
     qemu_fprintf(f, " PC=%016" PRIx64 " ", env->pc);
-    qemu_fprintf(f, " FCSR0 0x%08x  fp_status 0x%02x\n", env->fcsr0,
-                 get_float_exception_flags(&env->fp_status));
+    qemu_fprintf(f, " FCSR0 0x%08x\n", env->fcsr0);
 
     /* gpr */
     for (i = 0; i < 32; i++) {

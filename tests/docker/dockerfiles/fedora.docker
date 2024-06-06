@@ -41,7 +41,6 @@ exec "$@"\n' > /usr/bin/nosync && \
                flex \
                fuse3-devel \
                gcc \
-               gcc-c++ \
                gcovr \
                gettext \
                git \
@@ -130,19 +129,17 @@ exec "$@"\n' > /usr/bin/nosync && \
                vte291-devel \
                which \
                xen-devel \
-               xfsprogs-devel \
                xorriso \
                zlib-devel \
                zlib-static \
                zstd && \
     nosync dnf autoremove -y && \
     nosync dnf clean all -y && \
+    rm -f /usr/lib*/python3*/EXTERNALLY-MANAGED && \
     rpm -qa | sort > /packages.txt && \
     mkdir -p /usr/libexec/ccache-wrappers && \
-    ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/c++ && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/cc && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/clang && \
-    ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/g++ && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/gcc
 
 ENV CCACHE_WRAPPERSDIR "/usr/libexec/ccache-wrappers"

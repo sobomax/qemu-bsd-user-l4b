@@ -436,6 +436,9 @@ static int kvm_loongarch_get_regs_fp(CPUState *cs)
     env->fcsr0 = fpu.fcsr;
     for (i = 0; i < 32; i++) {
         env->fpr[i].vreg.UD[0] = fpu.fpr[i].val64[0];
+        env->fpr[i].vreg.UD[1] = fpu.fpr[i].val64[1];
+        env->fpr[i].vreg.UD[2] = fpu.fpr[i].val64[2];
+        env->fpr[i].vreg.UD[3] = fpu.fpr[i].val64[3];
     }
     for (i = 0; i < 8; i++) {
         env->cf[i] = fpu.fcc & 0xFF;
@@ -455,6 +458,9 @@ static int kvm_loongarch_put_regs_fp(CPUState *cs)
     fpu.fcc = 0;
     for (i = 0; i < 32; i++) {
         fpu.fpr[i].val64[0] = env->fpr[i].vreg.UD[0];
+        fpu.fpr[i].val64[1] = env->fpr[i].vreg.UD[1];
+        fpu.fpr[i].val64[2] = env->fpr[i].vreg.UD[2];
+        fpu.fpr[i].val64[3] = env->fpr[i].vreg.UD[3];
     }
 
     for (i = 0; i < 8; i++) {
@@ -587,6 +593,11 @@ int kvm_arch_get_registers(CPUState *cs)
         return ret;
     }
 
+    ret = kvm_loongarch_get_cpucfg(cs);
+    if (ret) {
+        return ret;
+    }
+
     ret = kvm_loongarch_get_csr(cs);
     if (ret) {
         return ret;
@@ -598,11 +609,6 @@ int kvm_arch_get_registers(CPUState *cs)
     }
 
     ret = kvm_loongarch_get_mpstate(cs);
-    if (ret) {
-        return ret;
-    }
-
-    ret = kvm_loongarch_get_cpucfg(cs);
     return ret;
 }
 
@@ -611,6 +617,11 @@ int kvm_arch_put_registers(CPUState *cs, int level)
     int ret;
 
     ret = kvm_loongarch_put_regs_core(cs);
+    if (ret) {
+        return ret;
+    }
+
+    ret = kvm_loongarch_put_cpucfg(cs);
     if (ret) {
         return ret;
     }
@@ -626,11 +637,6 @@ int kvm_arch_put_registers(CPUState *cs, int level)
     }
 
     ret = kvm_loongarch_put_mpstate(cs);
-    if (ret) {
-        return ret;
-    }
-
-    ret = kvm_loongarch_put_cpucfg(cs);
     return ret;
 }
 
@@ -729,11 +735,6 @@ int kvm_arch_process_async_events(CPUState *cs)
 }
 
 bool kvm_arch_stop_on_emulation_error(CPUState *cs)
-{
-    return true;
-}
-
-bool kvm_arch_cpu_check_are_resettable(void)
 {
     return true;
 }

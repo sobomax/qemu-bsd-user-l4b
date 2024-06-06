@@ -257,7 +257,7 @@ static vaddr hexagon_cpu_get_pc(CPUState *cs)
 static void hexagon_cpu_synchronize_from_tb(CPUState *cs,
                                             const TranslationBlock *tb)
 {
-    tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+    tcg_debug_assert(!tcg_cflags_has(cs, CF_PCREL));
     cpu_env(cs)->gpr[HEX_REG_PC] = tb->pc;
 }
 
@@ -273,14 +273,14 @@ static void hexagon_restore_state_to_opc(CPUState *cs,
     cpu_env(cs)->gpr[HEX_REG_PC] = data[0];
 }
 
-static void hexagon_cpu_reset_hold(Object *obj)
+static void hexagon_cpu_reset_hold(Object *obj, ResetType type)
 {
     CPUState *cs = CPU(obj);
     HexagonCPUClass *mcc = HEXAGON_CPU_GET_CLASS(obj);
     CPUHexagonState *env = cpu_env(cs);
 
     if (mcc->parent_phases.hold) {
-        mcc->parent_phases.hold(obj);
+        mcc->parent_phases.hold(obj, type);
     }
 
     set_default_nan_mode(1, &env->fp_status);

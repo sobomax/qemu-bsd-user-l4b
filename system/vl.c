@@ -742,6 +742,9 @@ static QemuOptsList qemu_smp_opts = {
             .name = "clusters",
             .type = QEMU_OPT_NUMBER,
         }, {
+            .name = "modules",
+            .type = QEMU_OPT_NUMBER,
+        }, {
             .name = "cores",
             .type = QEMU_OPT_NUMBER,
         }, {
@@ -768,6 +771,10 @@ static QemuOptsList qemu_run_with_opts = {
 #endif
         {
             .name = "chroot",
+            .type = QEMU_OPT_STRING,
+        },
+        {
+            .name = "user",
             .type = QEMU_OPT_STRING,
         },
         { /* end of list */ }
@@ -2720,7 +2727,8 @@ void qmp_x_exit_preconfig(Error **errp)
     if (incoming) {
         Error *local_err = NULL;
         if (strcmp(incoming, "defer") != 0) {
-            qmp_migrate_incoming(incoming, false, NULL, &local_err);
+            qmp_migrate_incoming(incoming, false, NULL, true, true,
+                                 &local_err);
             if (local_err) {
                 error_reportf_err(local_err, "-incoming %s: ", incoming);
                 exit(1);
@@ -3583,6 +3591,7 @@ void qemu_init(int argc, char **argv)
                 break;
 #if defined(CONFIG_POSIX)
             case QEMU_OPTION_runas:
+                warn_report("-runas is deprecated, use '-run-with user=...' instead");
                 if (!os_set_runas(optarg)) {
                     error_report("User \"%s\" doesn't exist"
                                  " (and is not <uid>:<gid>)",
@@ -3609,6 +3618,16 @@ void qemu_init(int argc, char **argv)
                 if (str) {
                     os_set_chroot(str);
                 }
+                str = qemu_opt_get(opts, "user");
+                if (str) {
+                    if (!os_set_runas(str)) {
+                        error_report("User \"%s\" doesn't exist"
+                                     " (and is not <uid>:<gid>)",
+                                     optarg);
+                        exit(1);
+                    }
+                }
+
                 break;
             }
 #endif /* CONFIG_POSIX */
