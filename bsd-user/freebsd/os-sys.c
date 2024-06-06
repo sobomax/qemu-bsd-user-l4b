@@ -21,8 +21,10 @@
 #include "qemu/osdep.h"
 #include "qemu.h"
 #include "qemu-bsd.h"
-#include "target_arch_sysarch.h"
 #include "signal-common.h"
+#ifdef	TARGET_ARM
+#include "target/arm/cpu-features.h"
+#endif
 #include <sys/param.h>
 #include <sys/mount.h>
 #include <sys/sysctl.h>

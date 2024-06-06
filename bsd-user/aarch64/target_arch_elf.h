@@ -20,6 +20,8 @@
 #ifndef TARGET_ARCH_ELF_H
 #define TARGET_ARCH_ELF_H
 
+#include "target/arm/cpu-features.h"
+
 #define ELF_START_MMAP 0x80000000
 #define ELF_ET_DYN_LOAD_ADDR    0x100000
 
