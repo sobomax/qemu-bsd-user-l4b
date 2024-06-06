@@ -28,6 +28,8 @@ bsd_user_ss.add(elf, procstat, kvm)
 
 # Pull in the OS-specific build glue, if any
 subdir(targetos)
+subdir(host_os)
+
 specific_ss.add_all(when: 'CONFIG_BSD_USER', if_true: bsd_user_ss)
 
 bsd_syscall_nr = generator(sh,

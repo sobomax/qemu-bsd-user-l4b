@@ -478,10 +478,11 @@ void do_m68k_semihosting(CPUM68KState *env, int nr);
  * The 68000 family is defined in six main CPU classes, the 680[012346]0.
  * Generally each successive CPU adds enhanced data/stack/instructions.
  * However, some features are only common to one, or a few classes.
- * The features covers those subsets of instructons.
+ * The features cover those subsets of instructions.
  *
- * CPU32/32+ are basically 680010 compatible with some 68020 class instructons,
- * and some additional CPU32 instructions. Mostly Supervisor state differences.
+ * CPU32/32+ are basically 680010 compatible with some 68020 class
+ * instructions, and some additional CPU32 instructions. Mostly Supervisor
+ * state differences.
  *
  * The ColdFire core ISA is a RISC-style reduction of the 68000 series cpu.
  * There are 4 ColdFire core ISA revisions: A, A+, B and C.
@@ -549,14 +550,14 @@ enum m68k_features {
     M68K_FEATURE_TRAPCC,
     /* MOVE from SR privileged (from 68010) */
     M68K_FEATURE_MOVEFROMSR_PRIV,
+    /* Exception frame with format+vector (from 68010) */
+    M68K_FEATURE_EXCEPTION_FORMAT_VEC,
 };
 
 static inline bool m68k_feature(CPUM68KState *env, int feature)
 {
     return (env->features & BIT_ULL(feature)) != 0;
 }
-
-void m68k_cpu_list(void);
 
 void register_m68k_insns (CPUM68KState *env);
 
@@ -576,15 +577,9 @@ enum {
 
 #define CPU_RESOLVING_TYPE TYPE_M68K_CPU
 
-#define cpu_list m68k_cpu_list
-
 /* MMU modes definitions */
 #define MMU_KERNEL_IDX 0
 #define MMU_USER_IDX 1
-static inline int cpu_mmu_index (CPUM68KState *env, bool ifetch)
-{
-    return (env->sr & SR_S) == 0 ? 1 : 0;
-}
 
 bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
                        MMUAccessType access_type, int mmu_idx,

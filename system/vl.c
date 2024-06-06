@@ -96,7 +96,7 @@
 #endif
 #include "sysemu/qtest.h"
 #ifdef CONFIG_TCG
-#include "accel/tcg/perf.h"
+#include "tcg/perf.h"
 #endif
 
 #include "disas/disas.h"
@@ -181,7 +181,6 @@ static const char *log_file;
 static bool list_data_dirs;
 static const char *qtest_chrdev;
 static const char *qtest_log;
-static bool opt_one_insn_per_tb;
 
 static int has_defaults = 1;
 static int default_audio = 1;
@@ -892,7 +891,7 @@ static void help(int exitcode)
     printf("\nDuring emulation, the following keys are useful:\n"
            "ctrl-alt-f      toggle full screen\n"
            "ctrl-alt-n      switch to virtual console 'n'\n"
-           "ctrl-alt        toggle mouse and keyboard grab\n"
+           "ctrl-alt-g      toggle mouse and keyboard grab\n"
            "\n"
            "When using -nographic, press 'ctrl-a h' to get some help.\n"
            "\n"
@@ -1440,18 +1439,22 @@ static void qemu_create_default_devices(void)
 static int serial_parse(const char *devname)
 {
     int index = num_serial_hds;
-    char label[32];
 
-    if (strcmp(devname, "none") == 0)
-        return 0;
-    snprintf(label, sizeof(label), "serial%d", index);
     serial_hds = g_renew(Chardev *, serial_hds, index + 1);
 
-    serial_hds[index] = qemu_chr_new_mux_mon(label, devname, NULL);
-    if (!serial_hds[index]) {
-        error_report("could not connect serial device"
-                     " to character backend '%s'", devname);
-        return -1;
+    if (strcmp(devname, "none") == 0) {
+        /* Don't allocate a serial device for this index */
+        serial_hds[index] = NULL;
+    } else {
+        char label[32];
+        snprintf(label, sizeof(label), "serial%d", index);
+
+        serial_hds[index] = qemu_chr_new_mux_mon(label, devname, NULL);
+        if (!serial_hds[index]) {
+            error_report("could not connect serial device"
+                         " to character backend '%s'", devname);
+            return -1;
+        }
     }
     num_serial_hds++;
     return 0;
@@ -1911,7 +1914,6 @@ static bool object_create_early(const char *type)
      * Allocation of large amounts of memory may delay
      * chardev initialization for too long, and trigger timeouts
      * on software that waits for a monitor socket to be created
-     * (e.g. libvirt).
      */
     if (g_str_has_prefix(type, "memory-backend-")) {
         return false;
@@ -1930,7 +1932,7 @@ static void qemu_apply_machine_options(QDict *qdict)
     }
 
     if (current_machine->smp.cpus > 1) {
-        replay_add_blocker("smp");
+        replay_add_blocker("multiple CPUs");
     }
 }
 
@@ -2009,6 +2011,14 @@ static void qemu_create_late_backends(void)
     net_init_clients();
 
     object_option_foreach_add(object_create_late);
+
+    /*
+     * Wait for any outstanding memory prealloc from created memory
+     * backends to complete.
+     */
+    if (!qemu_finish_async_prealloc_mem(&error_fatal)) {
+        exit(1);
+    }
 
     if (tpm_init() < 0) {
         exit(1);
@@ -2108,7 +2118,6 @@ static void qemu_create_machine(QDict *qdict)
     }
 
     cpu_exec_init_all();
-    page_size_init();
 
     if (machine_class->hw_version) {
         qemu_set_hw_version(machine_class->hw_version);
@@ -2270,8 +2279,7 @@ static void user_register_global_props(void)
 
 static int do_configure_icount(void *opaque, QemuOpts *opts, Error **errp)
 {
-    icount_configure(opts, errp);
-    return 0;
+    return !icount_configure(opts, errp);
 }
 
 static int accelerator_set_property(void *opaque,
@@ -2308,19 +2316,7 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
     qemu_opt_foreach(opts, accelerator_set_property,
                      accel,
                      &error_fatal);
-    /*
-     * If legacy -singlestep option is set, honour it for TCG and
-     * silently ignore for any other accelerator (which is how this
-     * option has always behaved).
-     */
-    if (opt_one_insn_per_tb) {
-        /*
-         * This will always succeed for TCG, and we want to ignore
-         * the error from trying to set a nonexistent property
-         * on any other accelerator.
-         */
-        object_property_set_bool(OBJECT(accel), "one-insn-per-tb", true, NULL);
-    }
+
     ret = accel_init_machine(accel, current_machine);
     if (ret < 0) {
         if (!qtest_with_kvm || ret != -ENOENT) {
@@ -2426,6 +2422,10 @@ static void qemu_validate_options(const QDict *machine_opts)
           }
     }
 
+    if (loadvm && incoming) {
+        error_report("'incoming' and 'loadvm' options are mutually exclusive");
+        exit(EXIT_FAILURE);
+    }
     if (loadvm && preconfig_requested) {
         error_report("'preconfig' and 'loadvm' options are "
                      "mutually exclusive");
@@ -2706,7 +2706,9 @@ void qmp_x_exit_preconfig(Error **errp)
     qemu_machine_creation_done();
 
     if (loadvm) {
+        RunState state = autostart ? RUN_STATE_RUNNING : runstate_get();
         load_snapshot(loadvm, NULL, false, NULL, &error_fatal);
+        load_snapshot_resume(state);
     }
     if (replay_mode != REPLAY_MODE_NONE) {
         replay_vmstate_init();
@@ -2773,6 +2775,8 @@ void qemu_init(int argc, char **argv)
 
     error_init(argv[0]);
     qemu_init_exec_dir(argv[0]);
+
+    os_setup_limits();
 
     qemu_init_arch_modules();
 
@@ -2922,7 +2926,7 @@ void qemu_init(int argc, char **argv)
                           optarg, FD_OPTS);
                 break;
             case QEMU_OPTION_no_fd_bootchk:
-                fd_bootchk = 0;
+                qdict_put_str(machine_opts_dict, "fd-bootchk", "off");
                 break;
             case QEMU_OPTION_netdev:
                 default_net = 0;
@@ -3050,9 +3054,6 @@ void qemu_init(int argc, char **argv)
                 break;
             case QEMU_OPTION_bios:
                 qdict_put_str(machine_opts_dict, "firmware", optarg);
-                break;
-            case QEMU_OPTION_singlestep:
-                opt_one_insn_per_tb = true;
                 break;
             case QEMU_OPTION_S:
                 autostart = 0;
@@ -3263,7 +3264,7 @@ void qemu_init(int argc, char **argv)
                 pid_file = optarg;
                 break;
             case QEMU_OPTION_win2k_hack:
-                win2k_install_hack = 1;
+                object_register_sugar_prop("ide-device", "win2k-install-hack", "true", true);
                 break;
             case QEMU_OPTION_acpitable:
                 opts = qemu_opts_parse_noisily(qemu_find_opts("acpi"),
@@ -3363,14 +3364,6 @@ void qemu_init(int argc, char **argv)
                 display_remote++;
                 break;
 #endif
-            case QEMU_OPTION_no_acpi:
-                warn_report("-no-acpi is deprecated, use '-machine acpi=off' instead");
-                qdict_put_str(machine_opts_dict, "acpi", "off");
-                break;
-            case QEMU_OPTION_no_hpet:
-                warn_report("-no-hpet is deprecated, use '-machine hpet=off' instead");
-                qdict_put_str(machine_opts_dict, "hpet", "off");
-                break;
             case QEMU_OPTION_no_reboot:
                 olist = qemu_find_opts("action");
                 qemu_opts_parse_noisily(olist, "reboot=shutdown", false);
@@ -3594,20 +3587,9 @@ void qemu_init(int argc, char **argv)
                     exit(1);
                 }
                 break;
-            case QEMU_OPTION_chroot:
-                warn_report("option is deprecated,"
-                            " use '-run-with chroot=...' instead");
-                os_set_chroot(optarg);
-                break;
             case QEMU_OPTION_daemonize:
                 os_set_daemonize(true);
                 break;
-#if defined(CONFIG_LINUX)
-            /* deprecated */
-            case QEMU_OPTION_asyncteardown:
-                init_async_teardown();
-                break;
-#endif
             case QEMU_OPTION_run_with: {
                 const char *str;
                 opts = qemu_opts_parse_noisily(qemu_find_opts("run-with"),
@@ -3725,6 +3707,7 @@ void qemu_init(int argc, char **argv)
      * over memory-backend-file objects).
      */
     qemu_create_late_backends();
+    phase_advance(PHASE_LATE_BACKENDS_CREATED);
 
     /*
      * Note: creates a QOM object, must run only after global and
@@ -3733,7 +3716,7 @@ void qemu_init(int argc, char **argv)
     migration_object_init();
 
     /* parse features once if machine provides default cpu_type */
-    current_machine->cpu_type = machine_class->default_cpu_type;
+    current_machine->cpu_type = machine_class_default_cpu_type(machine_class);
     if (cpu_option) {
         current_machine->cpu_type = parse_cpu_option(cpu_option);
     }

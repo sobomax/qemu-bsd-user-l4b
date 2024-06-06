@@ -312,112 +312,112 @@
 #
 # Examples:
 #
-# 1. Before the first migration
+#     1. Before the first migration
 #
-# -> { "execute": "query-migrate" }
-# <- { "return": {} }
+#     -> { "execute": "query-migrate" }
+#     <- { "return": {} }
 #
-# 2. Migration is done and has succeeded
+#     2. Migration is done and has succeeded
 #
-# -> { "execute": "query-migrate" }
-# <- { "return": {
-#         "status": "completed",
-#         "total-time":12345,
-#         "setup-time":12345,
-#         "downtime":12345,
-#         "ram":{
-#           "transferred":123,
-#           "remaining":123,
-#           "total":246,
-#           "duplicate":123,
-#           "normal":123,
-#           "normal-bytes":123456,
-#           "dirty-sync-count":15
-#         }
-#      }
-#    }
-#
-# 3. Migration is done and has failed
-#
-# -> { "execute": "query-migrate" }
-# <- { "return": { "status": "failed" } }
-#
-# 4. Migration is being performed and is not a block migration:
-#
-# -> { "execute": "query-migrate" }
-# <- {
-#       "return":{
-#          "status":"active",
-#          "total-time":12345,
-#          "setup-time":12345,
-#          "expected-downtime":12345,
-#          "ram":{
-#             "transferred":123,
-#             "remaining":123,
-#             "total":246,
-#             "duplicate":123,
-#             "normal":123,
-#             "normal-bytes":123456,
-#             "dirty-sync-count":15
+#     -> { "execute": "query-migrate" }
+#     <- { "return": {
+#             "status": "completed",
+#             "total-time":12345,
+#             "setup-time":12345,
+#             "downtime":12345,
+#             "ram":{
+#               "transferred":123,
+#               "remaining":123,
+#               "total":246,
+#               "duplicate":123,
+#               "normal":123,
+#               "normal-bytes":123456,
+#               "dirty-sync-count":15
+#             }
 #          }
-#       }
-#    }
+#        }
 #
-# 5. Migration is being performed and is a block migration:
+#     3. Migration is done and has failed
 #
-# -> { "execute": "query-migrate" }
-# <- {
-#       "return":{
-#          "status":"active",
-#          "total-time":12345,
-#          "setup-time":12345,
-#          "expected-downtime":12345,
-#          "ram":{
-#             "total":1057024,
-#             "remaining":1053304,
-#             "transferred":3720,
-#             "duplicate":123,
-#             "normal":123,
-#             "normal-bytes":123456,
-#             "dirty-sync-count":15
-#          },
-#          "disk":{
-#             "total":20971520,
-#             "remaining":20880384,
-#             "transferred":91136
-#          }
-#       }
-#    }
+#     -> { "execute": "query-migrate" }
+#     <- { "return": { "status": "failed" } }
 #
-# 6. Migration is being performed and XBZRLE is active:
+#     4. Migration is being performed and is not a block migration:
 #
-# -> { "execute": "query-migrate" }
-# <- {
-#       "return":{
-#          "status":"active",
-#          "total-time":12345,
-#          "setup-time":12345,
-#          "expected-downtime":12345,
-#          "ram":{
-#             "total":1057024,
-#             "remaining":1053304,
-#             "transferred":3720,
-#             "duplicate":10,
-#             "normal":3333,
-#             "normal-bytes":3412992,
-#             "dirty-sync-count":15
-#          },
-#          "xbzrle-cache":{
-#             "cache-size":67108864,
-#             "bytes":20971520,
-#             "pages":2444343,
-#             "cache-miss":2244,
-#             "cache-miss-rate":0.123,
-#             "encoding-rate":80.1,
-#             "overflow":34434
-#          }
-#       }
-#    }
+#     -> { "execute": "query-migrate" }
+#     <- {
+#           "return":{
+#              "status":"active",
+#              "total-time":12345,
+#              "setup-time":12345,
+#              "expected-downtime":12345,
+#              "ram":{
+#                 "transferred":123,
+#                 "remaining":123,
+#                 "total":246,
+#                 "duplicate":123,
+#                 "normal":123,
+#                 "normal-bytes":123456,
+#                 "dirty-sync-count":15
+#              }
+#           }
+#        }
+#
+#     5. Migration is being performed and is a block migration:
+#
+#     -> { "execute": "query-migrate" }
+#     <- {
+#           "return":{
+#              "status":"active",
+#              "total-time":12345,
+#              "setup-time":12345,
+#              "expected-downtime":12345,
+#              "ram":{
+#                 "total":1057024,
+#                 "remaining":1053304,
+#                 "transferred":3720,
+#                 "duplicate":123,
+#                 "normal":123,
+#                 "normal-bytes":123456,
+#                 "dirty-sync-count":15
+#              },
+#              "disk":{
+#                 "total":20971520,
+#                 "remaining":20880384,
+#                 "transferred":91136
+#              }
+#           }
+#        }
+#
+#     6. Migration is being performed and XBZRLE is active:
+#
+#     -> { "execute": "query-migrate" }
+#     <- {
+#           "return":{
+#              "status":"active",
+#              "total-time":12345,
+#              "setup-time":12345,
+#              "expected-downtime":12345,
+#              "ram":{
+#                 "total":1057024,
+#                 "remaining":1053304,
+#                 "transferred":3720,
+#                 "duplicate":10,
+#                 "normal":3333,
+#                 "normal-bytes":3412992,
+#                 "dirty-sync-count":15
+#              },
+#              "xbzrle-cache":{
+#                 "cache-size":67108864,
+#                 "bytes":20971520,
+#                 "pages":2444343,
+#                 "cache-miss":2244,
+#                 "cache-miss-rate":0.123,
+#                 "encoding-rate":80.1,
+#                 "overflow":34434
+#              }
+#           }
+#        }
 ##
 { 'command': 'query-migrate', 'returns': 'MigrationInfo' }
 
@@ -531,10 +531,14 @@
 #     and can result in more stable read performance.  Requires KVM
 #     with accelerator property "dirty-ring-size" set.  (Since 8.1)
 #
+# @mapped-ram: Migrate using fixed offsets in the migration file for
+#     each RAM page.  Requires a migration URI that supports seeking,
+#     such as a file.  (since 9.0)
+#
 # Features:
 #
 # @deprecated: Member @block is deprecated.  Use blockdev-mirror with
-#     NBD instead.  Member @compression is deprecated because it is
+#     NBD instead.  Member @compress is deprecated because it is
 #     unreliable and untested.  It is recommended to use multifd
 #     migration, which offers an alternative compression
 #     implementation that is reliable and tested.
@@ -555,7 +559,7 @@
            { 'name': 'x-ignore-shared', 'features': [ 'unstable' ] },
            'validate-uuid', 'background-snapshot',
            'zero-copy-send', 'postcopy-preempt', 'switchover-ack',
-           'dirty-limit'] }
+           'dirty-limit', 'mapped-ram'] }
 
 ##
 # @MigrationCapabilityStatus:
@@ -582,9 +586,9 @@
 #
 # Example:
 #
-# -> { "execute": "migrate-set-capabilities" , "arguments":
-#      { "capabilities": [ { "capability": "xbzrle", "state": true } ] } }
-# <- { "return": {} }
+#     -> { "execute": "migrate-set-capabilities" , "arguments":
+#          { "capabilities": [ { "capability": "xbzrle", "state": true } ] } }
+#     <- { "return": {} }
 ##
 { 'command': 'migrate-set-capabilities',
   'data': { 'capabilities': ['MigrationCapabilityStatus'] } }
@@ -600,17 +604,17 @@
 #
 # Example:
 #
-# -> { "execute": "query-migrate-capabilities" }
-# <- { "return": [
-#       {"state": false, "capability": "xbzrle"},
-#       {"state": false, "capability": "rdma-pin-all"},
-#       {"state": false, "capability": "auto-converge"},
-#       {"state": false, "capability": "zero-blocks"},
-#       {"state": false, "capability": "compress"},
-#       {"state": true, "capability": "events"},
-#       {"state": false, "capability": "postcopy-ram"},
-#       {"state": false, "capability": "x-colo"}
-#    ]}
+#     -> { "execute": "query-migrate-capabilities" }
+#     <- { "return": [
+#           {"state": false, "capability": "xbzrle"},
+#           {"state": false, "capability": "rdma-pin-all"},
+#           {"state": false, "capability": "auto-converge"},
+#           {"state": false, "capability": "zero-blocks"},
+#           {"state": false, "capability": "compress"},
+#           {"state": true, "capability": "events"},
+#           {"state": false, "capability": "postcopy-ram"},
+#           {"state": false, "capability": "x-colo"}
+#        ]}
 ##
 { 'command': 'query-migrate-capabilities', 'returns':   ['MigrationCapabilityStatus']}
 
@@ -636,22 +640,52 @@
 #
 # @normal: the original form of migration. (since 8.2)
 #
-# @cpr-reboot: The migrate command saves state to a file, allowing one to
-#              quit qemu, reboot to an updated kernel, and restart an updated
-#              version of qemu.  The caller must specify a migration URI
-#              that writes to and reads from a file.  Unlike normal mode,
-#              the use of certain local storage options does not block the
-#              migration, but the caller must not modify guest block devices
-#              between the quit and restart.  To avoid saving guest RAM to the
-#              file, the memory backend must be shared, and the @x-ignore-shared
-#              migration capability must be set.  Guest RAM must be non-volatile
-#              across reboot, such as by backing it with a dax device, but this
-#              is not enforced.  The restarted qemu arguments must match those
-#              used to initially start qemu, plus the -incoming option.
-#              (since 8.2)
+# @cpr-reboot: The migrate command stops the VM and saves state to
+#     the URI.  After quitting QEMU, the user resumes by running
+#     QEMU -incoming.
+#
+#     This mode allows the user to quit QEMU, optionally update and
+#     reboot the OS, and restart QEMU.  If the user reboots, the URI
+#     must persist across the reboot, such as by using a file.
+#
+#     Unlike normal mode, the use of certain local storage options
+#     does not block the migration, but the user must not modify the
+#     contents of guest block devices between the quit and restart.
+#
+#     This mode supports VFIO devices provided the user first puts
+#     the guest in the suspended runstate, such as by issuing
+#     guest-suspend-ram to the QEMU guest agent.
+#
+#     Best performance is achieved when the memory backend is shared
+#     and the @x-ignore-shared migration capability is set, but this
+#     is not required.  Further, if the user reboots before restarting
+#     such a configuration, the shared memory must persist across the
+#     reboot, such as by backing it with a dax device.
+#
+#     @cpr-reboot may not be used with postcopy, background-snapshot,
+#     or COLO.
+#
+#     (since 8.2)
 ##
 { 'enum': 'MigMode',
   'data': [ 'normal', 'cpr-reboot' ] }
+
+##
+# @ZeroPageDetection:
+#
+# @none: Do not perform zero page checking.
+#
+# @legacy: Perform zero page checking in main migration thread.
+#
+# @multifd: Perform zero page checking in multifd sender thread if
+#     multifd migration is enabled, else in the main migration
+#     thread as for @legacy.
+#
+# Since: 9.0
+#
+##
+{ 'enum': 'ZeroPageDetection',
+  'data': [ 'none', 'legacy', 'multifd' ] }
 
 ##
 # @BitmapMigrationBitmapAliasTransform:
@@ -874,6 +908,10 @@
 # @mode: Migration mode. See description in @MigMode. Default is 'normal'.
 #        (Since 8.2)
 #
+# @zero-page-detection: Whether and how to detect zero pages.
+#     See description in @ZeroPageDetection.  Default is 'multifd'.
+#     (since 9.0)
+#
 # Features:
 #
 # @deprecated: Member @block-incremental is deprecated.  Use
@@ -907,7 +945,8 @@
            'block-bitmap-mapping',
            { 'name': 'x-vcpu-dirty-limit-period', 'features': ['unstable'] },
            'vcpu-dirty-limit',
-           'mode'] }
+           'mode',
+           'zero-page-detection'] }
 
 ##
 # @MigrateSetParameters:
@@ -979,6 +1018,10 @@
 #     the hostname associated with the migration URI, if any.  (Since
 #     2.9) Previously (since 2.7), this was reported by omitting
 #     tls-hostname instead.
+#
+# @tls-authz: ID of the 'authz' object subclass that provides access
+#     control checking of the TLS x509 certificate distinguished name.
+#     (Since 4.0)
 #
 # @max-bandwidth: to set maximum speed for migration.  maximum speed
 #     in bytes per second.  (Since 2.8)
@@ -1062,6 +1105,10 @@
 # @mode: Migration mode. See description in @MigMode. Default is 'normal'.
 #        (Since 8.2)
 #
+# @zero-page-detection: Whether and how to detect zero pages.
+#     See description in @ZeroPageDetection.  Default is 'multifd'.
+#     (since 9.0)
+#
 # Features:
 #
 # @deprecated: Member @block-incremental is deprecated.  Use
@@ -1115,7 +1162,8 @@
             '*x-vcpu-dirty-limit-period': { 'type': 'uint64',
                                             'features': [ 'unstable' ] },
             '*vcpu-dirty-limit': 'uint64',
-            '*mode': 'MigMode'} }
+            '*mode': 'MigMode',
+            '*zero-page-detection': 'ZeroPageDetection'} }
 
 ##
 # @migrate-set-parameters:
@@ -1126,9 +1174,9 @@
 #
 # Example:
 #
-# -> { "execute": "migrate-set-parameters" ,
-#      "arguments": { "multifd-channels": 5 } }
-# <- { "return": {} }
+#     -> { "execute": "migrate-set-parameters" ,
+#          "arguments": { "multifd-channels": 5 } }
+#     <- { "return": {} }
 ##
 { 'command': 'migrate-set-parameters', 'boxed': true,
   'data': 'MigrateSetParameters' }
@@ -1290,6 +1338,10 @@
 # @mode: Migration mode. See description in @MigMode. Default is 'normal'.
 #        (Since 8.2)
 #
+# @zero-page-detection: Whether and how to detect zero pages.
+#     See description in @ZeroPageDetection.  Default is 'multifd'.
+#     (since 9.0)
+#
 # Features:
 #
 # @deprecated: Member @block-incremental is deprecated.  Use
@@ -1340,7 +1392,8 @@
             '*x-vcpu-dirty-limit-period': { 'type': 'uint64',
                                             'features': [ 'unstable' ] },
             '*vcpu-dirty-limit': 'uint64',
-            '*mode': 'MigMode'} }
+            '*mode': 'MigMode',
+            '*zero-page-detection': 'ZeroPageDetection'} }
 
 ##
 # @query-migrate-parameters:
@@ -1353,15 +1406,15 @@
 #
 # Example:
 #
-# -> { "execute": "query-migrate-parameters" }
-# <- { "return": {
-#          "multifd-channels": 2,
-#          "cpu-throttle-increment": 10,
-#          "cpu-throttle-initial": 20,
-#          "max-bandwidth": 33554432,
-#          "downtime-limit": 300
-#       }
-#    }
+#     -> { "execute": "query-migrate-parameters" }
+#     <- { "return": {
+#              "multifd-channels": 2,
+#              "cpu-throttle-increment": 10,
+#              "cpu-throttle-initial": 20,
+#              "max-bandwidth": 33554432,
+#              "downtime-limit": 300
+#           }
+#        }
 ##
 { 'command': 'query-migrate-parameters',
   'returns': 'MigrationParameters' }
@@ -1377,8 +1430,8 @@
 #
 # Example:
 #
-# -> { "execute": "migrate-start-postcopy" }
-# <- { "return": {} }
+#     -> { "execute": "migrate-start-postcopy" }
+#     <- { "return": {} }
 ##
 { 'command': 'migrate-start-postcopy' }
 
@@ -1393,9 +1446,9 @@
 #
 # Example:
 #
-# <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
-#     "event": "MIGRATION",
-#     "data": {"status": "completed"} }
+#     <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
+#         "event": "MIGRATION",
+#         "data": {"status": "completed"} }
 ##
 { 'event': 'MIGRATION',
   'data': {'status': 'MigrationStatus'}}
@@ -1412,8 +1465,8 @@
 #
 # Example:
 #
-# <- { "timestamp": {"seconds": 1449669631, "microseconds": 239225},
-#       "event": "MIGRATION_PASS", "data": {"pass": 2} }
+#     <- { "timestamp": {"seconds": 1449669631, "microseconds": 239225},
+#           "event": "MIGRATION_PASS", "data": {"pass": 2} }
 ##
 { 'event': 'MIGRATION_PASS',
   'data': { 'pass': 'int' } }
@@ -1496,8 +1549,8 @@
 #
 # Example:
 #
-# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
-#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
+#     <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
+#          "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
 ##
 { 'event': 'COLO_EXIT',
   'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
@@ -1539,8 +1592,8 @@
 #
 # Example:
 #
-# -> { "execute": "x-colo-lost-heartbeat" }
-# <- { "return": {} }
+#     -> { "execute": "x-colo-lost-heartbeat" }
+#     <- { "return": {} }
 ##
 { 'command': 'x-colo-lost-heartbeat',
   'features': [ 'unstable' ],
@@ -1551,8 +1604,6 @@
 #
 # Cancel the current executing migration process.
 #
-# Returns: nothing on success
-#
 # Notes: This command succeeds even if there is no migration process
 #     running.
 #
@@ -1560,8 +1611,8 @@
 #
 # Example:
 #
-# -> { "execute": "migrate_cancel" }
-# <- { "return": {} }
+#     -> { "execute": "migrate_cancel" }
+#     <- { "return": {} }
 ##
 { 'command': 'migrate_cancel' }
 
@@ -1572,15 +1623,13 @@
 #
 # @state: The state the migration is currently expected to be in
 #
-# Returns: nothing on success
-#
 # Since: 2.11
 #
 # Example:
 #
-# -> { "execute": "migrate-continue" , "arguments":
-#      { "state": "pre-switchover" } }
-# <- { "return": {} }
+#     -> { "execute": "migrate-continue" , "arguments":
+#          { "state": "pre-switchover" } }
+#     <- { "return": {} }
 ##
 { 'command': 'migrate-continue', 'data': {'state': 'MigrationStatus'} }
 
@@ -1597,7 +1646,7 @@
 #
 # @file: Direct the migration stream to a file.
 #
-# Since 8.2
+# Since: 8.2
 ##
 { 'enum': 'MigrationAddressType',
   'data': [ 'socket', 'exec', 'rdma', 'file' ] }
@@ -1609,7 +1658,7 @@
 #
 # @offset: The file offset where the migration stream will start
 #
-# Since 8.2
+# Since: 8.2
 ##
 { 'struct': 'FileMigrationArgs',
   'data': { 'filename': 'str',
@@ -1620,7 +1669,7 @@
 #
 # @args: command (list head) and arguments to execute.
 #
-# Since 8.2
+# Since: 8.2
 ##
 { 'struct': 'MigrationExecCommand',
   'data': {'args': [ 'str' ] } }
@@ -1630,7 +1679,9 @@
 #
 # Migration endpoint configuration.
 #
-# Since 8.2
+# @transport: The migration stream transport mechanism
+#
+# Since: 8.2
 ##
 { 'union': 'MigrationAddress',
   'base': { 'transport' : 'MigrationAddressType'},
@@ -1648,7 +1699,7 @@
 #
 # @main: Main outbound migration channel.
 #
-# Since 8.1
+# Since: 8.1
 ##
 { 'enum': 'MigrationChannelType',
   'data': [ 'main' ] }
@@ -1662,7 +1713,7 @@
 #
 # @addr: Migration endpoint configuration on destination interface.
 #
-# Since 8.1
+# Since: 8.1
 ##
 { 'struct': 'MigrationChannel',
   'data': {
@@ -1693,71 +1744,70 @@
 # @deprecated: Members @inc and @blk are deprecated.  Use
 #     blockdev-mirror with NBD instead.
 #
-# Returns: nothing on success
-#
 # Since: 0.14
 #
 # Notes:
 #
-# 1. The 'query-migrate' command should be used to check migration's
-#    progress and final result (this information is provided by the
-#    'status' member)
+#     1. The 'query-migrate' command should be used to check
+#        migration's progress and final result (this information is
+#        provided by the 'status' member)
 #
-# 2. All boolean arguments default to false
+#     2. All boolean arguments default to false
 #
-# 3. The user Monitor's "detach" argument is invalid in QMP and should
-#    not be used
+#     3. The user Monitor's "detach" argument is invalid in QMP and
+#        should not be used
 #
-# 4. The uri argument should have the Uniform Resource Identifier of
-#    default destination VM. This connection will be bound to default
-#    network.
+#     4. The uri argument should have the Uniform Resource Identifier
+#        of default destination VM. This connection will be bound to
+#        default network.
 #
-# 5. For now, number of migration streams is restricted to one, i.e
-#    number of items in 'channels' list is just 1.
+#     5. For now, number of migration streams is restricted to one,
+#        i.e number of items in 'channels' list is just 1.
 #
-# 6. The 'uri' and 'channels' arguments are mutually exclusive;
-#    exactly one of the two should be present.
+#     6. The 'uri' and 'channels' arguments are mutually exclusive;
+#        exactly one of the two should be present.
 #
 # Example:
 #
-# -> { "execute": "migrate", "arguments": { "uri": "tcp:0:4446" } }
-# <- { "return": {} }
-# -> { "execute": "migrate",
-#      "arguments": {
-#          "channels": [ { "channel-type": "main",
-#                          "addr": { "transport": "socket",
-#                                    "type": "inet",
-#                                    "host": "10.12.34.9",
-#                                    "port": "1050" } } ] } }
-# <- { "return": {} }
+#     -> { "execute": "migrate", "arguments": { "uri": "tcp:0:4446" } }
+#     <- { "return": {} }
 #
-# -> { "execute": "migrate",
-#      "arguments": {
-#          "channels": [ { "channel-type": "main",
-#                          "addr": { "transport": "exec",
-#                                    "args": [ "/bin/nc", "-p", "6000",
-#                                              "/some/sock" ] } } ] } }
-# <- { "return": {} }
+#     -> { "execute": "migrate",
+#          "arguments": {
+#              "channels": [ { "channel-type": "main",
+#                              "addr": { "transport": "socket",
+#                                        "type": "inet",
+#                                        "host": "10.12.34.9",
+#                                        "port": "1050" } } ] } }
+#     <- { "return": {} }
 #
-# -> { "execute": "migrate",
-#      "arguments": {
-#          "channels": [ { "channel-type": "main",
-#                          "addr": { "transport": "rdma",
-#                                    "host": "10.12.34.9",
-#                                    "port": "1050" } } ] } }
-# <- { "return": {} }
+#     -> { "execute": "migrate",
+#          "arguments": {
+#              "channels": [ { "channel-type": "main",
+#                              "addr": { "transport": "exec",
+#                                        "args": [ "/bin/nc", "-p", "6000",
+#                                                  "/some/sock" ] } } ] } }
+#     <- { "return": {} }
 #
-# -> { "execute": "migrate",
-#      "arguments": {
-#          "channels": [ { "channel-type": "main",
-#                          "addr": { "transport": "file",
-#                                    "filename": "/tmp/migfile",
-#                                    "offset": "0x1000" } } ] } }
-# <- { "return": {} }
+#     -> { "execute": "migrate",
+#          "arguments": {
+#              "channels": [ { "channel-type": "main",
+#                              "addr": { "transport": "rdma",
+#                                        "host": "10.12.34.9",
+#                                        "port": "1050" } } ] } }
+#     <- { "return": {} }
+#
+#     -> { "execute": "migrate",
+#          "arguments": {
+#              "channels": [ { "channel-type": "main",
+#                              "addr": { "transport": "file",
+#                                        "filename": "/tmp/migfile",
+#                                        "offset": "0x1000" } } ] } }
+#     <- { "return": {} }
 #
 ##
 { 'command': 'migrate',
-  'data': {'uri': 'str',
+  'data': {'*uri': 'str',
            '*channels': [ 'MigrationChannel' ],
            '*blk': { 'type': 'bool', 'features': [ 'deprecated' ] },
            '*inc': { 'type': 'bool', 'features': [ 'deprecated' ] },
@@ -1775,57 +1825,55 @@
 # @channels: list of migration stream channels with each stream in the
 #     list connected to a destination interface endpoint.
 #
-# Returns: nothing on success
-#
 # Since: 2.3
 #
 # Notes:
 #
-# 1. It's a bad idea to use a string for the uri, but it needs
-#    to stay compatible with -incoming and the format of the uri
-#    is already exposed above libvirt.
+#     1. It's a bad idea to use a string for the uri, but it needs to
+#        stay compatible with -incoming and the format of the uri is
+#        already exposed above libvirt.
 #
-# 2. QEMU must be started with -incoming defer to allow
-#    migrate-incoming to be used.
+#     2. QEMU must be started with -incoming defer to allow
+#        migrate-incoming to be used.
 #
-# 3. The uri format is the same as for -incoming
+#     3. The uri format is the same as for -incoming
 #
-# 5. For now, number of migration streams is restricted to one, i.e
-#    number of items in 'channels' list is just 1.
+#     4. For now, number of migration streams is restricted to one,
+#        i.e number of items in 'channels' list is just 1.
 #
-# 4. The 'uri' and 'channels' arguments are mutually exclusive;
-#    exactly one of the two should be present.
+#     5. The 'uri' and 'channels' arguments are mutually exclusive;
+#        exactly one of the two should be present.
 #
 # Example:
 #
-# -> { "execute": "migrate-incoming",
-#      "arguments": { "uri": "tcp::4446" } }
-# <- { "return": {} }
+#     -> { "execute": "migrate-incoming",
+#          "arguments": { "uri": "tcp:0:4446" } }
+#     <- { "return": {} }
 #
-# -> { "execute": "migrate",
-#      "arguments": {
-#          "channels": [ { "channel-type": "main",
-#                          "addr": { "transport": "socket",
-#                                    "type": "inet",
-#                                    "host": "10.12.34.9",
-#                                    "port": "1050" } } ] } }
-# <- { "return": {} }
+#     -> { "execute": "migrate-incoming",
+#          "arguments": {
+#              "channels": [ { "channel-type": "main",
+#                              "addr": { "transport": "socket",
+#                                        "type": "inet",
+#                                        "host": "10.12.34.9",
+#                                        "port": "1050" } } ] } }
+#     <- { "return": {} }
 #
-# -> { "execute": "migrate",
-#      "arguments": {
-#          "channels": [ { "channel-type": "main",
-#                          "addr": { "transport": "exec",
-#                                    "args": [ "/bin/nc", "-p", "6000",
-#                                              "/some/sock" ] } } ] } }
-# <- { "return": {} }
+#     -> { "execute": "migrate-incoming",
+#          "arguments": {
+#              "channels": [ { "channel-type": "main",
+#                              "addr": { "transport": "exec",
+#                                        "args": [ "/bin/nc", "-p", "6000",
+#                                                  "/some/sock" ] } } ] } }
+#     <- { "return": {} }
 #
-# -> { "execute": "migrate",
-#      "arguments": {
-#          "channels": [ { "channel-type": "main",
-#                          "addr": { "transport": "rdma",
-#                                    "host": "10.12.34.9",
-#                                    "port": "1050" } } ] } }
-# <- { "return": {} }
+#     -> { "execute": "migrate-incoming",
+#          "arguments": {
+#              "channels": [ { "channel-type": "main",
+#                              "addr": { "transport": "rdma",
+#                                        "host": "10.12.34.9",
+#                                        "port": "1050" } } ] } }
+#     <- { "return": {} }
 ##
 { 'command': 'migrate-incoming',
              'data': {'*uri': 'str',
@@ -1844,15 +1892,13 @@
 # @live: Optional argument to ask QEMU to treat this command as part
 #     of a live migration.  Default to true.  (since 2.11)
 #
-# Returns: Nothing on success
-#
 # Since: 1.1
 #
 # Example:
 #
-# -> { "execute": "xen-save-devices-state",
-#      "arguments": { "filename": "/tmp/save" } }
-# <- { "return": {} }
+#     -> { "execute": "xen-save-devices-state",
+#          "arguments": { "filename": "/tmp/save" } }
+#     <- { "return": {} }
 ##
 { 'command': 'xen-save-devices-state',
   'data': {'filename': 'str', '*live':'bool' } }
@@ -1864,15 +1910,13 @@
 #
 # @enable: true to enable, false to disable.
 #
-# Returns: nothing
-#
 # Since: 1.3
 #
 # Example:
 #
-# -> { "execute": "xen-set-global-dirty-log",
-#      "arguments": { "enable": true } }
-# <- { "return": {} }
+#     -> { "execute": "xen-set-global-dirty-log",
+#          "arguments": { "enable": true } }
+#     <- { "return": {} }
 ##
 { 'command': 'xen-set-global-dirty-log', 'data': { 'enable': 'bool' } }
 
@@ -1890,9 +1934,9 @@
 #
 # Example:
 #
-# -> { "execute": "xen-load-devices-state",
-#      "arguments": { "filename": "/tmp/resume" } }
-# <- { "return": {} }
+#     -> { "execute": "xen-load-devices-state",
+#          "arguments": { "filename": "/tmp/resume" } }
+#     <- { "return": {} }
 ##
 { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
 
@@ -1908,13 +1952,11 @@
 # @failover: true to do failover, false to stop.  but cannot be
 #     specified if 'enable' is true.  default value is false.
 #
-# Returns: nothing.
-#
 # Example:
 #
-# -> { "execute": "xen-set-replication",
-#      "arguments": {"enable": true, "primary": false} }
-# <- { "return": {} }
+#     -> { "execute": "xen-set-replication",
+#          "arguments": {"enable": true, "primary": false} }
+#     <- { "return": {} }
 #
 # Since: 2.9
 ##
@@ -1947,8 +1989,8 @@
 #
 # Example:
 #
-# -> { "execute": "query-xen-replication-status" }
-# <- { "return": { "error": false } }
+#     -> { "execute": "query-xen-replication-status" }
+#     <- { "return": { "error": false } }
 #
 # Since: 2.9
 ##
@@ -1961,12 +2003,10 @@
 #
 # Xen uses this command to notify replication to trigger a checkpoint.
 #
-# Returns: nothing.
-#
 # Example:
 #
-# -> { "execute": "xen-colo-do-checkpoint" }
-# <- { "return": {} }
+#     -> { "execute": "xen-colo-do-checkpoint" }
+#     <- { "return": {} }
 #
 # Since: 2.9
 ##
@@ -2003,8 +2043,8 @@
 #
 # Example:
 #
-# -> { "execute": "query-colo-status" }
-# <- { "return": { "mode": "primary", "last-mode": "none", "reason": "request" } }
+#     -> { "execute": "query-colo-status" }
+#     <- { "return": { "mode": "primary", "last-mode": "none", "reason": "request" } }
 #
 # Since: 3.1
 ##
@@ -2019,13 +2059,11 @@
 #
 # @uri: the URI to be used for the recovery of migration stream.
 #
-# Returns: nothing.
-#
 # Example:
 #
-# -> { "execute": "migrate-recover",
-#      "arguments": { "uri": "tcp:192.168.1.200:12345" } }
-# <- { "return": {} }
+#     -> { "execute": "migrate-recover",
+#          "arguments": { "uri": "tcp:192.168.1.200:12345" } }
+#     <- { "return": {} }
 #
 # Since: 3.0
 ##
@@ -2038,12 +2076,10 @@
 #
 # Pause a migration.  Currently it only supports postcopy.
 #
-# Returns: nothing.
-#
 # Example:
 #
-# -> { "execute": "migrate-pause" }
-# <- { "return": {} }
+#     -> { "execute": "migrate-pause" }
+#     <- { "return": {} }
 #
 # Since: 3.0
 ##
@@ -2063,9 +2099,9 @@
 #
 # Example:
 #
-# <- { "event": "UNPLUG_PRIMARY",
-#      "data": { "device-id": "hostdev0" },
-#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
+#     <- { "event": "UNPLUG_PRIMARY",
+#          "data": { "device-id": "hostdev0" },
+#          "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
 ##
 { 'event': 'UNPLUG_PRIMARY',
   'data': { 'device-id': 'str' } }
@@ -2126,7 +2162,7 @@
 #
 # @millisecond: value is in milliseconds
 #
-# Since 8.2
+# Since: 8.2
 #
 ##
 { 'enum': 'TimeUnit',
@@ -2224,16 +2260,16 @@
 #
 # Example:
 #
-# -> {"execute": "calc-dirty-rate", "arguments": {"calc-time": 1,
-#                                                 'sample-pages': 512} }
-# <- { "return": {} }
+#     -> {"execute": "calc-dirty-rate", "arguments": {"calc-time": 1,
+#                                                     'sample-pages': 512} }
+#     <- { "return": {} }
 #
-# Measure dirty rate using dirty bitmap for 500 milliseconds:
+#     Measure dirty rate using dirty bitmap for 500 milliseconds:
 #
-# -> {"execute": "calc-dirty-rate", "arguments": {"calc-time": 500,
-#     "calc-time-unit": "millisecond", "mode": "dirty-bitmap"} }
+#     -> {"execute": "calc-dirty-rate", "arguments": {"calc-time": 500,
+#         "calc-time-unit": "millisecond", "mode": "dirty-bitmap"} }
 #
-# <- { "return": {} }
+#     <- { "return": {} }
 ##
 { 'command': 'calc-dirty-rate', 'data': {'calc-time': 'int64',
                                          '*calc-time-unit': 'TimeUnit',
@@ -2252,17 +2288,17 @@
 #
 # Examples:
 #
-# 1. Measurement is in progress:
+#     1. Measurement is in progress:
 #
-# <- {"status": "measuring", "sample-pages": 512,
-#     "mode": "page-sampling", "start-time": 1693900454, "calc-time": 10,
-#     "calc-time-unit": "second"}
+#     <- {"status": "measuring", "sample-pages": 512,
+#         "mode": "page-sampling", "start-time": 1693900454, "calc-time": 10,
+#         "calc-time-unit": "second"}
 #
-# 2. Measurement has been completed:
+#     2. Measurement has been completed:
 #
-# <- {"status": "measured", "sample-pages": 512, "dirty-rate": 108,
-#     "mode": "page-sampling", "start-time": 1693900454, "calc-time": 10,
-#     "calc-time-unit": "second"}
+#     <- {"status": "measured", "sample-pages": 512, "dirty-rate": 108,
+#         "mode": "page-sampling", "start-time": 1693900454, "calc-time": 10,
+#         "calc-time-unit": "second"}
 ##
 { 'command': 'query-dirty-rate', 'data': {'*calc-time-unit': 'TimeUnit' },
                                  'returns': 'DirtyRateInfo' }
@@ -2303,10 +2339,10 @@
 #
 # Example:
 #
-# -> {"execute": "set-vcpu-dirty-limit"}
-#     "arguments": { "dirty-rate": 200,
-#                    "cpu-index": 1 } }
-# <- { "return": {} }
+#     -> {"execute": "set-vcpu-dirty-limit"}
+#         "arguments": { "dirty-rate": 200,
+#                        "cpu-index": 1 } }
+#     <- { "return": {} }
 ##
 { 'command': 'set-vcpu-dirty-limit',
   'data': { '*cpu-index': 'int',
@@ -2327,9 +2363,9 @@
 #
 # Example:
 #
-# -> {"execute": "cancel-vcpu-dirty-limit"},
-#     "arguments": { "cpu-index": 1 } }
-# <- { "return": {} }
+#     -> {"execute": "cancel-vcpu-dirty-limit"},
+#         "arguments": { "cpu-index": 1 } }
+#     <- { "return": {} }
 ##
 { 'command': 'cancel-vcpu-dirty-limit',
   'data': { '*cpu-index': 'int'} }
@@ -2344,10 +2380,10 @@
 #
 # Example:
 #
-# -> {"execute": "query-vcpu-dirty-limit"}
-# <- {"return": [
-#        { "limit-rate": 60, "current-rate": 3, "cpu-index": 0},
-#        { "limit-rate": 60, "current-rate": 3, "cpu-index": 1}]}
+#     -> {"execute": "query-vcpu-dirty-limit"}
+#     <- {"return": [
+#            { "limit-rate": 60, "current-rate": 3, "cpu-index": 0},
+#            { "limit-rate": 60, "current-rate": 3, "cpu-index": 1}]}
 ##
 { 'command': 'query-vcpu-dirty-limit',
   'returns': [ 'DirtyLimitInfo' ] }
@@ -2408,44 +2444,42 @@
 #
 # If @tag already exists, an error will be reported
 #
-# Returns: nothing
-#
 # Example:
 #
-# -> { "execute": "snapshot-save",
-#      "arguments": {
-#         "job-id": "snapsave0",
-#         "tag": "my-snap",
-#         "vmstate": "disk0",
-#         "devices": ["disk0", "disk1"]
-#      }
-#    }
-# <- { "return": { } }
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1432121972, "microseconds": 744001},
-#     "data": {"status": "created", "id": "snapsave0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1432122172, "microseconds": 744001},
-#     "data": {"status": "running", "id": "snapsave0"}}
-# <- {"event": "STOP",
-#     "timestamp": {"seconds": 1432122372, "microseconds": 744001} }
-# <- {"event": "RESUME",
-#     "timestamp": {"seconds": 1432122572, "microseconds": 744001} }
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1432122772, "microseconds": 744001},
-#     "data": {"status": "waiting", "id": "snapsave0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1432122972, "microseconds": 744001},
-#     "data": {"status": "pending", "id": "snapsave0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1432123172, "microseconds": 744001},
-#     "data": {"status": "concluded", "id": "snapsave0"}}
-# -> {"execute": "query-jobs"}
-# <- {"return": [{"current-progress": 1,
-#                 "status": "concluded",
-#                 "total-progress": 1,
-#                 "type": "snapshot-save",
-#                 "id": "snapsave0"}]}
+#     -> { "execute": "snapshot-save",
+#          "arguments": {
+#             "job-id": "snapsave0",
+#             "tag": "my-snap",
+#             "vmstate": "disk0",
+#             "devices": ["disk0", "disk1"]
+#          }
+#        }
+#     <- { "return": { } }
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1432121972, "microseconds": 744001},
+#         "data": {"status": "created", "id": "snapsave0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1432122172, "microseconds": 744001},
+#         "data": {"status": "running", "id": "snapsave0"}}
+#     <- {"event": "STOP",
+#         "timestamp": {"seconds": 1432122372, "microseconds": 744001} }
+#     <- {"event": "RESUME",
+#         "timestamp": {"seconds": 1432122572, "microseconds": 744001} }
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1432122772, "microseconds": 744001},
+#         "data": {"status": "waiting", "id": "snapsave0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1432122972, "microseconds": 744001},
+#         "data": {"status": "pending", "id": "snapsave0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1432123172, "microseconds": 744001},
+#         "data": {"status": "concluded", "id": "snapsave0"}}
+#     -> {"execute": "query-jobs"}
+#     <- {"return": [{"current-progress": 1,
+#                     "status": "concluded",
+#                     "total-progress": 1,
+#                     "type": "snapshot-save",
+#                     "id": "snapsave0"}]}
 #
 # Since: 6.0
 ##
@@ -2480,44 +2514,42 @@
 # device nodes that can have changed since the original @snapshot-save
 # command execution.
 #
-# Returns: nothing
-#
 # Example:
 #
-# -> { "execute": "snapshot-load",
-#      "arguments": {
-#         "job-id": "snapload0",
-#         "tag": "my-snap",
-#         "vmstate": "disk0",
-#         "devices": ["disk0", "disk1"]
-#      }
-#    }
-# <- { "return": { } }
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1472124172, "microseconds": 744001},
-#     "data": {"status": "created", "id": "snapload0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1472125172, "microseconds": 744001},
-#     "data": {"status": "running", "id": "snapload0"}}
-# <- {"event": "STOP",
-#     "timestamp": {"seconds": 1472125472, "microseconds": 744001} }
-# <- {"event": "RESUME",
-#     "timestamp": {"seconds": 1472125872, "microseconds": 744001} }
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1472126172, "microseconds": 744001},
-#     "data": {"status": "waiting", "id": "snapload0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1472127172, "microseconds": 744001},
-#     "data": {"status": "pending", "id": "snapload0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1472128172, "microseconds": 744001},
-#     "data": {"status": "concluded", "id": "snapload0"}}
-# -> {"execute": "query-jobs"}
-# <- {"return": [{"current-progress": 1,
-#                 "status": "concluded",
-#                 "total-progress": 1,
-#                 "type": "snapshot-load",
-#                 "id": "snapload0"}]}
+#     -> { "execute": "snapshot-load",
+#          "arguments": {
+#             "job-id": "snapload0",
+#             "tag": "my-snap",
+#             "vmstate": "disk0",
+#             "devices": ["disk0", "disk1"]
+#          }
+#        }
+#     <- { "return": { } }
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1472124172, "microseconds": 744001},
+#         "data": {"status": "created", "id": "snapload0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1472125172, "microseconds": 744001},
+#         "data": {"status": "running", "id": "snapload0"}}
+#     <- {"event": "STOP",
+#         "timestamp": {"seconds": 1472125472, "microseconds": 744001} }
+#     <- {"event": "RESUME",
+#         "timestamp": {"seconds": 1472125872, "microseconds": 744001} }
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1472126172, "microseconds": 744001},
+#         "data": {"status": "waiting", "id": "snapload0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1472127172, "microseconds": 744001},
+#         "data": {"status": "pending", "id": "snapload0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1472128172, "microseconds": 744001},
+#         "data": {"status": "concluded", "id": "snapload0"}}
+#     -> {"execute": "query-jobs"}
+#     <- {"return": [{"current-progress": 1,
+#                     "status": "concluded",
+#                     "total-progress": 1,
+#                     "type": "snapshot-load",
+#                     "id": "snapload0"}]}
 #
 # Since: 6.0
 ##
@@ -2543,39 +2575,37 @@
 # to determine completion and to fetch details of any errors that
 # arise.
 #
-# Returns: nothing
-#
 # Example:
 #
-# -> { "execute": "snapshot-delete",
-#      "arguments": {
-#         "job-id": "snapdelete0",
-#         "tag": "my-snap",
-#         "devices": ["disk0", "disk1"]
-#      }
-#    }
-# <- { "return": { } }
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1442124172, "microseconds": 744001},
-#     "data": {"status": "created", "id": "snapdelete0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1442125172, "microseconds": 744001},
-#     "data": {"status": "running", "id": "snapdelete0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1442126172, "microseconds": 744001},
-#     "data": {"status": "waiting", "id": "snapdelete0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1442127172, "microseconds": 744001},
-#     "data": {"status": "pending", "id": "snapdelete0"}}
-# <- {"event": "JOB_STATUS_CHANGE",
-#     "timestamp": {"seconds": 1442128172, "microseconds": 744001},
-#     "data": {"status": "concluded", "id": "snapdelete0"}}
-# -> {"execute": "query-jobs"}
-# <- {"return": [{"current-progress": 1,
-#                 "status": "concluded",
-#                 "total-progress": 1,
-#                 "type": "snapshot-delete",
-#                 "id": "snapdelete0"}]}
+#     -> { "execute": "snapshot-delete",
+#          "arguments": {
+#             "job-id": "snapdelete0",
+#             "tag": "my-snap",
+#             "devices": ["disk0", "disk1"]
+#          }
+#        }
+#     <- { "return": { } }
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1442124172, "microseconds": 744001},
+#         "data": {"status": "created", "id": "snapdelete0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1442125172, "microseconds": 744001},
+#         "data": {"status": "running", "id": "snapdelete0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1442126172, "microseconds": 744001},
+#         "data": {"status": "waiting", "id": "snapdelete0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1442127172, "microseconds": 744001},
+#         "data": {"status": "pending", "id": "snapdelete0"}}
+#     <- {"event": "JOB_STATUS_CHANGE",
+#         "timestamp": {"seconds": 1442128172, "microseconds": 744001},
+#         "data": {"status": "concluded", "id": "snapdelete0"}}
+#     -> {"execute": "query-jobs"}
+#     <- {"return": [{"current-progress": 1,
+#                     "status": "concluded",
+#                     "total-progress": 1,
+#                     "type": "snapshot-delete",
+#                     "id": "snapdelete0"}]}
 #
 # Since: 6.0
 ##
