@@ -102,6 +102,7 @@ static const DisplayChangeListenerOps dcl_ops = {
 static DisplayChangeListener dcl = {
     .ops = &dcl_ops,
 };
+static QKbdState *kbd;
 static int cursor_hide = 1;
 static int left_command_key_enabled = 1;
 static bool swap_opt_cmd;
@@ -306,10 +307,8 @@ static void handleAnyDeviceErrors(Error * err)
 */
 @interface QemuCocoaView : NSView
 {
-    NSTrackingArea *trackingArea;
     QEMUScreen screen;
     pixman_image_t *pixman_image;
-    QKbdState *kbd;
     BOOL isMouseGrabbed;
     BOOL isAbsoluteEnabled;
     CFMachPortRef eventsTap;
@@ -359,9 +358,21 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
     self = [super initWithFrame:frameRect];
     if (self) {
 
+        NSTrackingAreaOptions options = NSTrackingActiveInKeyWindow |
+                                        NSTrackingMouseEnteredAndExited |
+                                        NSTrackingMouseMoved |
+                                        NSTrackingInVisibleRect;
+
+        NSTrackingArea *trackingArea =
+            [[NSTrackingArea alloc] initWithRect:CGRectZero
+                                         options:options
+                                           owner:self
+                                        userInfo:nil];
+
+        [self addTrackingArea:trackingArea];
+        [trackingArea release];
         screen.width = frameRect.size.width;
         screen.height = frameRect.size.height;
-        kbd = qkbd_state_init(dcl.con);
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_14_0
         [self setClipsToBounds:YES];
 #endif
@@ -378,8 +389,6 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
         pixman_image_unref(pixman_image);
     }
 
-    qkbd_state_free(kbd);
-
     if (eventsTap) {
         CFRelease(eventsTap);
     }
@@ -392,41 +401,23 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
     return YES;
 }
 
-- (void) removeTrackingRect
-{
-    if (trackingArea) {
-        [self removeTrackingArea:trackingArea];
-        [trackingArea release];
-        trackingArea = nil;
-    }
-}
-
-- (void) frameUpdated
-{
-    [self removeTrackingRect];
-
-    if ([self window]) {
-        NSTrackingAreaOptions options = NSTrackingActiveInKeyWindow |
-                                        NSTrackingMouseEnteredAndExited |
-                                        NSTrackingMouseMoved;
-        trackingArea = [[NSTrackingArea alloc] initWithRect:[self frame]
-                                                    options:options
-                                                      owner:self
-                                                   userInfo:nil];
-        [self addTrackingArea:trackingArea];
-        [self updateUIInfo];
-    }
-}
-
 - (void) viewDidMoveToWindow
 {
     [self resizeWindow];
-    [self frameUpdated];
 }
 
-- (void) viewWillMoveToWindow:(NSWindow *)newWindow
+- (void) selectConsoleLocked:(unsigned int)index
 {
-    [self removeTrackingRect];
+    QemuConsole *con = qemu_console_lookup_by_index(index);
+    if (!con) {
+        return;
+    }
+
+    unregister_displaychangelistener(&dcl);
+    qkbd_state_switch_console(kbd, con);
+    dcl.con = con;
+    register_displaychangelistener(&dcl);
+    [self updateUIInfo];
 }
 
 - (void) hideCursor
@@ -508,6 +499,43 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
     }
 }
 
+- (NSSize)fixAspectRatio:(NSSize)max
+{
+    NSSize scaled;
+    NSSize fixed;
+
+    scaled.width = screen.width * max.height;
+    scaled.height = screen.height * max.width;
+
+    /*
+     * Here screen is our guest's output size, and max is the size of the
+     * largest possible area of the screen we can display on.
+     * We want to scale up (screen.width x screen.height) by either:
+     *   1) max.height / screen.height
+     *   2) max.width / screen.width
+     * With the first scale factor the scale will result in an output height of
+     * max.height (i.e. we will fill the whole height of the available screen
+     * space and have black bars left and right) and with the second scale
+     * factor the scaling will result in an output width of max.width (i.e. we
+     * fill the whole width of the available screen space and have black bars
+     * top and bottom). We need to pick whichever keeps the whole of the guest
+     * output on the screen, which is to say the smaller of the two scale
+     * factors.
+     * To avoid doing more division than strictly necessary, instead of directly
+     * comparing scale factors 1 and 2 we instead calculate and compare those
+     * two scale factors multiplied by (screen.height * screen.width).
+     */
+    if (scaled.width < scaled.height) {
+        fixed.width = scaled.width / screen.height;
+        fixed.height = max.height;
+    } else {
+        fixed.width = max.width;
+        fixed.height = scaled.height / screen.width;
+    }
+
+    return fixed;
+}
+
 - (NSSize) screenSafeAreaSize
 {
     NSSize size = [[[self window] screen] frame].size;
@@ -525,8 +553,10 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
         [[self window] setContentSize:NSMakeSize(screen.width, screen.height)];
         [[self window] center];
     } else if ([[self window] styleMask] & NSWindowStyleMaskFullScreen) {
-        [[self window] setContentSize:[self screenSafeAreaSize]];
+        [[self window] setContentSize:[self fixAspectRatio:[self screenSafeAreaSize]]];
         [[self window] center];
+    } else {
+        [[self window] setContentSize:[self fixAspectRatio:[self frame].size]];
     }
 }
 
@@ -718,7 +748,8 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
     }
 
     if (keysym) {
-        qemu_text_console_put_keysym(NULL, keysym);
+        QemuTextConsole *con = QEMU_TEXT_CONSOLE(dcl.con);
+        qemu_text_console_put_keysym(con, keysym);
     }
 }
 
@@ -898,7 +929,7 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
 
                         // enable graphic console
                         case '1' ... '9':
-                            console_select(key - '0' - 1); /* ascii math */
+                            [self selectConsoleLocked:key - '0' - 1]; /* ascii math */
                             return true;
 
                         // release the mouse grab
@@ -909,7 +940,7 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
                 }
             }
 
-            if (qemu_console_is_graphic(NULL)) {
+            if (qemu_console_is_graphic(dcl.con)) {
                 qkbd_state_key_event(kbd, keycode, true);
             } else {
                 [self handleMonitorInput: event];
@@ -924,7 +955,7 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
                 return true;
             }
 
-            if (qemu_console_is_graphic(NULL)) {
+            if (qemu_console_is_graphic(dcl.con)) {
                 qkbd_state_key_event(kbd, keycode, false);
             }
             return true;
@@ -1263,7 +1294,7 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
 - (void)windowDidResize:(NSNotification *)notification
 {
     [cocoaView updateBounds];
-    [cocoaView frameUpdated];
+    [cocoaView updateUIInfo];
 }
 
 /* Called when the user clicks on a window's close button */
@@ -1357,6 +1388,7 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
 
     [[cocoaView window] setStyleMask:styleMask];
     [sender setState:styleMask & NSWindowStyleMaskResizable ? NSControlStateValueOn : NSControlStateValueOff];
+    [cocoaView resizeWindow];
 }
 
 - (void)toggleZoomInterpolation:(id) sender
@@ -1374,7 +1406,7 @@ static CGEventRef handleTapEvent(CGEventTapProxy proxy, CGEventType type, CGEven
 - (void)displayConsole:(id)sender
 {
     with_bql(^{
-        console_select([sender tag]);
+        [cocoaView selectConsoleLocked:[sender tag]];
     });
 }
 
@@ -1945,7 +1977,6 @@ static void cocoa_switch(DisplayChangeListener *dcl,
     pixman_image_ref(image);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [cocoaView updateUIInfo];
         [cocoaView switchSurface:image];
     });
 }
@@ -1955,7 +1986,7 @@ static void cocoa_refresh(DisplayChangeListener *dcl)
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
     COCOA_DEBUG("qemu_cocoa: cocoa_refresh\n");
-    graphic_hw_update(NULL);
+    graphic_hw_update(dcl->con);
 
     if (qemu_input_is_absolute(dcl->con)) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -2039,8 +2070,12 @@ static void cocoa_display_init(DisplayState *ds, DisplayOptions *opts)
     add_console_menu_entries();
     addRemovableDevicesMenuItems();
 
+    dcl.con = qemu_console_lookup_default();
+    kbd = qkbd_state_init(dcl.con);
+
     // register vga output callbacks
     register_displaychangelistener(&dcl);
+    [cocoaView updateUIInfo];
 
     qemu_event_init(&cbevent, false);
     cbowner = [[QemuCocoaPasteboardTypeOwner alloc] init];
