@@ -193,7 +193,7 @@ static bool mmap_pread(int fd, void *p, size_t len, off_t offset, bool zero)
  */
 static int mmap_frag(abi_ulong real_start,
                      abi_ulong start, abi_ulong end,
-                     int prot, int flags, int fd, abi_ulong offset)
+                     int target_prot, int flags, int fd, abi_ulong offset)
 {
     abi_ulong real_end, addr;
     void *host_start;
@@ -212,23 +212,23 @@ static int mmap_frag(abi_ulong real_start,
 
     if (prot1 == 0) {
         /* no page was there, so we allocate one. See also above. */
-        void *p = mmap(host_start, qemu_host_page_size, prot,
+        void *p = mmap(host_start, qemu_host_page_size, target_prot,
                        flags | ((fd != -1) ? MAP_ANON : 0), -1, 0);
         if (p == MAP_FAILED) {
             return -1;
         }
-        prot1 = prot;
+        prot1 = target_prot;
     }
     prot1 &= PAGE_RWX;
 
-    prot_new = prot | prot1;
+    prot_new = target_prot | prot1;
     if (fd != -1) {
         /*
          * msync() won't work here, so we return an error if write is
          * possible while it is a shared mapping
          */
         if ((flags & TARGET_BSD_MAP_FLAGMASK) == MAP_SHARED &&
-            (prot & PROT_WRITE)) {
+            (target_prot & PROT_WRITE)) {
             return -1;
         }
 
@@ -415,7 +415,7 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
 }
 
 /* NOTE: all the constants are the HOST ones */
-abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+abi_long target_mmap(abi_ulong start, abi_ulong len, int target_prot,
                      int flags, int fd, off_t offset)
 {
     abi_ulong ret, end, real_start, real_end, retaddr, host_offset, host_len;
@@ -425,9 +425,9 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
         qemu_log("mmap: start=0x" TARGET_ABI_FMT_lx
                  " len=0x" TARGET_ABI_FMT_lx " prot=%c%c%c flags=",
                  start, len,
-                 prot & PROT_READ ? 'r' : '-',
-                 prot & PROT_WRITE ? 'w' : '-',
-                 prot & PROT_EXEC ? 'x' : '-');
+                 target_prot & PROT_READ ? 'r' : '-',
+                 target_prot & PROT_WRITE ? 'w' : '-',
+                 target_prot & PROT_EXEC ? 'x' : '-');
         if (flags & MAP_ALIGNMENT_MASK) {
             qemu_log("MAP_ALIGNED(%u) ",
                      (flags & MAP_ALIGNMENT_MASK) >> MAP_ALIGNMENT_SHIFT);
@@ -470,14 +470,15 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
         goto fail;
     }
     if (flags & MAP_STACK) {
-        if ((fd != -1) || ((prot & (PROT_READ | PROT_WRITE)) !=
-                    (PROT_READ | PROT_WRITE))) {
+        if (fd != -1 ||
+            ((target_prot & (PROT_READ | PROT_WRITE)) !=
+             (PROT_READ | PROT_WRITE))) {
             errno = EINVAL;
             goto fail;
         }
     }
 #ifdef MAP_GUARD
-    if ((flags & MAP_GUARD) && (prot != PROT_NONE || fd != -1 ||
+    if ((flags & MAP_GUARD) && (target_prot != PROT_NONE || fd != -1 ||
         offset != 0 || (flags & (MAP_SHARED | MAP_PRIVATE |
         /* MAP_PREFAULT | */ /* MAP_PREFAULT not in mman.h */
         MAP_PREFAULT_READ | MAP_ANON | MAP_STACK)) != 0)) {
@@ -568,7 +569,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
          * especially important if qemu_host_page_size >
          * qemu_real_host_page_size
          */
-        p = mmap(g2h_untagged(start), host_len, prot,
+        p = mmap(g2h_untagged(start), host_len, target_prot,
                  flags | MAP_FIXED | ((fd != -1) ? MAP_ANON : 0), -1, 0);
         if (p == MAP_FAILED) {
             goto fail;
@@ -576,7 +577,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
         /* update start so that it points to the file position at 'offset' */
         host_start = (unsigned long)p;
         if (fd != -1) {
-            p = mmap(g2h_untagged(start), len, prot,
+            p = mmap(g2h_untagged(start), len, target_prot,
                      flags | MAP_FIXED, fd, host_offset);
             if (p == MAP_FAILED) {
                 munmap(g2h_untagged(start), host_len);
@@ -614,11 +615,11 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
              * possible while it is a shared mapping
              */
             if ((flags & TARGET_BSD_MAP_FLAGMASK) == MAP_SHARED &&
-                (prot & PROT_WRITE)) {
+                (target_prot & PROT_WRITE)) {
                 errno = EINVAL;
                 goto fail;
             }
-            retaddr = target_mmap(start, len, prot | PROT_WRITE,
+            retaddr = target_mmap(start, len, target_prot | PROT_WRITE,
                                   MAP_FIXED | MAP_PRIVATE | MAP_ANON,
                                   -1, 0);
             if (retaddr == -1) {
@@ -627,8 +628,8 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
             if (!mmap_pread(fd, g2h_untagged(start), len, offset, false)) {
                 goto fail;
             }
-            if (!(prot & PROT_WRITE)) {
-                ret = target_mprotect(start, len, prot);
+            if (!(target_prot & PROT_WRITE)) {
+                ret = target_mprotect(start, len, target_prot);
                 assert(ret == 0);
             }
             goto the_end;
@@ -647,14 +648,14 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
             if (real_end == real_start + qemu_host_page_size) {
                 /* one single host page */
                 ret = mmap_frag(real_start, start, end,
-                                prot, flags, fd, offset);
+                                target_prot, flags, fd, offset);
                 if (ret == -1) {
                     goto fail;
                 }
                 goto the_end1;
             }
             ret = mmap_frag(real_start, start, real_start + qemu_host_page_size,
-                            prot, flags, fd, offset);
+                            target_prot, flags, fd, offset);
             if (ret == -1) {
                 goto fail;
             }
@@ -664,7 +665,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
         if (end < real_end) {
             ret = mmap_frag(real_end - qemu_host_page_size,
                             real_end - qemu_host_page_size, end,
-                            prot, flags, fd,
+                            target_prot, flags, fd,
                             offset + real_end - qemu_host_page_size - start);
             if (ret == -1) {
                 goto fail;
@@ -682,14 +683,14 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
                 offset1 = offset + real_start - start;
             }
             p = mmap(g2h_untagged(real_start), real_end - real_start,
-                     prot, flags, fd, offset1);
+                     target_prot, flags, fd, offset1);
             if (p == MAP_FAILED) {
                 goto fail;
             }
         }
     }
  the_end1:
-    page_set_flags(start, start + len - 1, prot | PAGE_VALID);
+    page_set_flags(start, start + len - 1, target_prot | PAGE_VALID);
  the_end:
 #ifdef DEBUG_MMAP
     printf("ret=0x" TARGET_ABI_FMT_lx "\n", start);
