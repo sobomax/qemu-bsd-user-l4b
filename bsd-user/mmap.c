@@ -65,6 +65,7 @@ void mmap_fork_end(int child)
 /* NOTE: all the constants are the HOST ones, but addresses are target. */
 int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
 {
+    int host_page_size = qemu_real_host_page_size();
     abi_ulong end, host_start, host_end, addr;
     int prot1, ret;
 
@@ -87,7 +88,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
     }
 
     mmap_lock();
-    host_start = start & qemu_host_page_mask;
+    host_start = start & -host_page_size;
     host_end = HOST_PAGE_ALIGN(end);
     if (start > host_start) {
         /* handle host page containing start */
@@ -95,30 +96,30 @@ int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
         for (addr = host_start; addr < start; addr += TARGET_PAGE_SIZE) {
             prot1 |= page_get_flags(addr);
         }
-        if (host_end == host_start + qemu_host_page_size) {
+        if (host_end == host_start + host_page_size) {
             for (addr = end; addr < host_end; addr += TARGET_PAGE_SIZE) {
                 prot1 |= page_get_flags(addr);
             }
             end = host_end;
         }
         ret = mprotect(g2h_untagged(host_start),
-                       qemu_host_page_size, prot1 & PAGE_RWX);
+                       host_page_size, prot1 & PAGE_RWX);
         if (ret != 0) {
             goto error;
         }
-        host_start += qemu_host_page_size;
+        host_start += host_page_size;
     }
     if (end < host_end) {
         prot1 = target_prot;
         for (addr = end; addr < host_end; addr += TARGET_PAGE_SIZE) {
             prot1 |= page_get_flags(addr);
         }
-        ret = mprotect(g2h_untagged(host_end - qemu_host_page_size),
-                       qemu_host_page_size, prot1 & PAGE_RWX);
+        ret = mprotect(g2h_untagged(host_end - host_page_size),
+                       host_page_size, prot1 & PAGE_RWX);
         if (ret != 0) {
             goto error;
         }
-        host_end -= qemu_host_page_size;
+        host_end -= host_page_size;
     }
 
     /* handle the pages in the middle */
