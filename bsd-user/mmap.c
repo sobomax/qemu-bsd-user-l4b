@@ -809,23 +809,3 @@ int target_munmap(abi_ulong start, abi_ulong len)
     mmap_unlock();
     return ret;
 }
-
-int target_msync(abi_ulong start, abi_ulong len, int flags)
-{
-    abi_ulong end;
-
-    if (start & ~TARGET_PAGE_MASK) {
-        return -EINVAL;
-    }
-    len = TARGET_PAGE_ALIGN(len);
-    end = start + len;
-    if (end < start) {
-        return -EINVAL;
-    }
-    if (end == start) {
-        return 0;
-    }
-
-    start &= qemu_host_page_mask;
-    return msync(g2h_untagged(start), end - start, flags);
-}
