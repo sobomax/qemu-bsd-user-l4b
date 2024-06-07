@@ -192,7 +192,7 @@ int loader_exec(const char *filename, char **argv, char **envp,
                 && bprm->buf[1] == 'E'
                 && bprm->buf[2] == 'L'
                 && bprm->buf[3] == 'F') {
-            retval = load_elf_binary(bprm, regs, infop);
+            retval = load_elf_binary(bprm, infop);
         } else {
             fprintf(stderr, "Unknown binary format\n");
             retval = -1;
