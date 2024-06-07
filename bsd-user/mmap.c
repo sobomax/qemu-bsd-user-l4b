@@ -63,16 +63,16 @@ void mmap_fork_end(int child)
 }
 
 /* NOTE: all the constants are the HOST ones, but addresses are target. */
-int target_mprotect(abi_ulong start, abi_ulong len, int prot)
+int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
 {
     abi_ulong end, host_start, host_end, addr;
     int prot1, ret;
 
     qemu_log_mask(CPU_LOG_PAGE, "mprotect: start=0x" TARGET_ABI_FMT_lx
                   " len=0x" TARGET_ABI_FMT_lx " prot=%c%c%c\n", start, len,
-                  prot & PROT_READ ? 'r' : '-',
-                  prot & PROT_WRITE ? 'w' : '-',
-                  prot & PROT_EXEC ? 'x' : '-');
+                  target_prot & PROT_READ ? 'r' : '-',
+                  target_prot & PROT_WRITE ? 'w' : '-',
+                  target_prot & PROT_EXEC ? 'x' : '-');
     if ((start & ~TARGET_PAGE_MASK) != 0) {
         return -EINVAL;
     }
@@ -81,7 +81,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
         return -ENOMEM;
     }
     end = start + len;
-    prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
+    target_prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
     if (len == 0) {
         return 0;
     }
@@ -91,7 +91,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
     host_end = HOST_PAGE_ALIGN(end);
     if (start > host_start) {
         /* handle host page containing start */
-        prot1 = prot;
+        prot1 = target_prot;
         for (addr = host_start; addr < start; addr += TARGET_PAGE_SIZE) {
             prot1 |= page_get_flags(addr);
         }
@@ -109,7 +109,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
         host_start += qemu_host_page_size;
     }
     if (end < host_end) {
-        prot1 = prot;
+        prot1 = target_prot;
         for (addr = end; addr < host_end; addr += TARGET_PAGE_SIZE) {
             prot1 |= page_get_flags(addr);
         }
@@ -123,12 +123,12 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
 
     /* handle the pages in the middle */
     if (host_start < host_end) {
-        ret = mprotect(g2h_untagged(host_start), host_end - host_start, prot);
+        ret = mprotect(g2h_untagged(host_start), host_end - host_start, target_prot);
         if (ret != 0) {
             goto error;
         }
     }
-    page_set_flags(start, start + len - 1, prot | PAGE_VALID);
+    page_set_flags(start, start + len - 1, target_prot | PAGE_VALID);
     mmap_unlock();
     return 0;
 error:
