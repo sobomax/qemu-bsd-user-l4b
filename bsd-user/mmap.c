@@ -62,12 +62,26 @@ void mmap_fork_end(int child)
     }
 }
 
+/*
+ * Validate target prot bitmask.
+ * Return the prot bitmask for the host in *HOST_PROT.
+ * Return 0 if the target prot bitmask is invalid, otherwise
+ * the internal qemu page_flags (which will include PAGE_VALID).
+ */
+static int validate_prot_to_pageflags(int prot)
+{
+    int valid = PROT_READ | PROT_WRITE | PROT_EXEC;
+    int page_flags = (prot & PAGE_RWX) | PAGE_VALID;
+
+    return prot & ~valid ? 0 : page_flags;
+}
+
 /* NOTE: all the constants are the HOST ones, but addresses are target. */
 int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
 {
     int host_page_size = qemu_real_host_page_size();
     abi_ulong end, host_start, host_end, addr;
-    int prot1, ret;
+    int prot1, ret, page_flags;
 
     qemu_log_mask(CPU_LOG_PAGE, "mprotect: start=0x" TARGET_ABI_FMT_lx
                   " len=0x" TARGET_ABI_FMT_lx " prot=%c%c%c\n", start, len,
@@ -76,16 +90,21 @@ int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
                   target_prot & PROT_EXEC ? 'x' : '-');
     if ((start & ~TARGET_PAGE_MASK) != 0) {
         return -EINVAL;
+    page_flags = validate_prot_to_pageflags(target_prot);
+    if (!page_flags) {
+        return -TARGET_EINVAL;
     }
     len = TARGET_PAGE_ALIGN(len);
+    if (len == 0)
+        return 0;
     if (!guest_range_valid_untagged(start, len)) {
         return -ENOMEM;
     }
-    end = start + len;
     target_prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
     if (len == 0) {
         return 0;
     }
+    end = start + len;
 
     mmap_lock();
     host_start = start & -host_page_size;
@@ -129,7 +148,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
             goto error;
         }
     }
-    page_set_flags(start, start + len - 1, target_prot | PAGE_VALID);
+    page_set_flags(start, start + len - 1, page_flags);
     mmap_unlock();
     return 0;
 error:
