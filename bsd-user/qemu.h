@@ -185,8 +185,6 @@ int loader_exec(const char *filename, char **argv, char **envp,
              struct bsd_binprm *bprm);
 
 int load_elf_binary(struct bsd_binprm *bprm, struct image_info *info);
-int load_flt_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
-                    struct image_info *info);
 int is_target_elf_binary(int fd);
 
 abi_long memcpy_to_target(abi_ulong dest, const void *src,
