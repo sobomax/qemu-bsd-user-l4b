@@ -97,7 +97,6 @@ unsigned long reserved_va;
 bool bsd_user_strict;                /* Abort for unimplemned things */
 
 const char *interp_prefix = CONFIG_QEMU_INTERP_PREFIX;
-const char *qemu_uname_release;
 
 unsigned long target_maxtsiz = TARGET_MAXTSIZ;   /* max text size */
 unsigned long target_dfldsiz = TARGET_DFLDSIZ;   /* initial data size limit */
@@ -397,8 +396,6 @@ int main(int argc, char **argv)
             interp_prefix = argv[optind++];
         } else if (!strcmp(r, "g")) {
             gdbstub = g_strdup(argv[optind++]);
-        } else if (!strcmp(r, "r")) {
-            qemu_uname_release = argv[optind++];
         } else if (!strcmp(r, "cpu")) {
             cpu_model = argv[optind++];
             if (is_help_option(cpu_model)) {
