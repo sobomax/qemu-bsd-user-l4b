@@ -35,8 +35,8 @@ abi_ulong target_stksiz;
 abi_ulong target_stkbas;
 
 static int elf_core_dump(int signr, CPUArchState *env);
-static int load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr,
-    int fd, abi_ulong rbase, abi_ulong *baddrp);
+static int load_elf_sections(const char *image_name, const struct elfhdr *hdr,
+    struct elf_phdr *phdr, int fd, abi_ulong rbase, abi_ulong *baddrp);
 
 static inline void memcpy_fromfs(void *to, const void *from, unsigned long n)
 {
@@ -268,7 +268,8 @@ static void padzero(abi_ulong elf_bss, abi_ulong last_bss)
     }
 }
 
-static abi_ulong load_elf_interp(struct elfhdr *interp_elf_ex,
+static abi_ulong load_elf_interp(const char *elf_interpreter,
+                                 struct elfhdr *interp_elf_ex,
                                  int interpreter_fd,
                                  abi_ulong *interp_load_addr)
 {
@@ -335,7 +336,7 @@ static abi_ulong load_elf_interp(struct elfhdr *interp_elf_ex,
         }
     }
 
-    error = load_elf_sections(interp_elf_ex, elf_phdata, interpreter_fd, rbase,
+    error = load_elf_sections(elf_interpreter, interp_elf_ex, elf_phdata, interpreter_fd, rbase,
         &baddr);
     if (error != 0) {
         perror("load_elf_sections");
@@ -526,8 +527,9 @@ int is_target_elf_binary(int fd)
 }
 
 static int
-load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr, int fd,
-    abi_ulong rbase, abi_ulong *baddrp)
+load_elf_sections(const char *image_name, const struct elfhdr *hdr,
+                  struct elf_phdr *phdr, int fd, abi_ulong rbase,
+                  abi_ulong *baddrp)
 {
     struct elf_phdr *elf_ppnt;
     abi_ulong baddr;
@@ -764,7 +766,7 @@ int load_elf_binary(struct bsd_binprm *bprm, struct image_info *info)
 
     info->elf_flags = elf_ex.e_flags;
 
-    error = load_elf_sections(&elf_ex, elf_phdata, bprm->fd, et_dyn_addr,
+    error = load_elf_sections(bprm->filename, &elf_ex, elf_phdata, bprm->fd, et_dyn_addr,
         &load_addr);
     for (i = 0, elf_ppnt = elf_phdata; i < elf_ex.e_phnum; i++, elf_ppnt++) {
         if (elf_ppnt->p_type != PT_LOAD) {
@@ -780,7 +782,8 @@ int load_elf_binary(struct bsd_binprm *bprm, struct image_info *info)
     }
 
     if (elf_interpreter) {
-        elf_entry = load_elf_interp(&interp_elf_ex, interpreter_fd,
+        elf_entry = load_elf_interp(elf_interpreter,
+                                    &interp_elf_ex, interpreter_fd,
                                     &interp_load_addr);
         reloc_func_desc = interp_load_addr;
 
