@@ -21,6 +21,7 @@
 #include "qemu.h"
 #include "disas/disas.h"
 #include "qemu/path.h"
+#include "qapi/error.h"
 
 static abi_ulong target_auxents;   /* Where the AUX entries are in target */
 static size_t target_auxents_sz;   /* Size of AUX entries including AT_NULL */
@@ -210,62 +211,63 @@ static void setup_arg_pages(struct bsd_binprm *bprm, struct image_info *info,
     }
 }
 
-static void set_brk(abi_ulong start, abi_ulong end)
-{
-    /* page-align the start and end addresses... */
-    start = HOST_PAGE_ALIGN(start);
-    end = HOST_PAGE_ALIGN(end);
-    if (end <= start) {
-        return;
-    }
-    if (target_mmap(start, end - start, PROT_READ | PROT_WRITE | PROT_EXEC,
-        MAP_FIXED | MAP_PRIVATE | MAP_ANON, -1, 0) == -1) {
-        perror("cannot mmap brk");
-        exit(-1);
-    }
-}
-
-
-/*
- * We need to explicitly zero any fractional pages after the data
- * section (i.e. bss).  This would contain the junk from the file that
- * should not be in memory.
+/**
+ * zero_bss:
+ *
+ * Map and zero the bss.  We need to explicitly zero any fractional pages
+ * after the data section (i.e. bss).  Return false on mapping failure.
  */
-static void padzero(abi_ulong elf_bss, abi_ulong last_bss)
+static bool zero_bss(abi_ulong start_bss, abi_ulong end_bss,
+                     int prot, Error **errp)
 {
-    abi_ulong nbyte;
+    abi_ulong align_bss;
 
-    if (elf_bss >= last_bss) {
-        return;
+    /* We only expect writable bss; the code segment shouldn't need this. */
+    if (!(prot & PROT_WRITE)) {
+        error_setg(errp, "PT_LOAD with non-writable bss");
+        return false;
     }
 
-    /*
-     * XXX: this is really a hack : if the real host page size is
-     * smaller than the target page size, some pages after the end
-     * of the file may not be mapped. A better fix would be to
-     * patch target_mmap(), but it is more complicated as the file
-     * size must be known.
-     */
-    if (qemu_real_host_page_size() < qemu_host_page_size) {
-        abi_ulong end_addr, end_addr1;
-        end_addr1 = REAL_HOST_PAGE_ALIGN(elf_bss);
-        end_addr = HOST_PAGE_ALIGN(elf_bss);
-        if (end_addr1 < end_addr) {
-            mmap((void *)g2h_untagged(end_addr1), end_addr - end_addr1,
-                 PROT_READ | PROT_WRITE | PROT_EXEC,
-                 MAP_FIXED | MAP_PRIVATE | MAP_ANON, -1, 0);
+    align_bss = TARGET_PAGE_ALIGN(start_bss);
+    end_bss = TARGET_PAGE_ALIGN(end_bss);
+
+    if (start_bss < align_bss) {
+        int flags = page_get_flags(start_bss);
+
+        if (!(flags & PAGE_RWX)) {
+            /*
+             * The whole address space of the executable was reserved
+             * at the start, therefore all pages will be VALID.
+             * But assuming there are no PROT_NONE PT_LOAD segments,
+             * a PROT_NONE page means no data all bss, and we can
+             * simply extend the new anon mapping back to the start
+             * of the page of bss.
+             */
+            align_bss -= TARGET_PAGE_SIZE;
+        } else {
+            /*
+             * The start of the bss shares a page with something.
+             * The only thing that we expect is the data section,
+             * which would already be marked writable.
+             * Overlapping the RX code segment seems malformed.
+             */
+            if (!(flags & PAGE_WRITE)) {
+                error_setg(errp, "PT_LOAD with bss overlapping "
+                           "non-writable page");
+                return false;
+            }
+
+            /* The page is already mapped and writable. */
+            memset(g2h_untagged(start_bss), 0, align_bss - start_bss);
         }
     }
-
-    nbyte = elf_bss & (qemu_host_page_size - 1);
-    if (nbyte) {
-        nbyte = qemu_host_page_size - nbyte;
-        do {
-            /* FIXME - what to do if put_user() fails? */
-            put_user_u8(0, elf_bss);
-            elf_bss++;
-        } while (--nbyte);
+    if (align_bss < end_bss &&
+        target_mmap(align_bss, end_bss - align_bss, prot,
+                    MAP_FIXED | MAP_PRIVATE | MAP_ANON, -1, 0) == -1) {
+        error_setg_errno(errp, errno, "Error mapping bss");
+        return false;
     }
+    return true;
 }
 
 static abi_ulong load_elf_interp(const char *elf_interpreter,
@@ -535,6 +537,7 @@ load_elf_sections(const char *image_name, const struct elfhdr *hdr,
     abi_ulong baddr;
     int i;
     bool first;
+    Error *err = NULL;
 
     /*
      * Now we do a little grungy work by mmaping the ELF image into
@@ -579,12 +582,10 @@ load_elf_sections(const char *image_name, const struct elfhdr *hdr,
             start_bss = rbase + elf_ppnt->p_vaddr + elf_ppnt->p_filesz;
             end_bss = rbase + elf_ppnt->p_vaddr + elf_ppnt->p_memsz;
 
-            /*
-             * Calling set_brk effectively mmaps the pages that we need for the
-             * bss and break sections.
-             */
-            set_brk(start_bss, end_bss);
-            padzero(start_bss, end_bss);
+            if (start_bss < end_bss &&
+                !zero_bss(start_bss, end_bss, elf_prot, &err)) {
+                goto exit_errmsg;
+            }
         }
 
         if (first) {
@@ -597,6 +598,9 @@ load_elf_sections(const char *image_name, const struct elfhdr *hdr,
         *baddrp = baddr;
     }
     return 0;
+exit_errmsg:
+    error_reportf_err(err, "%s: ", image_name);
+    exit(-1);
 }
 
 int load_elf_binary(struct bsd_binprm *bprm, struct image_info *info)
