@@ -77,10 +77,10 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
         return -EINVAL;
     }
     len = TARGET_PAGE_ALIGN(len);
-    end = start + len;
-    if (end < start) {
-        return -EINVAL;
+    if (!guest_range_valid_untagged(start, len)) {
+        return -ENOMEM;
     }
+    end = start + len;
     prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
     if (len == 0) {
         return 0;
@@ -759,7 +759,7 @@ int target_munmap(abi_ulong start, abi_ulong len)
         return -EINVAL;
     }
     len = TARGET_PAGE_ALIGN(len);
-    if (len == 0) {
+    if (len == 0 || !guest_range_valid_untagged(start, len)) {
         return -EINVAL;
     }
     mmap_lock();
