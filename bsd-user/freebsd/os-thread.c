@@ -850,6 +850,15 @@ abi_long freebsd_umtx_wake(abi_ulong target_addr, uint32_t n_wake)
         n_wake, NULL, 0));
 }
 
+abi_long freebsd_umtx_wake_unsafe(abi_ulong target_addr, uint32_t n_wake)
+{
+
+    DEBUG_UMTX("<WAKE> %s: _umtx_op(%p, %d, 0x%x, NULL, NULL)\n",
+            __func__, g2h_untagged(target_addr), UMTX_OP_WAKE, n_wake);
+    return get_errno(_umtx_op(g2h_untagged(target_addr), QEMU_UMTX_OP(UMTX_OP_WAKE),
+        n_wake, NULL, 0));
+}
+
 abi_long freebsd_umtx_mutex_wake(abi_ulong obj, abi_long val)
 {
 

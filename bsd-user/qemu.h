@@ -309,6 +309,7 @@ abi_long freebsd_unlock_umtx(abi_ulong target_addr, abi_long id);
 abi_long freebsd_umtx_wait(abi_ulong targ_addr, abi_ulong id,
         size_t tsz, void *t);
 abi_long freebsd_umtx_wake(abi_ulong target_addr, uint32_t n_wake);
+abi_long freebsd_umtx_wake_unsafe(abi_ulong target_addr, uint32_t n_wake);
 abi_long freebsd_umtx_mutex_wake(abi_ulong target_addr, abi_long val);
 abi_long freebsd_umtx_wait_uint(abi_ulong obj, uint32_t val, size_t tsz,
         void *t);

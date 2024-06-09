@@ -73,7 +73,7 @@ static inline abi_long do_freebsd_thr_exit(CPUArchState *cpu_env,
     if (tid_addr) {
         /* Signal target userland that it can free the stack. */
         if (!put_user_sal(1, tid_addr)) {
-            freebsd_umtx_wake(tid_addr, INT_MAX);
+            freebsd_umtx_wake_unsafe(tid_addr, INT_MAX);
         }
     }
 
