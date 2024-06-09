@@ -445,6 +445,8 @@ abi_long freebsd_umtx_mutex_wake2(abi_ulong target_addr, uint32_t flags)
         return -TARGET_EFAULT;
     }
 
+    DEBUG_UMTX("<MUTEX WAKE2> %s: _umtx_op(%p, %d, 0x%x, NULL, NULL)\n",
+            __func__, g2h_untagged(target_addr), UMTX_OP_MUTEX_WAKE2, flags);
     return optimized_umtx_op(target_addr, UMTX_OP_MUTEX_WAKE2, flags, NULL,
         NULL);
 #else
@@ -881,12 +883,21 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
     switch (mode) {
     case TARGET_UMUTEX_WAIT:
         op = UMTX_OP_MUTEX_WAIT;
+        DEBUG_UMTX("<MUTEX WAIT> %s: _umtx_op(%p, %d, 0x%llx, %p, %p)\n",
+                __func__, g2h_untagged(target_addr), op, (long long)val,
+                (void *)(uintptr_t)tsz, ts);
         break;
     case TARGET_UMUTEX_TRY:
         op = UMTX_OP_MUTEX_TRYLOCK;
+        DEBUG_UMTX("<MUTEX TRYLOCK> %s: _umtx_op(%p, %d, 0x%llx, %p, %p)\n",
+                __func__, g2h_untagged(target_addr), op, (long long)val,
+                (void *)(uintptr_t)tsz, ts);
         break;
     default:
         op = UMTX_OP_MUTEX_LOCK;
+        DEBUG_UMTX("<MUTEX LOCK> %s: _umtx_op(%p, %d, 0x%llx, %p, %p)\n",
+                __func__, g2h_untagged(target_addr), op, (long long)val,
+                (void *)(uintptr_t)tsz, ts);
         break;
     }
 
