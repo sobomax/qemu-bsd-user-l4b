@@ -354,7 +354,7 @@ abi_long freebsd_umtx_wait(abi_ulong targ_addr, abi_ulong target_id, size_t tsz,
         return -TARGET_EFAULT;
     }
 
-    DEBUG_UMTX("<WAIT> %s: _umtx_op(%p, %d, 0x%llx, %d, %d, %p)\n",
+    DEBUG_UMTX("<WAIT> %s: _umtx_op(%p, %d, 0x%llx, %d, %p)\n",
             __func__, g2h_untagged(targ_addr), UMTX_OP_WAIT, (long long)target_id,
             (int)tsz, t);
     return _umtx_wait(g2h_untagged(targ_addr), target_id, tsz, t, __func__);
