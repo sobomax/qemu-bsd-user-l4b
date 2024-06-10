@@ -57,9 +57,10 @@ static inline void target_cpu_loop(CPUARMState *env)
 
         switch (trapnr) {
         case EXCP_SWI:
-            /* See arm/arm/trap.c cpu_fetch_syscall_args() */
+            /* See arm64/arm64/trap.c cpu_fetch_syscall_args() */
             code = env->xregs[8];
-            if (code == TARGET_FREEBSD_NR_syscall) {
+            if (code == TARGET_FREEBSD_NR_syscall ||
+                code == TARGET_FREEBSD_NR___syscall) {
                 code = env->xregs[0];
                 arg1 = env->xregs[1];
                 arg2 = env->xregs[2];
@@ -68,16 +69,6 @@ static inline void target_cpu_loop(CPUARMState *env)
                 arg5 = env->xregs[5];
                 arg6 = env->xregs[6];
                 arg7 = env->xregs[7];
-                arg8 = 0;
-            } else if (code == TARGET_FREEBSD_NR___syscall) {
-                code = env->xregs[0];
-                arg1 = env->xregs[2];
-                arg2 = env->xregs[3];
-                arg3 = env->xregs[4];
-                arg4 = env->xregs[5];
-                arg5 = env->xregs[6];
-                arg6 = env->xregs[7];
-                arg7 = 0;
                 arg8 = 0;
             } else {
                 arg1 = env->xregs[0];
