@@ -763,7 +763,7 @@ static inline abi_ulong get_sigframe(struct target_sigaction *ka,
 /* TODO: make this a target_arch function / define */
 #if defined(TARGET_ARM)
     return (sp - frame_size) & ~7;
-#elif defined(TARGET_AARCH64)
+#elif defined(TARGET_AARCH64) || defined(TARGET_RISCV)
     return (sp - frame_size) & ~15;
 #else
     return sp - frame_size;
