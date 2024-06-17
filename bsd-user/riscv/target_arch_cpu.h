@@ -22,7 +22,7 @@
 
 #include "target_arch.h"
 
-#define TARGET_DEFAULT_CPU_MODEL "any"
+#define TARGET_DEFAULT_CPU_MODEL "max"
 
 static inline void target_cpu_init(CPURISCVState *env,
         struct target_pt_regs *regs)
