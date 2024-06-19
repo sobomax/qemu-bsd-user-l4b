@@ -1589,6 +1589,7 @@ abi_long do_freebsd_thr_new(CPUArchState *env,
     ts->bprm = parent_ts->bprm;
     ts->info = parent_ts->info;
     ts->signal_mask = parent_ts->signal_mask;
+    ts->ts_tid = qemu_get_thread_id();
 
     pthread_mutex_init(&info.mutex, NULL);
     pthread_mutex_lock(&info.mutex);
