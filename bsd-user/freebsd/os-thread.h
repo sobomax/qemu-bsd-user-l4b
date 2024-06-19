@@ -169,7 +169,7 @@ static inline abi_long do_freebsd_getcontext(void *cpu_env, abi_ulong arg1)
     if (arg1 == 0) {
         return -TARGET_EINVAL;
     }
-    ret = get_errno(sigprocmask(0, NULL, &sigmask));
+    ret = do_sigprocmask(0, NULL, &sigmask);
     if (!is_error(ret)) {
         ucp = lock_user(VERIFY_WRITE, arg1, sizeof(target_ucontext_t), 0);
         if (ucp == 0) {
@@ -199,7 +199,7 @@ static inline abi_long do_freebsd_setcontext(void *cpu_env, abi_ulong arg1)
     target_to_host_sigset(&sigmask, &ucp->uc_sigmask);
     unlock_user(ucp, arg1, sizeof(target_ucontext_t));
     if (!is_error(ret)) {
-        (void)sigprocmask(SIG_SETMASK, &sigmask, NULL);
+        (void)do_sigprocmask(SIG_SETMASK, &sigmask, NULL);
     }
     return ret == 0 ? -TARGET_EJUSTRETURN : ret;
 }
@@ -216,7 +216,7 @@ static inline abi_long do_freebsd_swapcontext(void *cpu_env, abi_ulong arg1,
         return -TARGET_EINVAL;
     }
     /* Save current context in arg1. */
-    ret = get_errno(sigprocmask(0, NULL,  &sigmask));
+    ret = do_sigprocmask(0, NULL, &sigmask);
     if (!is_error(ret)) {
         ucp = lock_user(VERIFY_WRITE, arg1, sizeof(target_ucontext_t), 0);
         if (ucp == 0) {
@@ -240,7 +240,7 @@ static inline abi_long do_freebsd_swapcontext(void *cpu_env, abi_ulong arg1,
     target_to_host_sigset(&sigmask, &ucp->uc_sigmask);
     unlock_user(ucp, arg2, sizeof(target_ucontext_t));
     if (!is_error(ret)) {
-        (void)sigprocmask(SIG_SETMASK, &sigmask, NULL);
+        (void)do_sigprocmask(SIG_SETMASK, &sigmask, NULL);
     }
     return ret == 0 ? -TARGET_EJUSTRETURN : ret;
 }

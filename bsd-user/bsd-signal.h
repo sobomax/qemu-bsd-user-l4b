@@ -63,18 +63,9 @@ static inline abi_long do_bsd_sigprocmask(abi_long arg1, abi_ulong arg2,
     void *p;
     sigset_t set, oldset, *set_ptr;
     int how;
-    CPUState *cpu = thread_cpu;
-    TaskState *ts = (TaskState *)cpu->opaque;
 
     ret = 0;
-    oldset = ts->signal_mask;
     if (arg2) {
-        int i;
-
-        if (block_signals()) {
-            return -TARGET_ERESTART;
-        }
-
         p = lock_user(VERIFY_READ, arg2, sizeof(target_sigset_t), 1);
         if (p == NULL) {
             return -TARGET_EFAULT;
@@ -85,32 +76,21 @@ static inline abi_long do_bsd_sigprocmask(abi_long arg1, abi_ulong arg2,
         switch (arg1) {
         case TARGET_SIG_BLOCK:
             how = SIG_BLOCK;
-            sigorset(&ts->signal_mask, &ts->signal_mask, set_ptr);
             break;
-
         case TARGET_SIG_UNBLOCK:
             how = SIG_UNBLOCK;
-            for (i = 1; i <= NSIG; ++i) {
-                if (sigismember(set_ptr, i)) {
-                    sigdelset(&ts->signal_mask, i);
-                }
-            }
             break;
-
         case TARGET_SIG_SETMASK:
             how = SIG_SETMASK;
-            ts->signal_mask = set;
             break;
-
         default:
-            return -TARGET_EFAULT;
+            return -TARGET_EINVAL;
         }
-
-        /* Silently ignore attempts to change blocking status of KILL or STOP */
-        sigdelset(&ts->signal_mask, SIGKILL);
-        sigdelset(&ts->signal_mask, SIGSTOP);
-        ret = get_errno(sigprocmask(how, &ts->signal_mask, NULL));
+    } else {
+        how = 0;
+        set_ptr = NULL;
     }
+    ret = do_sigprocmask(how, set_ptr, &oldset);
     if (!is_error(ret) && arg3) {
         p = lock_user(VERIFY_WRITE, arg3, sizeof(target_sigset_t), 0);
         if (p == NULL) {
