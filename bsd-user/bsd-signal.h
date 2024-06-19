@@ -149,6 +149,9 @@ static inline abi_long do_bsd_sigsuspend(void *cpu_env, abi_long arg1,
 /* sigreturn(2) */
 static inline abi_long do_bsd_sigreturn(void *cpu_env, abi_long arg1)
 {
+    if (block_signals()) {
+        return -TARGET_ERESTART;
+    }
     return do_sigreturn(cpu_env, arg1);
 }
 

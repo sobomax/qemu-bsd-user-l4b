@@ -1086,6 +1086,12 @@ void process_pending_signals(CPUArchState *env)
         /*
          * Unblock signals and check one more time. Unblocking signals may cause
          * us to take another host signal, which will set signal_pending again.
+         *
+         * XXX: This is what linux-user does, but should this not use the old
+         * mask from the original sigprocmask above instead? This only works
+         * because, when we get the sigreturn, we come back here again, but
+         * until then for a non-SA_NODEFER handler we'll have any pending
+         * signals masked out for the host.
          */
         qatomic_set(&ts->signal_pending, 0);
         ts->in_sigsuspend = false;
