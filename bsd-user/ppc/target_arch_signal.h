@@ -73,4 +73,6 @@ struct target_sigframe {
 	target_siginfo_t  sf_si;
 };
 
+#define TARGET_SIGSTACK_ALIGN 16
+
 #endif /* TARGET_ARCH_SIGNAL_H */
