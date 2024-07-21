@@ -45,7 +45,6 @@
 #include "qemu/job.h"
 #include "qemu/log.h"
 #include "qemu/module.h"
-#include "qemu/plugin.h"
 #include "qemu/sockets.h"
 #include "qemu/timer.h"
 #include "qemu/thread.h"
@@ -583,6 +582,12 @@ void qemu_system_guest_crashloaded(GuestPanicInformation *info)
     qemu_log_mask(LOG_GUEST_ERROR, "Guest crash loaded");
     qapi_event_send_guest_crashloaded(GUEST_PANIC_ACTION_RUN, info);
     qapi_free_GuestPanicInformation(info);
+}
+
+void qemu_system_guest_pvshutdown(void)
+{
+    qapi_event_send_guest_pvshutdown();
+    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
 }
 
 void qemu_system_reset_request(ShutdownCause reason)

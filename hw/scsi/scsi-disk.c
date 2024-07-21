@@ -58,6 +58,9 @@
 
 #define TYPE_SCSI_DISK_BASE         "scsi-disk-base"
 
+#define MAX_SERIAL_LEN              36
+#define MAX_SERIAL_LEN_FOR_DEVID    20
+
 OBJECT_DECLARE_TYPE(SCSIDiskState, SCSIDiskClass, SCSI_DISK_BASE)
 
 struct SCSIDiskClass {
@@ -111,6 +114,7 @@ struct SCSIDiskState {
      * 0xffff        - reserved
      */
     uint16_t rotation_rate;
+    bool migrate_emulated_scsi_request;
 };
 
 static void scsi_free_request(SCSIRequest *req)
@@ -159,6 +163,15 @@ static void scsi_disk_save_request(QEMUFile *f, SCSIRequest *req)
     }
 }
 
+static void scsi_disk_emulate_save_request(QEMUFile *f, SCSIRequest *req)
+{
+    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, req->dev);
+
+    if (s->migrate_emulated_scsi_request) {
+        scsi_disk_save_request(f, req);
+    }
+}
+
 static void scsi_disk_load_request(QEMUFile *f, SCSIRequest *req)
 {
     SCSIDiskReq *r = DO_UPCAST(SCSIDiskReq, req, req);
@@ -180,6 +193,15 @@ static void scsi_disk_load_request(QEMUFile *f, SCSIRequest *req)
     }
 
     qemu_iovec_init_external(&r->qiov, &r->iov, 1);
+}
+
+static void scsi_disk_emulate_load_request(QEMUFile *f, SCSIRequest *req)
+{
+    SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, req->dev);
+
+    if (s->migrate_emulated_scsi_request) {
+        scsi_disk_load_request(f, req);
+    }
 }
 
 /*
@@ -648,8 +670,8 @@ static int scsi_disk_emulate_vpd_page(SCSIRequest *req, uint8_t *outbuf)
         }
 
         l = strlen(s->serial);
-        if (l > 36) {
-            l = 36;
+        if (l > MAX_SERIAL_LEN) {
+            l = MAX_SERIAL_LEN;
         }
 
         trace_scsi_disk_emulate_vpd_page_80(req->cmd.xfer);
@@ -2501,9 +2523,20 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
     if (!s->vendor) {
         s->vendor = g_strdup("QEMU");
     }
+    if (s->serial && strlen(s->serial) > MAX_SERIAL_LEN) {
+        error_setg(errp, "The serial number can't be longer than %d characters",
+                   MAX_SERIAL_LEN);
+        return;
+    }
     if (!s->device_id) {
         if (s->serial) {
-            s->device_id = g_strdup_printf("%.20s", s->serial);
+            if (strlen(s->serial) > MAX_SERIAL_LEN_FOR_DEVID) {
+                error_setg(errp, "The serial number can't be longer than %d "
+                           "characters when it is also used as the default for "
+                           "device_id", MAX_SERIAL_LEN_FOR_DEVID);
+                return;
+            }
+            s->device_id = g_strdup(s->serial);
         } else {
             const char *str = blk_name(s->qdev.conf.blk);
             if (str && *str) {
@@ -2592,6 +2625,8 @@ static const SCSIReqOps scsi_disk_emulate_reqops = {
     .read_data    = scsi_disk_emulate_read_data,
     .write_data   = scsi_disk_emulate_write_data,
     .get_buf      = scsi_get_buf,
+    .load_request = scsi_disk_emulate_load_request,
+    .save_request = scsi_disk_emulate_save_request,
 };
 
 static const SCSIReqOps scsi_disk_dma_reqops = {
@@ -2648,19 +2683,12 @@ static const SCSIReqOps *const scsi_disk_reqops_dispatch[256] = {
 
 static void scsi_disk_new_request_dump(uint32_t lun, uint32_t tag, uint8_t *buf)
 {
-    int i;
     int len = scsi_cdb_length(buf);
-    char *line_buffer, *p;
+    g_autoptr(GString) str = NULL;
 
     assert(len > 0 && len <= 16);
-    line_buffer = g_malloc(len * 5 + 1);
-
-    for (i = 0, p = line_buffer; i < len; i++) {
-        p += sprintf(p, " 0x%02x", buf[i]);
-    }
-    trace_scsi_disk_new_request(lun, tag, line_buffer);
-
-    g_free(line_buffer);
+    str = qemu_hexdump_line(NULL, buf, len, 1, 0);
+    trace_scsi_disk_new_request(lun, tag, str->str);
 }
 
 static SCSIRequest *scsi_new_request(SCSIDevice *d, uint32_t tag, uint32_t lun,
@@ -3107,7 +3135,8 @@ static const TypeInfo scsi_disk_base_info = {
     DEFINE_PROP_STRING("serial", SCSIDiskState, serial),                \
     DEFINE_PROP_STRING("vendor", SCSIDiskState, vendor),                \
     DEFINE_PROP_STRING("product", SCSIDiskState, product),              \
-    DEFINE_PROP_STRING("device_id", SCSIDiskState, device_id)
+    DEFINE_PROP_STRING("device_id", SCSIDiskState, device_id),          \
+    DEFINE_PROP_BOOL("migrate-emulated-scsi-request", SCSIDiskState, migrate_emulated_scsi_request, true)
 
 
 static Property scsi_hd_properties[] = {

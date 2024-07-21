@@ -536,6 +536,7 @@ X86 Xen CPUs
 M: Stefano Stabellini <sstabellini@kernel.org>
 M: Anthony PERARD <anthony@xenproject.org>
 M: Paul Durrant <paul@xen.org>
+M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 L: xen-devel@lists.xenproject.org
 S: Supported
 F: */xen*
@@ -1033,6 +1034,7 @@ F: hw/adc/zynq-xadc.c
 F: include/hw/misc/zynq_slcr.h
 F: include/hw/adc/zynq-xadc.h
 X: hw/ssi/xilinx_*
+F: docs/system/arm/xlnx-zynq.rst
 
 Xilinx ZynqMP and Versal
 M: Alistair Francis <alistair@alistair23.me>
@@ -1158,6 +1160,9 @@ F: docs/system/arm/emcraft-sf2.rst
 ASPEED BMCs
 M: Cédric Le Goater <clg@kaod.org>
 M: Peter Maydell <peter.maydell@linaro.org>
+R: Steven Lee <steven_lee@aspeedtech.com>
+R: Troy Lee <leetroy@gmail.com>
+R: Jamin Lin <jamin_lin@aspeedtech.com>
 R: Andrew Jeffery <andrew@codeconstruct.com.au>
 R: Joel Stanley <joel@jms.id.au>
 L: qemu-arm@nongnu.org
@@ -1236,6 +1241,7 @@ LoongArch Machines
 ------------------
 Virt
 M: Song Gao <gaosong@loongson.cn>
+R: Jiaxun Yang <jiaxun.yang@flygoat.com>
 S: Maintained
 F: docs/system/loongarch/virt.rst
 F: configs/targets/loongarch64-softmmu.mak
@@ -2142,8 +2148,7 @@ F: tests/qtest/fuzz-sdcard-test.c
 F: tests/qtest/sdhci-test.c
 
 USB
-M: Gerd Hoffmann <kraxel@redhat.com>
-S: Odd Fixes
+S: Orphan
 F: hw/usb/*
 F: stubs/usb-dev-stub.c
 F: tests/qtest/usb-*-test.c
@@ -2152,7 +2157,6 @@ F: include/hw/usb.h
 F: include/hw/usb/
 
 USB (serial adapter)
-R: Gerd Hoffmann <kraxel@redhat.com>
 M: Samuel Thibault <samuel.thibault@ens-lyon.org>
 S: Maintained
 F: hw/usb/dev-serial.c
@@ -2197,6 +2201,8 @@ M: Zhenzhong Duan <zhenzhong.duan@intel.com>
 S: Supported
 F: backends/iommufd.c
 F: include/sysemu/iommufd.h
+F: backends/host_iommu_device.c
+F: include/sysemu/host_iommu_device.h
 F: include/qemu/chardev_open.h
 F: util/chardev_open.c
 F: docs/devel/vfio-iommufd.rst
@@ -2493,7 +2499,7 @@ F: hw/net/tulip.c
 F: hw/net/tulip.h
 
 pca954x
-M: Patrick Venture <venture@google.com>
+M: Patrick Leis <venture@google.com>
 S: Maintained
 F: hw/i2c/i2c_mux_pca954x.c
 F: include/hw/i2c/i2c_mux_pca954x.h
@@ -2578,8 +2584,7 @@ F: hw/display/ramfb*.c
 F: include/hw/display/ramfb.h
 
 virtio-gpu
-M: Gerd Hoffmann <kraxel@redhat.com>
-S: Odd Fixes
+S: Orphan
 F: hw/display/virtio-gpu*
 F: hw/display/virtio-vga.*
 F: include/hw/virtio/virtio-gpu.h
@@ -2601,7 +2606,6 @@ F: include/hw/virtio/virtio-blk-common.h
 
 vhost-user-gpu
 M: Marc-André Lureau <marcandre.lureau@redhat.com>
-R: Gerd Hoffmann <kraxel@redhat.com>
 S: Maintained
 F: docs/interop/vhost-user-gpu.rst
 F: contrib/vhost-user-gpu
@@ -3059,8 +3063,7 @@ F: stubs/memory_device.c
 F: docs/nvdimm.txt
 
 SPICE
-M: Gerd Hoffmann <kraxel@redhat.com>
-S: Odd Fixes
+S: Orphan
 F: include/ui/qemu-spice.h
 F: include/ui/spice-display.h
 F: ui/spice-*.c
@@ -3070,7 +3073,6 @@ F: qapi/ui.json
 F: docs/spice-port-fqdn.txt
 
 Graphics
-M: Gerd Hoffmann <kraxel@redhat.com>
 M: Marc-André Lureau <marcandre.lureau@redhat.com>
 S: Odd Fixes
 F: ui/
@@ -3315,6 +3317,7 @@ F: tests/qtest/
 F: docs/devel/qgraph.rst
 F: docs/devel/qtest.rst
 X: tests/qtest/bios-tables-test*
+X: tests/qtest/migration-*
 
 Device Fuzzing
 M: Alexander Bulekov <alxndr@bu.edu>
@@ -3411,7 +3414,7 @@ F: include/qemu/userfaultfd.h
 F: migration/
 F: scripts/vmstate-static-checker.py
 F: tests/vmstate-static-checker-data/
-F: tests/qtest/migration-test.c
+F: tests/qtest/migration-*
 F: docs/devel/migration/
 F: qapi/migration.json
 F: tests/migration/

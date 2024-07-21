@@ -510,6 +510,14 @@ than zero.
 
 Removed along with the ``compression`` migration capability.
 
+``-device virtio-blk,scsi=on|off`` (since 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''
+
+The virtio-blk SCSI passthrough feature is a legacy VIRTIO feature.  VIRTIO 1.0
+and later do not support it because the virtio-scsi device was introduced for
+full SCSI support.  Use virtio-scsi instead when SCSI passthrough is required.
+
+
 User-mode emulator command line arguments
 -----------------------------------------
 
@@ -670,6 +678,21 @@ Use ``multifd-channels`` instead.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 Use ``multifd-compression`` instead.
+
+QEMU Machine Protocol (QMP) events
+----------------------------------
+
+``MEM_UNPLUG_ERROR`` (removed in 9.1)
+'''''''''''''''''''''''''''''''''''''
+
+MEM_UNPLUG_ERROR has been replaced by the more generic ``DEVICE_UNPLUG_GUEST_ERROR`` event.
+
+``vcpu`` trace events (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''
+
+The ability to instrument QEMU helper functions with vCPU-aware trace
+points was removed in 7.0.
+
 
 Human Monitor Protocol (HMP) commands
 -------------------------------------
@@ -925,7 +948,7 @@ mips ``fulong2e`` machine alias (removed in 6.0)
 
 This machine has been renamed ``fuloong2e``.
 
-``pc-0.10`` up to ``pc-i440fx-1.7`` (removed in 4.0 up to 8.2)
+``pc-0.10`` up to ``pc-i440fx-2.3`` (removed in 4.0 up to 9.0)
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 These machine types were very old and likely could not be used for live
@@ -1128,5 +1151,23 @@ There is a newer Rust implementation of ``virtiofsd`` at
 stable for some time and is now widely used.
 The command line and feature set is very close to the removed
 C implementation.
+
+QEMU guest agent
+----------------
+
+``--blacklist`` command line option (removed in 9.1)
+''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+``--blacklist`` has been replaced by ``--block-rpcs`` (which is a better
+wording for what this option does). The short form ``-b`` still stays
+the same and thus is the preferred way for scripts that should run with
+both, older and future versions of QEMU.
+
+``blacklist`` config file option (removed in 9.1)
+'''''''''''''''''''''''''''''''''''''''''''''''''
+
+The ``blacklist`` config file option has been renamed to ``block-rpcs``
+(to be in sync with the renaming of the corresponding command line
+option).
 
 .. _Intel discontinuance notification: https://www.intel.com/content/www/us/en/content-details/781327/intel-is-discontinuing-ip-ordering-codes-listed-in-pdn2312-for-nios-ii-ip.html

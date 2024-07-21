@@ -11,6 +11,7 @@
 #include "hw/boards.h"
 #include "hw/char/serial.h"
 #include "sysemu/kvm.h"
+#include "sysemu/tcg.h"
 #include "sysemu/sysemu.h"
 #include "sysemu/qtest.h"
 #include "sysemu/runstate.h"
@@ -45,7 +46,33 @@
 #include "sysemu/tpm.h"
 #include "sysemu/block-backend.h"
 #include "hw/block/flash.h"
+#include "hw/virtio/virtio-iommu.h"
 #include "qemu/error-report.h"
+
+static bool virt_is_veiointc_enabled(LoongArchVirtMachineState *lvms)
+{
+    if (lvms->veiointc == ON_OFF_AUTO_OFF) {
+        return false;
+    }
+    return true;
+}
+
+static void virt_get_veiointc(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+{
+    LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(obj);
+    OnOffAuto veiointc = lvms->veiointc;
+
+    visit_type_OnOffAuto(v, name, &veiointc, errp);
+}
+
+static void virt_set_veiointc(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+{
+    LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(obj);
+
+    visit_type_OnOffAuto(v, name, &lvms->veiointc, errp);
+}
 
 static PFlashCFI01 *virt_flash_create1(LoongArchVirtMachineState *lvms,
                                        const char *name,
@@ -529,7 +556,7 @@ static void virt_build_smbios(LoongArchVirtMachineState *lvms)
         return;
     }
 
-    smbios_set_defaults("QEMU", product, mc->name, true);
+    smbios_set_defaults("QEMU", product, mc->name);
 
     smbios_get_tables(ms, SMBIOS_ENTRY_POINT_TYPE_64,
                       NULL, 0,
@@ -717,25 +744,47 @@ static void virt_irq_init(LoongArchVirtMachineState *lvms)
     uint32_t cpuintc_phandle, eiointc_phandle, pch_pic_phandle, pch_msi_phandle;
 
     /*
-     * The connection of interrupts:
-     *   +-----+    +---------+     +-------+
-     *   | IPI |--> | CPUINTC | <-- | Timer |
-     *   +-----+    +---------+     +-------+
-     *                  ^
-     *                  |
-     *            +---------+
-     *            | EIOINTC |
-     *            +---------+
-     *             ^       ^
-     *             |       |
-     *      +---------+ +---------+
-     *      | PCH-PIC | | PCH-MSI |
-     *      +---------+ +---------+
-     *        ^      ^          ^
-     *        |      |          |
-     * +--------+ +---------+ +---------+
-     * | UARTs  | | Devices | | Devices |
-     * +--------+ +---------+ +---------+
+     * Extended IRQ model.
+     *                                 |
+     * +-----------+     +-------------|--------+     +-----------+
+     * | IPI/Timer | --> | CPUINTC(0-3)|(4-255) | <-- | IPI/Timer |
+     * +-----------+     +-------------|--------+     +-----------+
+     *                         ^       |
+     *                         |
+     *                    +---------+
+     *                    | EIOINTC |
+     *                    +---------+
+     *                     ^       ^
+     *                     |       |
+     *              +---------+ +---------+
+     *              | PCH-PIC | | PCH-MSI |
+     *              +---------+ +---------+
+     *                ^      ^          ^
+     *                |      |          |
+     *         +--------+ +---------+ +---------+
+     *         | UARTs  | | Devices | | Devices |
+     *         +--------+ +---------+ +---------+
+     *
+     * Virt extended IRQ model.
+     *
+     *   +-----+    +---------------+     +-------+
+     *   | IPI |--> | CPUINTC(0-255)| <-- | Timer |
+     *   +-----+    +---------------+     +-------+
+     *                     ^
+     *                     |
+     *               +-----------+
+     *               | V-EIOINTC |
+     *               +-----------+
+     *                ^         ^
+     *                |         |
+     *         +---------+ +---------+
+     *         | PCH-PIC | | PCH-MSI |
+     *         +---------+ +---------+
+     *           ^      ^          ^
+     *           |      |          |
+     *    +--------+ +---------+ +---------+
+     *    | UARTs  | | Devices | | Devices |
+     *    +--------+ +---------+ +---------+
      */
 
     /* Create IPI device */
@@ -767,9 +816,16 @@ static void virt_irq_init(LoongArchVirtMachineState *lvms)
     /* Create EXTIOI device */
     extioi = qdev_new(TYPE_LOONGARCH_EXTIOI);
     qdev_prop_set_uint32(extioi, "num-cpu", ms->smp.cpus);
+    if (virt_is_veiointc_enabled(lvms)) {
+        qdev_prop_set_bit(extioi, "has-virtualization-extension", true);
+    }
     sysbus_realize_and_unref(SYS_BUS_DEVICE(extioi), &error_fatal);
     memory_region_add_subregion(&lvms->system_iocsr, APIC_BASE,
-                   sysbus_mmio_get_region(SYS_BUS_DEVICE(extioi), 0));
+                    sysbus_mmio_get_region(SYS_BUS_DEVICE(extioi), 0));
+    if (virt_is_veiointc_enabled(lvms)) {
+        memory_region_add_subregion(&lvms->system_iocsr, EXTIOI_VIRT_BASE,
+                    sysbus_mmio_get_region(SYS_BUS_DEVICE(extioi), 1));
+    }
 
     /*
      * connect ext irq to the cpu irq
@@ -876,38 +932,91 @@ static void virt_firmware_init(LoongArchVirtMachineState *lvms)
     }
 }
 
-
-static void virt_iocsr_misc_write(void *opaque, hwaddr addr,
-                                  uint64_t val, unsigned size)
+static MemTxResult virt_iocsr_misc_write(void *opaque, hwaddr addr,
+                                         uint64_t val, unsigned size,
+                                         MemTxAttrs attrs)
 {
+    LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(opaque);
+    uint64_t features;
+
+    switch (addr) {
+    case MISC_FUNC_REG:
+        if (!virt_is_veiointc_enabled(lvms)) {
+            return MEMTX_OK;
+        }
+
+        features = address_space_ldl(&lvms->as_iocsr,
+                                     EXTIOI_VIRT_BASE + EXTIOI_VIRT_CONFIG,
+                                     attrs, NULL);
+        if (val & BIT_ULL(IOCSRM_EXTIOI_EN)) {
+            features |= BIT(EXTIOI_ENABLE);
+        }
+        if (val & BIT_ULL(IOCSRM_EXTIOI_INT_ENCODE)) {
+            features |= BIT(EXTIOI_ENABLE_INT_ENCODE);
+        }
+
+        address_space_stl(&lvms->as_iocsr,
+                          EXTIOI_VIRT_BASE + EXTIOI_VIRT_CONFIG,
+                          features, attrs, NULL);
+        break;
+    default:
+        g_assert_not_reached();
+    }
+
+    return MEMTX_OK;
 }
 
-static uint64_t virt_iocsr_misc_read(void *opaque, hwaddr addr, unsigned size)
+static MemTxResult virt_iocsr_misc_read(void *opaque, hwaddr addr,
+                                        uint64_t *data,
+                                        unsigned size, MemTxAttrs attrs)
 {
-    uint64_t ret;
+    LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(opaque);
+    uint64_t ret = 0;
+    int features;
 
     switch (addr) {
     case VERSION_REG:
-        return 0x11ULL;
+        ret = 0x11ULL;
+        break;
     case FEATURE_REG:
         ret = BIT(IOCSRF_MSI) | BIT(IOCSRF_EXTIOI) | BIT(IOCSRF_CSRIPI);
         if (kvm_enabled()) {
             ret |= BIT(IOCSRF_VM);
         }
-        return ret;
+        break;
     case VENDOR_REG:
-        return 0x6e6f73676e6f6f4cULL; /* "Loongson" */
+        ret = 0x6e6f73676e6f6f4cULL; /* "Loongson" */
+        break;
     case CPUNAME_REG:
-        return 0x303030354133ULL;     /* "3A5000" */
+        ret = 0x303030354133ULL;     /* "3A5000" */
+        break;
     case MISC_FUNC_REG:
-        return BIT_ULL(IOCSRM_EXTIOI_EN);
+        if (!virt_is_veiointc_enabled(lvms)) {
+            ret |= BIT_ULL(IOCSRM_EXTIOI_EN);
+            break;
+        }
+
+        features = address_space_ldl(&lvms->as_iocsr,
+                                     EXTIOI_VIRT_BASE + EXTIOI_VIRT_CONFIG,
+                                     attrs, NULL);
+        if (features & BIT(EXTIOI_ENABLE)) {
+            ret |= BIT_ULL(IOCSRM_EXTIOI_EN);
+        }
+        if (features & BIT(EXTIOI_ENABLE_INT_ENCODE)) {
+            ret |= BIT_ULL(IOCSRM_EXTIOI_INT_ENCODE);
+        }
+        break;
+    default:
+        g_assert_not_reached();
     }
-    return 0ULL;
+
+    *data = ret;
+    return MEMTX_OK;
 }
 
 static const MemoryRegionOps virt_iocsr_misc_ops = {
-    .read  = virt_iocsr_misc_read,
-    .write = virt_iocsr_misc_write,
+    .read_with_attrs  = virt_iocsr_misc_read,
+    .write_with_attrs = virt_iocsr_misc_write,
     .endianness = DEVICE_LITTLE_ENDIAN,
     .valid = {
         .min_access_size = 4,
@@ -945,7 +1054,6 @@ static void fw_cfg_add_memory(MachineState *ms)
         memmap_add_entry(base, gap, 1);
         size -= gap;
         base = VIRT_HIGHMEM_BASE;
-        gap = ram_size - VIRT_LOWMEM_SIZE;
     }
 
     if (size) {
@@ -958,17 +1066,17 @@ static void fw_cfg_add_memory(MachineState *ms)
     }
 
     /* add fw_cfg memory map of other nodes */
-    size = ram_size - numa_info[0].node_mem;
-    gap  = VIRT_LOWMEM_BASE + VIRT_LOWMEM_SIZE;
-    if (base < gap && (base + size) > gap) {
+    if (numa_info[0].node_mem < gap && ram_size > gap) {
         /*
          * memory map for the maining nodes splited into two part
-         *   lowram:  [base, +(gap - base))
-         *   highram: [VIRT_HIGHMEM_BASE, +(size - (gap - base)))
+         * lowram:  [base, +(gap - numa_info[0].node_mem))
+         * highram: [VIRT_HIGHMEM_BASE, +(ram_size - gap))
          */
-        memmap_add_entry(base, gap - base, 1);
-        size -= gap - base;
+        memmap_add_entry(base, gap - numa_info[0].node_mem, 1);
+        size = ram_size - gap;
         base = VIRT_HIGHMEM_BASE;
+    } else {
+        size = ram_size - numa_info[0].node_mem;
     }
 
    if (size)
@@ -1117,6 +1225,9 @@ static void virt_initfn(Object *obj)
 {
     LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(obj);
 
+    if (tcg_enabled()) {
+        lvms->veiointc = ON_OFF_AUTO_OFF;
+    }
     lvms->acpi = ON_OFF_AUTO_AUTO;
     lvms->oem_id = g_strndup(ACPI_BUILD_APPNAME6, 6);
     lvms->oem_table_id = g_strndup(ACPI_BUILD_APPNAME8, 8);
@@ -1133,7 +1244,7 @@ static bool memhp_type_supported(DeviceState *dev)
 static void virt_mem_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
                                  Error **errp)
 {
-    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
+    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), errp);
 }
 
 static void virt_device_pre_plug(HotplugHandler *hotplug_dev,
@@ -1213,6 +1324,7 @@ static HotplugHandler *virt_get_hotplug_handler(MachineState *machine,
     MachineClass *mc = MACHINE_GET_CLASS(machine);
 
     if (device_is_dynamic_sysbus(mc, dev) ||
+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI) ||
         memhp_type_supported(dev)) {
         return HOTPLUG_HANDLER(machine);
     }
@@ -1302,6 +1414,11 @@ static void virt_class_init(ObjectClass *oc, void *data)
         NULL, NULL);
     object_class_property_set_description(oc, "acpi",
         "Enable ACPI");
+    object_class_property_add(oc, "v-eiointc", "OnOffAuto",
+        virt_get_veiointc, virt_set_veiointc,
+        NULL, NULL);
+    object_class_property_set_description(oc, "v-eiointc",
+                            "Enable Virt Extend I/O Interrupt Controller.");
     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_RAMFB_DEVICE);
 #ifdef CONFIG_TPM
     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_TPM_TIS_SYSBUS);

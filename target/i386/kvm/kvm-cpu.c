@@ -10,7 +10,6 @@
 #include "qemu/osdep.h"
 #include "cpu.h"
 #include "host-cpu.h"
-#include "kvm-cpu.h"
 #include "qapi/error.h"
 #include "sysemu/sysemu.h"
 #include "hw/boards.h"
@@ -65,8 +64,15 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
      *   cpu_common_realizefn() (via xcc->parent_realize)
      */
     if (cpu->max_features) {
-        if (enable_cpu_pm && kvm_has_waitpkg()) {
-            env->features[FEAT_7_0_ECX] |= CPUID_7_0_ECX_WAITPKG;
+        if (enable_cpu_pm) {
+            if (kvm_has_waitpkg()) {
+                env->features[FEAT_7_0_ECX] |= CPUID_7_0_ECX_WAITPKG;
+            }
+
+            if (env->features[FEAT_1_ECX] & CPUID_EXT_MONITOR) {
+                host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
+                           &cpu->mwait.ecx, &cpu->mwait.edx);
+	    }
         }
         if (cpu->ucode_rev == 0) {
             cpu->ucode_rev =
@@ -137,7 +143,7 @@ static void kvm_cpu_xsave_init(void)
         if (!esa->size) {
             continue;
         }
-        if ((x86_cpu_get_supported_feature_word(esa->feature, false) & esa->bits)
+        if ((x86_cpu_get_supported_feature_word(NULL, esa->feature) & esa->bits)
             != esa->bits) {
             continue;
         }
@@ -178,7 +184,7 @@ static PropValue kvm_default_props[] = {
 /*
  * Only for builtin_x86_defs models initialized with x86_register_cpudef_types.
  */
-void x86_cpu_change_kvm_default(const char *prop, const char *value)
+static void x86_cpu_change_kvm_default(const char *prop, const char *value)
 {
     PropValue *pv;
     for (pv = kvm_default_props; pv->prop; pv++) {

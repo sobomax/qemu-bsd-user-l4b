@@ -68,6 +68,7 @@
 #include "sysemu/numa.h"
 #include "sysemu/hostmem.h"
 #include "exec/gdbstub.h"
+#include "gdbstub/enums.h"
 #include "qemu/timer.h"
 #include "chardev/char.h"
 #include "qemu/bitmap.h"
@@ -999,9 +1000,16 @@ static bool vga_interface_available(VGAInterfaceType t)
     const VGAInterfaceInfo *ti = &vga_interfaces[t];
 
     assert(t < VGA_TYPE_MAX);
-    return !ti->class_names[0] ||
-           module_object_class_by_name(ti->class_names[0]) ||
-           module_object_class_by_name(ti->class_names[1]);
+
+    if (!ti->class_names[0] || module_object_class_by_name(ti->class_names[0])) {
+        return true;
+    }
+
+    if (ti->class_names[1] && module_object_class_by_name(ti->class_names[1])) {
+        return true;
+    }
+
+    return false;
 }
 
 static const char *
@@ -1664,28 +1672,27 @@ static const QEMUOption *lookup_opt(int argc, char **argv,
 
 static MachineClass *select_machine(QDict *qdict, Error **errp)
 {
+    ERRP_GUARD();
     const char *machine_type = qdict_get_try_str(qdict, "type");
-    GSList *machines = object_class_get_list(TYPE_MACHINE, false);
-    MachineClass *machine_class;
-    Error *local_err = NULL;
+    g_autoptr(GSList) machines = object_class_get_list(TYPE_MACHINE, false);
+    MachineClass *machine_class = NULL;
 
     if (machine_type) {
         machine_class = find_machine(machine_type, machines);
         qdict_del(qdict, "type");
         if (!machine_class) {
-            error_setg(&local_err, "unsupported machine type");
+            error_setg(errp, "unsupported machine type: \"%s\"", optarg);
         }
     } else {
         machine_class = find_default_machine(machines);
         if (!machine_class) {
-            error_setg(&local_err, "No machine specified, and there is no default");
+            error_setg(errp, "No machine specified, and there is no default");
         }
     }
 
-    g_slist_free(machines);
-    if (local_err) {
-        error_append_hint(&local_err, "Use -machine help to list supported machines\n");
-        error_propagate(errp, local_err);
+    if (!machine_class) {
+        error_append_hint(errp,
+                          "Use -machine help to list supported machines\n");
     }
     return machine_class;
 }
@@ -3545,8 +3552,8 @@ void qemu_init(int argc, char **argv)
                 if (!opts) {
                     exit(1);
                 }
-                enable_mlock = qemu_opt_get_bool(opts, "mem-lock", false);
-                enable_cpu_pm = qemu_opt_get_bool(opts, "cpu-pm", false);
+                enable_mlock = qemu_opt_get_bool(opts, "mem-lock", enable_mlock);
+                enable_cpu_pm = qemu_opt_get_bool(opts, "cpu-pm", enable_cpu_pm);
                 break;
             case QEMU_OPTION_compat:
                 {

@@ -142,6 +142,9 @@
 #
 # @postcopy-paused: during postcopy but paused.  (since 3.0)
 #
+# @postcopy-recover-setup: setup phase for a postcopy recovery process,
+#     preparing for a recovery phase to start.  (since 9.1)
+#
 # @postcopy-recover: trying to recover from a paused postcopy.  (since
 #     3.0)
 #
@@ -166,6 +169,7 @@
 { 'enum': 'MigrationStatus',
   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
             'active', 'postcopy-active', 'postcopy-paused',
+            'postcopy-recover-setup',
             'postcopy-recover', 'completed', 'failed', 'colo',
             'pre-switchover', 'device', 'wait-unplug' ] }
 ##
@@ -283,14 +287,14 @@
 #
 # Since: 0.14
 #
-# Examples:
-#
-#     1. Before the first migration
+# .. qmp-example::
+#    :title: Before the first migration
 #
 #     -> { "execute": "query-migrate" }
 #     <- { "return": {} }
 #
-#     2. Migration is done and has succeeded
+# .. qmp-example::
+#    :title: Migration is done and has succeeded
 #
 #     -> { "execute": "query-migrate" }
 #     <- { "return": {
@@ -310,12 +314,14 @@
 #          }
 #        }
 #
-#     3. Migration is done and has failed
+# .. qmp-example::
+#    :title: Migration is done and has failed
 #
 #     -> { "execute": "query-migrate" }
 #     <- { "return": { "status": "failed" } }
 #
-#     4. Migration is being performed:
+# .. qmp-example::
+#    :title: Migration is being performed
 #
 #     -> { "execute": "query-migrate" }
 #     <- {
@@ -336,7 +342,8 @@
 #           }
 #        }
 #
-#     5. Migration is being performed and XBZRLE is active:
+# .. qmp-example::
+#    :title: Migration is being performed and XBZRLE is active
 #
 #     -> { "execute": "query-migrate" }
 #     <- {
@@ -510,7 +517,7 @@
 #
 # Since: 1.2
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate-set-capabilities" , "arguments":
 #          { "capabilities": [ { "capability": "xbzrle", "state": true } ] } }
@@ -528,7 +535,7 @@
 #
 # Since: 1.2
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "query-migrate-capabilities" }
 #     <- { "return": [
@@ -554,11 +561,20 @@
 #
 # @zstd: use zstd compression method.
 #
+# @qpl: use qpl compression method.  Query Processing Library(qpl) is
+#       based on the deflate compression algorithm and use the Intel
+#       In-Memory Analytics Accelerator(IAA) accelerated compression
+#       and decompression.  (Since 9.1)
+#
+# @uadk: use UADK library compression method.  (Since 9.1)
+#
 # Since: 5.0
 ##
 { 'enum': 'MultiFDCompression',
   'data': [ 'none', 'zlib',
-            { 'name': 'zstd', 'if': 'CONFIG_ZSTD' } ] }
+            { 'name': 'zstd', 'if': 'CONFIG_ZSTD' },
+            { 'name': 'qpl', 'if': 'CONFIG_QPL' },
+            { 'name': 'uadk', 'if': 'CONFIG_UADK' } ] }
 
 ##
 # @MigMode:
@@ -812,6 +828,10 @@
 #     See description in @ZeroPageDetection.  Default is 'multifd'.
 #     (since 9.0)
 #
+# @direct-io: Open migration files with O_DIRECT when possible.  This
+#     only has effect if the @mapped-ram capability is enabled.
+#     (Since 9.1)
+#
 # Features:
 #
 # @unstable: Members @x-checkpoint-delay and
@@ -836,7 +856,8 @@
            { 'name': 'x-vcpu-dirty-limit-period', 'features': ['unstable'] },
            'vcpu-dirty-limit',
            'mode',
-           'zero-page-detection'] }
+           'zero-page-detection',
+           'direct-io'] }
 
 ##
 # @MigrateSetParameters:
@@ -982,6 +1003,10 @@
 #     See description in @ZeroPageDetection.  Default is 'multifd'.
 #     (since 9.0)
 #
+# @direct-io: Open migration files with O_DIRECT when possible.  This
+#     only has effect if the @mapped-ram capability is enabled.
+#     (Since 9.1)
+#
 # Features:
 #
 # @unstable: Members @x-checkpoint-delay and
@@ -1021,7 +1046,8 @@
                                             'features': [ 'unstable' ] },
             '*vcpu-dirty-limit': 'uint64',
             '*mode': 'MigMode',
-            '*zero-page-detection': 'ZeroPageDetection'} }
+            '*zero-page-detection': 'ZeroPageDetection',
+            '*direct-io': 'bool' } }
 
 ##
 # @migrate-set-parameters:
@@ -1030,7 +1056,7 @@
 #
 # Since: 2.4
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate-set-parameters" ,
 #          "arguments": { "multifd-channels": 5 } }
@@ -1181,6 +1207,10 @@
 #     See description in @ZeroPageDetection.  Default is 'multifd'.
 #     (since 9.0)
 #
+# @direct-io: Open migration files with O_DIRECT when possible.  This
+#     only has effect if the @mapped-ram capability is enabled.
+#     (Since 9.1)
+#
 # Features:
 #
 # @unstable: Members @x-checkpoint-delay and
@@ -1217,7 +1247,8 @@
                                             'features': [ 'unstable' ] },
             '*vcpu-dirty-limit': 'uint64',
             '*mode': 'MigMode',
-            '*zero-page-detection': 'ZeroPageDetection'} }
+            '*zero-page-detection': 'ZeroPageDetection',
+            '*direct-io': 'bool' } }
 
 ##
 # @query-migrate-parameters:
@@ -1228,7 +1259,7 @@
 #
 # Since: 2.4
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "query-migrate-parameters" }
 #     <- { "return": {
@@ -1252,7 +1283,7 @@
 #
 # Since: 2.5
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate-start-postcopy" }
 #     <- { "return": {} }
@@ -1268,7 +1299,7 @@
 #
 # Since: 2.4
 #
-# Example:
+# .. qmp-example::
 #
 #     <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
 #         "event": "MIGRATION",
@@ -1287,7 +1318,7 @@
 #
 # Since: 2.6
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "timestamp": {"seconds": 1449669631, "microseconds": 239225},
 #           "event": "MIGRATION_PASS", "data": {"pass": 2} }
@@ -1371,7 +1402,7 @@
 #
 # Since: 3.1
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
 #          "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
@@ -1414,7 +1445,7 @@
 #
 # Since: 2.8
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "x-colo-lost-heartbeat" }
 #     <- { "return": {} }
@@ -1428,12 +1459,12 @@
 #
 # Cancel the current executing migration process.
 #
-# Notes: This command succeeds even if there is no migration process
-#     running.
+# .. note:: This command succeeds even if there is no migration process
+#    running.
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate_cancel" }
 #     <- { "return": {} }
@@ -1449,7 +1480,7 @@
 #
 # Since: 2.11
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate-continue" , "arguments":
 #          { "state": "pre-switchover" } }
@@ -1561,16 +1592,16 @@
 #
 # Since: 0.14
 #
-# Notes:
+# .. admonition:: Notes
 #
 #     1. The 'query-migrate' command should be used to check
 #        migration's progress and final result (this information is
-#        provided by the 'status' member)
+#        provided by the 'status' member).
 #
-#     2. All boolean arguments default to false
+#     2. All boolean arguments default to false.
 #
 #     3. The user Monitor's "detach" argument is invalid in QMP and
-#        should not be used
+#        should not be used.
 #
 #     4. The uri argument should have the Uniform Resource Identifier
 #        of default destination VM. This connection will be bound to
@@ -1582,7 +1613,7 @@
 #     6. The 'uri' and 'channels' arguments are mutually exclusive;
 #        exactly one of the two should be present.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate", "arguments": { "uri": "tcp:0:4446" } }
 #     <- { "return": {} }
@@ -1644,7 +1675,7 @@
 #
 # Since: 2.3
 #
-# Notes:
+# .. admonition:: Notes
 #
 #     1. It's a bad idea to use a string for the uri, but it needs to
 #        stay compatible with -incoming and the format of the uri is
@@ -1661,7 +1692,7 @@
 #     5. The 'uri' and 'channels' arguments are mutually exclusive;
 #        exactly one of the two should be present.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate-incoming",
 #          "arguments": { "uri": "tcp:0:4446" } }
@@ -1712,7 +1743,7 @@
 #
 # Since: 1.1
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "xen-save-devices-state",
 #          "arguments": { "filename": "/tmp/save" } }
@@ -1730,7 +1761,7 @@
 #
 # Since: 1.3
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "xen-set-global-dirty-log",
 #          "arguments": { "enable": true } }
@@ -1750,7 +1781,7 @@
 #
 # Since: 2.7
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "xen-load-devices-state",
 #          "arguments": { "filename": "/tmp/resume" } }
@@ -1770,7 +1801,7 @@
 # @failover: true to do failover, false to stop.  Cannot be specified
 #     if 'enable' is true.  Default value is false.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "xen-set-replication",
 #          "arguments": {"enable": true, "primary": false} }
@@ -1805,7 +1836,7 @@
 #
 # Returns: A @ReplicationStatus object showing the status.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "query-xen-replication-status" }
 #     <- { "return": { "error": false } }
@@ -1821,7 +1852,7 @@
 #
 # Xen uses this command to notify replication to trigger a checkpoint.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "xen-colo-do-checkpoint" }
 #     <- { "return": {} }
@@ -1859,7 +1890,7 @@
 #
 # Returns: A @COLOStatus object showing the status.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "query-colo-status" }
 #     <- { "return": { "mode": "primary", "last-mode": "none", "reason": "request" } }
@@ -1877,7 +1908,7 @@
 #
 # @uri: the URI to be used for the recovery of migration stream.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate-recover",
 #          "arguments": { "uri": "tcp:192.168.1.200:12345" } }
@@ -1894,7 +1925,7 @@
 #
 # Pause a migration.  Currently it only supports postcopy.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "migrate-pause" }
 #     <- { "return": {} }
@@ -1915,7 +1946,7 @@
 #
 # Since: 4.2
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "event": "UNPLUG_PRIMARY",
 #          "data": { "device-id": "hostdev0" },
@@ -2075,13 +2106,16 @@
 #
 # Since: 5.2
 #
-# Example:
+# .. qmp-example::
 #
 #     -> {"execute": "calc-dirty-rate", "arguments": {"calc-time": 1,
-#                                                     'sample-pages': 512} }
+#                                                     "sample-pages": 512} }
 #     <- { "return": {} }
 #
-#     Measure dirty rate using dirty bitmap for 500 milliseconds:
+# .. qmp-example::
+#    :annotated:
+#
+#    Measure dirty rate using dirty bitmap for 500 milliseconds::
 #
 #     -> {"execute": "calc-dirty-rate", "arguments": {"calc-time": 500,
 #         "calc-time-unit": "millisecond", "mode": "dirty-bitmap"} }
@@ -2103,15 +2137,15 @@
 #
 # Since: 5.2
 #
-# Examples:
-#
-#     1. Measurement is in progress:
+# .. qmp-example::
+#    :title: Measurement is in progress
 #
 #     <- {"status": "measuring", "sample-pages": 512,
 #         "mode": "page-sampling", "start-time": 1693900454, "calc-time": 10,
 #         "calc-time-unit": "second"}
 #
-#     2. Measurement has been completed:
+# .. qmp-example::
+#    :title: Measurement has been completed
 #
 #     <- {"status": "measured", "sample-pages": 512, "dirty-rate": 108,
 #         "mode": "page-sampling", "start-time": 1693900454, "calc-time": 10,
@@ -2154,7 +2188,7 @@
 #
 # Since: 7.1
 #
-# Example:
+# .. qmp-example::
 #
 #     -> {"execute": "set-vcpu-dirty-limit"}
 #         "arguments": { "dirty-rate": 200,
@@ -2178,7 +2212,7 @@
 #
 # Since: 7.1
 #
-# Example:
+# .. qmp-example::
 #
 #     -> {"execute": "cancel-vcpu-dirty-limit"},
 #         "arguments": { "cpu-index": 1 } }
@@ -2195,7 +2229,7 @@
 #
 # Since: 7.1
 #
-# Example:
+# .. qmp-example::
 #
 #     -> {"execute": "query-vcpu-dirty-limit"}
 #     <- {"return": [
@@ -2259,7 +2293,7 @@
 #
 # If @tag already exists, an error will be reported
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "snapshot-save",
 #          "arguments": {
@@ -2329,7 +2363,7 @@
 # device nodes that can have changed since the original @snapshot-save
 # command execution.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "snapshot-load",
 #          "arguments": {
@@ -2390,7 +2424,7 @@
 # to determine completion and to fetch details of any errors that
 # arise.
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "snapshot-delete",
 #          "arguments": {

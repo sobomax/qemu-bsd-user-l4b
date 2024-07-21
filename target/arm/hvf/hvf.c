@@ -33,7 +33,7 @@
 #include "trace/trace-target_arm_hvf.h"
 #include "migration/vmstate.h"
 
-#include "exec/gdbstub.h"
+#include "gdbstub/enums.h"
 
 #define MDSCR_EL1_SS_SHIFT  0
 #define MDSCR_EL1_MDE_SHIFT 15
@@ -1278,6 +1278,7 @@ static int hvf_sysreg_read(CPUState *cpu, uint32_t reg, uint32_t rt)
         /* Call the TCG sysreg handler. This is only safe for GICv3 regs. */
         if (!hvf_sysreg_read_cp(cpu, reg, &val)) {
             hvf_raise_exception(cpu, EXCP_UDEF, syn_uncategorized());
+            return 1;
         }
         break;
     case SYSREG_DBGBVR0_EL1:

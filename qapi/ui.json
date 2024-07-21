@@ -83,7 +83,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "set_password", "arguments": { "protocol": "vnc",
 #                                                    "password": "secret" } }
@@ -107,11 +107,10 @@
 #     - '+INT' where INT is the number of seconds from now (integer)
 #     - 'INT' where INT is the absolute time in seconds
 #
-# Notes: Time is relative to the server and currently there is no way
-#     to coordinate server time with client time.  It is not
-#     recommended to use the absolute time version of the @time
-#     parameter unless you're sure you are on the same machine as the
-#     QEMU instance.
+# .. note:: Time is relative to the server and currently there is no way
+#    to coordinate server time with client time.  It is not recommended
+#    to use the absolute time version of the @time parameter unless
+#    you're sure you are on the same machine as the QEMU instance.
 #
 # Since: 7.0
 ##
@@ -145,7 +144,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "expire_password", "arguments": { "protocol": "vnc",
 #                                                       "time": "+60" } }
@@ -187,7 +186,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "screendump",
 #          "arguments": { "filename": "/tmp/image" } }
@@ -274,8 +273,6 @@
 # @unknown: No information is available about mouse mode used by the
 #     spice server.
 #
-# Note: spice/enums.h has a SpiceMouseMode already, hence the name.
-#
 # Since: 1.1
 ##
 { 'enum': 'SpiceQueryMouseMode',
@@ -331,7 +328,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "query-spice" }
 #     <- { "return": {
@@ -361,7 +358,7 @@
 #                    "channel-id": 0,
 #                    "tls": false
 #                 },
-#                 [ ... more channels follow ... ]
+#                 ...
 #              ]
 #           }
 #        }
@@ -380,7 +377,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "timestamp": {"seconds": 1290688046, "microseconds": 388707},
 #          "event": "SPICE_CONNECTED",
@@ -406,7 +403,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "timestamp": {"seconds": 1290688046, "microseconds": 417172},
 #          "event": "SPICE_INITIALIZED",
@@ -433,7 +430,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "timestamp": {"seconds": 1290688046, "microseconds": 388707},
 #          "event": "SPICE_DISCONNECTED",
@@ -454,7 +451,7 @@
 #
 # Since: 1.3
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "timestamp": {"seconds": 1290688046, "microseconds": 417172},
 #          "event": "SPICE_MIGRATE_COMPLETED" }
@@ -662,7 +659,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "query-vnc" }
 #     <- { "return": {
@@ -705,9 +702,9 @@
 #
 # Since: 1.1
 #
-# Notes: An empty password in this command will set the password to
-#     the empty string.  Existing clients are unaffected by executing
-#     this command.
+# .. note:: An empty password in this command will set the password to
+#    the empty string.  Existing clients are unaffected by executing
+#    this command.
 ##
 { 'command': 'change-vnc-password',
   'data': { 'password': 'str' },
@@ -722,12 +719,12 @@
 #
 # @client: client information
 #
-# Note: This event is emitted before any authentication takes place,
-#     thus the authentication ID is not provided
+# .. note:: This event is emitted before any authentication takes place,
+#    thus the authentication ID is not provided.
 #
 # Since: 0.13
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "event": "VNC_CONNECTED",
 #          "data": {
@@ -754,7 +751,7 @@
 #
 # Since: 0.13
 #
-# Example:
+# .. qmp-example::
 #
 #     <-  { "event": "VNC_INITIALIZED",
 #           "data": {
@@ -780,7 +777,7 @@
 #
 # Since: 0.13
 #
-# Example:
+# .. qmp-example::
 #
 #     <- { "event": "VNC_DISCONNECTED",
 #          "data": {
@@ -828,7 +825,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "query-mice" }
 #     <- { "return": [
@@ -1037,7 +1034,7 @@
 #
 # Since: 1.3
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "send-key",
 #          "arguments": { "keys": [ { "type": "qcode", "data": "ctrl" },
@@ -1268,14 +1265,13 @@
 #
 # Since: 2.6
 #
-# Note: The consoles are visible in the qom tree, under
-#     /backend/console[$index]. They have a device link and head
-#     property, so it is possible to map which console belongs to
-#     which device and display.
+# .. note:: The consoles are visible in the qom tree, under
+#    ``/backend/console[$index]``. They have a device link and head
+#    property, so it is possible to map which console belongs to which
+#    device and display.
 #
-# Examples:
-#
-#     1. Press left mouse button.
+# .. qmp-example::
+#    :title: Press left mouse button
 #
 #     -> { "execute": "input-send-event",
 #         "arguments": { "device": "video0",
@@ -1289,7 +1285,8 @@
 #                        "data" : { "down": false, "button": "left" } } ] } }
 #     <- { "return": {} }
 #
-#     2. Press ctrl-alt-del.
+# .. qmp-example::
+#    :title: Press ctrl-alt-del
 #
 #     -> { "execute": "input-send-event",
 #          "arguments": { "events": [
@@ -1301,7 +1298,8 @@
 #               "key": {"type": "qcode", "data": "delete" } } } ] } }
 #     <- { "return": {} }
 #
-#     3. Move mouse pointer to absolute coordinates (20000, 400).
+# .. qmp-example::
+#    :title: Move mouse pointer to absolute coordinates
 #
 #     -> { "execute": "input-send-event" ,
 #       "arguments": { "events": [
@@ -1616,7 +1614,7 @@
 #
 # Since: 6.0
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "display-reload",
 #          "arguments": { "type": "vnc", "tls-certs": true  } }
@@ -1673,7 +1671,7 @@
 #
 # Since: 7.1
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "display-update",
 #          "arguments": { "type": "vnc", "addresses":
@@ -1704,7 +1702,7 @@
 #
 # Since: 0.14
 #
-# Example:
+# .. qmp-example::
 #
 #     -> { "execute": "client_migrate_info",
 #          "arguments": { "protocol": "spice",
