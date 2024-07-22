@@ -37,6 +37,7 @@ extern char **environ;
 #include "target_os_vmparam.h"
 #include "target_os_signal.h"
 #include "hostdep.h"
+#include "target.h"
 #include "exec/gdbstub.h"
 #include "exec/page-protection.h"
 #include "qemu/clang-tsa.h"
@@ -576,16 +577,6 @@ target_arg64(uint64_t word0, uint64_t word1)
     return word0;
 }
 #endif /* TARGET_ABI_BITS != 32 */
-
-/* ARM EABI and 32-bit powerpc have aligned even on pairs of registers */
-static inline int regpairs_aligned(void *cpu_env)
-{
-#if TARGET_ABI_BITS == 32 && !defined(TARGET_I386)
-    return 1;
-#else
-    return 0;
-#endif
-}
 
 #include <pthread.h>
 
