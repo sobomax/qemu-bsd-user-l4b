@@ -125,8 +125,10 @@ void fork_end(pid_t pid)
     mmap_fork_end(child);
     if (child) {
         CPUState *cpu, *next_cpu;
-        /* Child processes created by fork() only have a single thread.
-           Discard information about the parent threads.  */
+        /*
+         * Child processes created by fork() only have a single thread.
+         * Discard information about the parent threads.
+         */
         CPU_FOREACH_SAFE(cpu, next_cpu) {
             if (cpu != thread_cpu) {
                 QTAILQ_REMOVE_RCU(&cpus_queue, cpu, node);

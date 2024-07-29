@@ -18,4 +18,3 @@ static inline bool regpairs_aligned(void *cpu_env)
 }
 
 #endif /* TARGET_H */
-

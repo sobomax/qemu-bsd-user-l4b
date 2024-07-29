@@ -106,7 +106,6 @@ static inline void target_cpu_loop(CPUARMState *env)
             force_sig_fault(TARGET_SIGILL, TARGET_ILL_ILLOPN, env->pc);
             break;
 
-
         case EXCP_PREFETCH_ABORT:
         case EXCP_DATA_ABORT:
             /* We should only arrive here with EC in {DATAABORT, INSNABORT}. */
@@ -182,5 +181,4 @@ static inline void target_cpu_clone_regs(CPUARMState *env, target_ulong newsp)
 static inline void target_cpu_reset(CPUArchState *env)
 {
 }
-
 #endif /* TARGET_ARCH_CPU_H */
