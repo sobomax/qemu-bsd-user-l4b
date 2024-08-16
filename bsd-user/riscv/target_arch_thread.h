@@ -40,8 +40,8 @@ static inline void target_thread_init(struct target_pt_regs *regs,
 {
     regs->sepc = infop->entry;
     regs->regs[xRA] = infop->entry;
-    regs->regs[10] = infop->start_stack;               /* a0 */
-    regs->regs[xSP] = infop->start_stack & ~(16 - 1);
+    regs->regs[xA0] = infop->start_stack;               /* a0 */
+    regs->regs[xSP] = ROUND_DOWN(infop->start_stack,16);
 }
 
 #endif /* TARGET_ARCH_THREAD_H */

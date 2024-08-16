@@ -38,14 +38,14 @@ set_sigtramp_args(CPURISCVState *regs, int sig, struct target_sigframe *frame,
      *  ra (1)  = sigtramp at base of user stack
      */
 
-     regs->gpr[10] = sig;
-     regs->gpr[11] = frame_addr +
+     regs->gpr[xA0] = sig;
+     regs->gpr[xA1] = frame_addr +
          offsetof(struct target_sigframe, sf_si);
-     regs->gpr[12] = frame_addr +
+     regs->gpr[xA2] = frame_addr +
          offsetof(struct target_sigframe, sf_uc);
      regs->pc = ka->_sa_handler;
-     regs->gpr[2] = frame_addr;
-     regs->gpr[1] = TARGET_PS_STRINGS - TARGET_SZSIGCODE;
+     regs->gpr[xSP] = frame_addr;
+     regs->gpr[xRA] = TARGET_PS_STRINGS - TARGET_SZSIGCODE;
      return 0;
 }
 
