@@ -27,19 +27,15 @@ static inline abi_long setup_sigtramp(abi_ulong offset, unsigned sigf_uc,
     int i;
     uint32_t sys_exit = TARGET_FREEBSD_NR_exit;
 
-    uint32_t sigtramp_code[] = {
-    /* 1 */ 0x00010513,                         /* mv a0, sp */
-    /* 2 */ 0x00050513 + (sigf_uc << 20),       /* addi a0, a0, sigf_uc */
-    /* 3 */ 0x00000293 + (sys_sigreturn << 20), /* li t0, sys_sigreturn */
-    /* 4 */ 0x00000073,                         /* ecall */
-    /* 5 */ 0x00000293 + (sys_exit << 20),      /* li t0, sys_exit */
-    /* 6 */ 0x00000073,                         /* ecall */
-    /* 7 */ 0xFF1FF06F                          /* b -16 */
+     static const uint32_t sigtramp_code[] = {
+    /* 1 */ const_le32(0x00010513),                         /* mv a0, sp */
+    /* 2 */ const_le32(0x00050513 + (sigf_uc << 20)),       /* addi a0, a0, sigf_uc */
+    /* 3 */ const_le32(0x00000293 + (sys_sigreturn << 20)), /* li t0, sys_sigreturn */
+    /* 4 */ const_le32(0x00000073),                         /* ecall */
+    /* 5 */ const_le32(0x00000293 + (sys_exit << 20)),      /* li t0, sys_exit */
+    /* 6 */ const_le32(0x00000073),                         /* ecall */
+    /* 7 */ const_le32(0xFF1FF06F)                          /* b -16 */
     };
-
-    for (i = 0; i < 7; i++) {
-        tswap32s(&sigtramp_code[i]);
-    }
 
     return memcpy_to_target(offset, sigtramp_code, TARGET_SZSIGCODE);
 }

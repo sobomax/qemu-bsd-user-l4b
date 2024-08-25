@@ -29,7 +29,7 @@ static inline void target_cpu_init(CPURISCVState *env,
 {
     int i;
 
-    for (i = 0; i < 32; i++) {
+    for (i = 1; i < 32; i++) {
         env->gpr[i] = regs->regs[i];
     }
 
