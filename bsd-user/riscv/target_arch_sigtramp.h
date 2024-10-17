@@ -27,7 +27,7 @@ static inline abi_long setup_sigtramp(abi_ulong offset, unsigned sigf_uc,
     int i;
     uint32_t sys_exit = TARGET_FREEBSD_NR_exit;
 
-     static const uint32_t sigtramp_code[] = {
+    static const uint32_t sigtramp_code[] = {
     /* 1 */ const_le32(0x00010513),                         /* mv a0, sp */
     /* 2 */ const_le32(0x00050513 + (sigf_uc << 20)),       /* addi a0, a0, sigf_uc */
     /* 3 */ const_le32(0x00000293 + (sys_sigreturn << 20)), /* li t0, sys_sigreturn */

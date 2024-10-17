@@ -137,7 +137,7 @@ static inline void target_cpu_clone_regs(CPURISCVState *env, target_ulong newsp)
     }
 
     env->gpr[xA0] = 0; /* a0 */
-    env->gpr[xT0] = 0;   /* t0 */
+    env->gpr[xT0] = 0; /* t0 */
 }
 
 static inline void target_cpu_reset(CPUArchState *env)
