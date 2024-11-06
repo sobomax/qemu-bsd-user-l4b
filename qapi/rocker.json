@@ -42,7 +42,7 @@
 ##
 # @RockerPortDuplex:
 #
-# An eumeration of port duplex states.
+# An enumeration of port duplex states.
 #
 # @half: half duplex
 #
@@ -55,7 +55,7 @@
 ##
 # @RockerPortAutoneg:
 #
-# An eumeration of port autoneg states.
+# An enumeration of port autoneg states.
 #
 # @off: autoneg is off
 #
@@ -288,8 +288,8 @@
 #
 # @ttl-check: perform TTL check
 #
-# .. note:: Optional members may or may not appear in the group depending
-#    if they're relevant to the group type.
+# .. note:: Optional members may or may not appear in the group
+#    depending if they're relevant to the group type.
 #
 # Since: 2.4
 ##

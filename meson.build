@@ -316,6 +316,11 @@ elif host_os == 'sunos'
   qemu_common_flags += '-D__EXTENSIONS__'
 elif host_os == 'haiku'
   qemu_common_flags += ['-DB_USE_POSITIVE_POSIX_ERRORS', '-D_BSD_SOURCE', '-fPIC']
+elif host_os == 'windows'
+  if not compiler.compiles('struct x { int y; } __attribute__((gcc_struct));',
+                           args: '-Werror')
+    error('Your compiler does not support __attribute__((gcc_struct)) - please use GCC instead of Clang')
+  endif
 endif
 
 # __sync_fetch_and_and requires at least -march=i486. Many toolchains
@@ -650,7 +655,19 @@ warn_flags = [
 ]
 
 if host_os != 'darwin'
-  warn_flags += ['-Wthread-safety']
+  tsa_has_cleanup = cc.compiles('''
+    struct __attribute__((capability("mutex"))) mutex {};
+    void lock(struct mutex *m) __attribute__((acquire_capability(m)));
+    void unlock(struct mutex *m) __attribute__((release_capability(m)));
+
+    void test(void) {
+      struct mutex __attribute__((cleanup(unlock))) m;
+      lock(&m);
+    }
+  ''', args: ['-Wthread-safety', '-Werror'])
+  if tsa_has_cleanup
+    warn_flags += ['-Wthread-safety']
+  endif
 endif
 
 # Set up C++ compiler flags
@@ -2294,6 +2311,8 @@ config_host_data.set('CONFIG_BLKIO', blkio.found())
 if blkio.found()
   config_host_data.set('CONFIG_BLKIO_VHOST_VDPA_FD',
                        blkio.version().version_compare('>=1.3.0'))
+  config_host_data.set('CONFIG_BLKIO_WRITE_ZEROS_FUA',
+                       blkio.version().version_compare('>=1.4.0'))
 endif
 config_host_data.set('CONFIG_CURL', curl.found())
 config_host_data.set('CONFIG_CURSES', curses.found())
