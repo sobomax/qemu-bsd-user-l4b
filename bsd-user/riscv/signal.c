@@ -21,7 +21,7 @@
 #include "qemu.h"
 
 /*
- * Compare with sendsig() in riscv/riscv/machdep.c
+ * Compare with sendsig() in riscv/riscv/exec_machdep.c
  * Assumes that target stack frame memory is locked.
  */
 abi_long
@@ -115,7 +115,7 @@ abi_long get_mcontext(CPURISCVState *regs, target_mcontext_t *mcp,
     return 0;
 }
 
-/* Compare with set_mcontext() in riscv/riscv/machdep.c */
+/* Compare with set_mcontext() in riscv/riscv/exec_machdep.c */
 abi_long set_mcontext(CPURISCVState *regs, target_mcontext_t *mcp,
         int srflag)
 {

@@ -21,6 +21,7 @@
 #define TARGET_ARCH_CPU_H
 
 #include "target_arch.h"
+#include "signal-common.h"
 
 #define TARGET_DEFAULT_CPU_MODEL "max"
 
@@ -60,32 +61,32 @@ static inline void target_cpu_loop(CPURISCVState *env)
             cpu_exec_step_atomic(cs);
             break;
         case RISCV_EXCP_U_ECALL:
-            syscall_num = env->gpr[xT0]; /* t0 */
+            syscall_num = env->gpr[xT0];
             env->pc += TARGET_INSN_SIZE;
             /* Compare to cpu_fetch_syscall_args() in riscv/riscv/trap.c */
             if (TARGET_FREEBSD_NR___syscall == syscall_num ||
                 TARGET_FREEBSD_NR_syscall == syscall_num) {
                 ret = do_freebsd_syscall(env,
-                                         env->gpr[xA0], /* a0 */
-                                         env->gpr[xA1], /* a1 */
-                                         env->gpr[xA2], /* a2 */
-                                         env->gpr[xA3], /* a3 */
-                                         env->gpr[xA4], /* a4 */
-                                         env->gpr[xA5], /* a5 */
-                                         env->gpr[xA6], /* a6 */
-                                         env->gpr[xA7], /* a7 */
+                                         env->gpr[xA0],
+                                         env->gpr[xA1],
+                                         env->gpr[xA2],
+                                         env->gpr[xA3],
+                                         env->gpr[xA4],
+                                         env->gpr[xA5],
+                                         env->gpr[xA6],
+                                         env->gpr[xA7],
                                          0);
             } else {
                 ret = do_freebsd_syscall(env,
                                          syscall_num,
-                                         env->gpr[xA0], /* a0 */
-                                         env->gpr[xA1], /* a1 */
-                                         env->gpr[xA2], /* a2 */
-                                         env->gpr[xA3], /* a3 */
-                                         env->gpr[xA4], /* a4 */
-                                         env->gpr[xA5], /* a5 */
-                                         env->gpr[xA6], /* a6 */
-                                         env->gpr[xA7]  /* a7 */
+                                         env->gpr[xA0],
+                                         env->gpr[xA1],
+                                         env->gpr[xA2],
+                                         env->gpr[xA3],
+                                         env->gpr[xA4],
+                                         env->gpr[xA5],
+                                         env->gpr[xA6],
+                                         env->gpr[xA7]
                     );
             }
 
@@ -94,13 +95,13 @@ static inline void target_cpu_loop(CPURISCVState *env)
              * riscv/riscv/vm_machdep.c
              */
             if (ret >= 0) {
-                env->gpr[xA0] = ret; /* a0 */
-                env->gpr[xT0] = 0;   /* t0 */
+                env->gpr[xA0] = ret;
+                env->gpr[xT0] = 0;
             } else if (ret == -TARGET_ERESTART) {
                 env->pc -= TARGET_INSN_SIZE;
             } else if (ret != -TARGET_EJUSTRETURN) {
-                env->gpr[xA0] = -ret; /* a0 */
-                env->gpr[xT0] = 1;   /* t0 */
+                env->gpr[xA0] = -ret;
+                env->gpr[xT0] = 1;
             }
             break;
         case RISCV_EXCP_ILLEGAL_INST:
@@ -136,8 +137,8 @@ static inline void target_cpu_clone_regs(CPURISCVState *env, target_ulong newsp)
         env->gpr[xSP] = newsp;
     }
 
-    env->gpr[xA0] = 0; /* a0 */
-    env->gpr[xT0] = 0; /* t0 */
+    env->gpr[xA0] = 0;
+    env->gpr[xT0] = 0;
 }
 
 static inline void target_cpu_reset(CPUArchState *env)

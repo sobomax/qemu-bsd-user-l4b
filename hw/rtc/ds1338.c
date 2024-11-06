@@ -17,6 +17,7 @@
 #include "qemu/module.h"
 #include "qom/object.h"
 #include "sysemu/rtc.h"
+#include "trace.h"
 
 /* Size of NVRAM including both the user-accessible area and the
  * secondary register area.
@@ -126,6 +127,9 @@ static uint8_t ds1338_recv(I2CSlave *i2c)
     uint8_t res;
 
     res  = s->nvram[s->ptr];
+
+    trace_ds1338_recv(s->ptr, res);
+
     inc_regptr(s);
     return res;
 }
@@ -133,6 +137,8 @@ static uint8_t ds1338_recv(I2CSlave *i2c)
 static int ds1338_send(I2CSlave *i2c, uint8_t data)
 {
     DS1338State *s = DS1338(i2c);
+
+    trace_ds1338_send(s->ptr, data);
 
     if (s->addr_byte) {
         s->ptr = data & (NVRAM_SIZE - 1);
@@ -223,7 +229,7 @@ static void ds1338_class_init(ObjectClass *klass, void *data)
     k->event = ds1338_event;
     k->recv = ds1338_recv;
     k->send = ds1338_send;
-    dc->reset = ds1338_reset;
+    device_class_set_legacy_reset(dc, ds1338_reset);
     dc->vmsd = &vmstate_ds1338;
 }
 

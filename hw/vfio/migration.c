@@ -81,7 +81,7 @@ static const char *mig_state_to_str(enum vfio_device_mig_state state)
     }
 }
 
-static VfioMigrationState
+static QapiVfioMigrationState
 mig_state_to_qapi_state(enum vfio_device_mig_state state)
 {
     switch (state) {
@@ -576,9 +576,6 @@ static void vfio_state_pending_exact(void *opaque, uint64_t *must_precopy,
 
     if (vfio_device_state_is_precopy(vbasedev)) {
         vfio_query_precopy_size(migration);
-
-        *must_precopy +=
-            migration->precopy_init_size + migration->precopy_dirty_size;
     }
 
     trace_vfio_state_pending_exact(vbasedev->name, *must_precopy, *can_postcopy,

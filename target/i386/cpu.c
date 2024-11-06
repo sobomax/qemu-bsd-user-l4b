@@ -31,7 +31,6 @@
 #include "qapi/error.h"
 #include "qemu/error-report.h"
 #include "qapi/qapi-visit-machine.h"
-#include "qapi/qmp/qerror.h"
 #include "standard-headers/asm-x86/kvm_para.h"
 #include "hw/qdev-properties.h"
 #include "hw/i386/topology.h"
@@ -47,6 +46,9 @@
 #include "cpu-internal.h"
 
 static void x86_cpu_realizefn(DeviceState *dev, Error **errp);
+static void x86_cpu_get_supported_cpuid(uint32_t func, uint32_t index,
+                                        uint32_t *eax, uint32_t *ebx,
+                                        uint32_t *ecx, uint32_t *edx);
 
 /* Helpers for building CPUID[2] descriptors: */
 
@@ -899,6 +901,7 @@ void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
 #define TCG_SGX_12_0_EAX_FEATURES 0
 #define TCG_SGX_12_0_EBX_FEATURES 0
 #define TCG_SGX_12_1_EAX_FEATURES 0
+#define TCG_24_0_EBX_FEATURES 0
 
 #if defined CONFIG_USER_ONLY
 #define CPUID_8000_0008_EBX_KERNEL_FEATURES (CPUID_8000_0008_EBX_IBPB | \
@@ -1054,9 +1057,9 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
         .type = CPUID_FEATURE_WORD,
         .feat_names = {
             "fsgsbase", "tsc-adjust", "sgx", "bmi1",
-            "hle", "avx2", NULL, "smep",
+            "hle", "avx2", "fdp-excptn-only", "smep",
             "bmi2", "erms", "invpcid", "rtm",
-            NULL, NULL, "mpx", NULL,
+            NULL, "zero-fcs-fds", "mpx", NULL,
             "avx512f", "avx512dq", "rdseed", "adx",
             "smap", "avx512ifma", "pcommit", "clflushopt",
             "clwb", "intel-pt", "avx512pf", "avx512er",
@@ -1133,7 +1136,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
             "avx-vnni-int8", "avx-ne-convert", NULL, NULL,
             "amx-complex", NULL, "avx-vnni-int16", NULL,
             NULL, NULL, "prefetchiti", NULL,
-            NULL, NULL, NULL, NULL,
+            NULL, NULL, NULL, "avx10",
             NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
@@ -1148,8 +1151,8 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
     [FEAT_7_2_EDX] = {
         .type = CPUID_FEATURE_WORD,
         .feat_names = {
-            NULL, NULL, NULL, NULL,
-            NULL, "mcdt-no", NULL, NULL,
+            "intel-psfd", "ipred-ctrl", "rrsba-ctrl", "ddpd-u",
+            "bhi-ctrl", "mcdt-no", NULL, NULL,
             NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
@@ -1163,6 +1166,20 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
             .reg = R_EDX,
         },
         .tcg_features = TCG_7_2_EDX_FEATURES,
+    },
+    [FEAT_24_0_EBX] = {
+        .type = CPUID_FEATURE_WORD,
+        .feat_names = {
+            [16] = "avx10-128",
+            [17] = "avx10-256",
+            [18] = "avx10-512",
+        },
+        .cpuid = {
+            .eax = 0x24,
+            .needs_ecx = true, .ecx = 0,
+            .reg = R_EBX,
+        },
+        .tcg_features = TCG_24_0_EBX_FEATURES,
     },
     [FEAT_8000_0007_EDX] = {
         .type = CPUID_FEATURE_WORD,
@@ -1221,10 +1238,32 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
             NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
+            "eraps", NULL, NULL, "sbpb",
+            "ibpb-brtype", "srso-no", "srso-user-kernel-no", NULL,
+        },
+        .cpuid = { .eax = 0x80000021, .reg = R_EAX, },
+        .tcg_features = 0,
+        .unmigratable_flags = 0,
+    },
+    [FEAT_8000_0021_EBX] = {
+        .type = CPUID_FEATURE_WORD,
+        .cpuid = { .eax = 0x80000021, .reg = R_EBX, },
+        .tcg_features = 0,
+        .unmigratable_flags = 0,
+    },
+    [FEAT_8000_0022_EAX] = {
+        .type = CPUID_FEATURE_WORD,
+        .feat_names = {
+            "perfmon-v2", NULL, NULL, NULL,
+            NULL, NULL, NULL, NULL,
+            NULL, NULL, NULL, NULL,
+            NULL, NULL, NULL, NULL,
+            NULL, NULL, NULL, NULL,
+            NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
         },
-        .cpuid = { .eax = 0x80000021, .reg = R_EAX, },
+        .cpuid = { .eax = 0x80000022, .reg = R_EAX, },
         .tcg_features = 0,
         .unmigratable_flags = 0,
     },
@@ -1297,7 +1336,9 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
             .needs_ecx = true, .ecx = 0,
             .reg = R_EAX,
         },
-        .tcg_features = ~0U,
+        .tcg_features = XSTATE_FP_MASK | XSTATE_SSE_MASK |
+            XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK |
+            XSTATE_PKRU_MASK,
         .migratable_flags = XSTATE_FP_MASK | XSTATE_SSE_MASK |
             XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK |
             XSTATE_OPMASK_MASK | XSTATE_ZMM_Hi256_MASK | XSTATE_Hi16_ZMM_MASK |
@@ -1310,7 +1351,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
             .needs_ecx = true, .ecx = 0,
             .reg = R_EDX,
         },
-        .tcg_features = ~0U,
+        .tcg_features = 0U,
     },
     /*Below are MSR exposed features*/
     [FEAT_ARCH_CAPABILITIES] = {
@@ -1435,7 +1476,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
             "vmx-exit-save-efer", "vmx-exit-load-efer",
                 "vmx-exit-save-preemption-timer", "vmx-exit-clear-bndcfgs",
             NULL, "vmx-exit-clear-rtit-ctl", NULL, NULL,
-            NULL, "vmx-exit-load-pkrs", NULL, NULL,
+            NULL, "vmx-exit-load-pkrs", NULL, "vmx-exit-secondary-ctls",
         },
         .msr = {
             .index = MSR_IA32_VMX_TRUE_EXIT_CTLS,
@@ -1450,7 +1491,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
             NULL, "vmx-entry-ia32e-mode", NULL, NULL,
             NULL, "vmx-entry-load-perf-global-ctrl", "vmx-entry-load-pat", "vmx-entry-load-efer",
             "vmx-entry-load-bndcfgs", NULL, "vmx-entry-load-rtit-ctl", NULL,
-            NULL, NULL, "vmx-entry-load-pkrs", NULL,
+            NULL, NULL, "vmx-entry-load-pkrs", "vmx-entry-load-fred",
             NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL,
         },
@@ -1746,6 +1787,22 @@ static FeatureDep feature_dependencies[] = {
         .from = { FEAT_7_0_EBX,             CPUID_7_0_EBX_SGX },
         .to = { FEAT_SGX_12_1_EAX,          ~0ull },
     },
+    {
+        .from = { FEAT_24_0_EBX,            CPUID_24_0_EBX_AVX10_128 },
+        .to = { FEAT_24_0_EBX,              CPUID_24_0_EBX_AVX10_256 },
+    },
+    {
+        .from = { FEAT_24_0_EBX,            CPUID_24_0_EBX_AVX10_256 },
+        .to = { FEAT_24_0_EBX,              CPUID_24_0_EBX_AVX10_512 },
+    },
+    {
+        .from = { FEAT_24_0_EBX,            CPUID_24_0_EBX_AVX10_VL_MASK },
+        .to = { FEAT_7_1_EDX,               CPUID_7_1_EDX_AVX10 },
+    },
+    {
+        .from = { FEAT_7_1_EDX,             CPUID_7_1_EDX_AVX10 },
+        .to = { FEAT_24_0_EBX,              ~0ull },
+    },
 };
 
 typedef struct X86RegisterInfo32 {
@@ -1865,9 +1922,10 @@ static inline uint64_t x86_cpu_xsave_xss_components(X86CPU *cpu)
  * Returns the set of feature flags that are supported and migratable by
  * QEMU, for a given FeatureWord.
  */
-static uint64_t x86_cpu_get_migratable_flags(FeatureWord w)
+static uint64_t x86_cpu_get_migratable_flags(X86CPU *cpu, FeatureWord w)
 {
     FeatureWordInfo *wi = &feature_word_info[w];
+    CPUX86State *env = &cpu->env;
     uint64_t r = 0;
     int i;
 
@@ -1881,6 +1939,12 @@ static uint64_t x86_cpu_get_migratable_flags(FeatureWord w)
             r |= f;
         }
     }
+
+    /* when tsc-khz is set explicitly, invtsc is migratable */
+    if ((w == FEAT_8000_0007_EDX) && env->user_tsc_khz) {
+        r |= CPUID_APM_INVTSC;
+    }
+
     return r;
 }
 
@@ -1959,6 +2023,7 @@ typedef struct X86CPUDefinition {
     int family;
     int model;
     int stepping;
+    uint8_t avx10_version;
     FeatureWordArray features;
     const char *model_id;
     const CPUCaches *const cache_info;
@@ -4338,6 +4403,23 @@ static const X86CPUDefinition builtin_x86_defs[] = {
         .model_id = "Intel Xeon Processor (GraniteRapids)",
         .versions = (X86CPUVersionDefinition[]) {
             { .version = 1 },
+            {
+                .version = 2,
+                .props = (PropValue[]) {
+                    { "ss", "on" },
+                    { "tsc-adjust", "on" },
+                    { "cldemote", "on" },
+                    { "movdiri", "on" },
+                    { "movdir64b", "on" },
+                    { "avx10", "on" },
+                    { "avx10-128", "on" },
+                    { "avx10-256", "on" },
+                    { "avx10-512", "on" },
+                    { "avx10-version", "1" },
+                    { "stepping", "1" },
+                    { /* end of list */ }
+                }
+            },
             { /* end of list */ },
         },
     },
@@ -5220,7 +5302,7 @@ static const X86CPUDefinition builtin_x86_defs[] = {
             CPUID_8000_0008_EBX_STIBP_ALWAYS_ON |
             CPUID_8000_0008_EBX_AMD_SSBD | CPUID_8000_0008_EBX_AMD_PSFD,
         .features[FEAT_8000_0021_EAX] =
-            CPUID_8000_0021_EAX_No_NESTED_DATA_BP |
+            CPUID_8000_0021_EAX_NO_NESTED_DATA_BP |
             CPUID_8000_0021_EAX_LFENCE_ALWAYS_SERIALIZING |
             CPUID_8000_0021_EAX_NULL_SEL_CLR_BASE |
             CPUID_8000_0021_EAX_AUTO_IBRS,
@@ -5433,13 +5515,13 @@ static void x86_cpuid_version_get_family(Object *obj, Visitor *v,
 {
     X86CPU *cpu = X86_CPU(obj);
     CPUX86State *env = &cpu->env;
-    int64_t value;
+    uint64_t value;
 
     value = (env->cpuid_version >> 8) & 0xf;
     if (value == 0xf) {
         value += (env->cpuid_version >> 20) & 0xff;
     }
-    visit_type_int(v, name, &value, errp);
+    visit_type_uint64(v, name, &value, errp);
 }
 
 static void x86_cpuid_version_set_family(Object *obj, Visitor *v,
@@ -5448,16 +5530,15 @@ static void x86_cpuid_version_set_family(Object *obj, Visitor *v,
 {
     X86CPU *cpu = X86_CPU(obj);
     CPUX86State *env = &cpu->env;
-    const int64_t min = 0;
-    const int64_t max = 0xff + 0xf;
-    int64_t value;
+    const uint64_t max = 0xff + 0xf;
+    uint64_t value;
 
-    if (!visit_type_int(v, name, &value, errp)) {
+    if (!visit_type_uint64(v, name, &value, errp)) {
         return;
     }
-    if (value < min || value > max) {
-        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE, "",
-                   name ? name : "null", value, min, max);
+    if (value > max) {
+        error_setg(errp, "parameter '%s' can be at most %" PRIu64,
+                   name ? name : "null", max);
         return;
     }
 
@@ -5475,11 +5556,11 @@ static void x86_cpuid_version_get_model(Object *obj, Visitor *v,
 {
     X86CPU *cpu = X86_CPU(obj);
     CPUX86State *env = &cpu->env;
-    int64_t value;
+    uint64_t value;
 
     value = (env->cpuid_version >> 4) & 0xf;
     value |= ((env->cpuid_version >> 16) & 0xf) << 4;
-    visit_type_int(v, name, &value, errp);
+    visit_type_uint64(v, name, &value, errp);
 }
 
 static void x86_cpuid_version_set_model(Object *obj, Visitor *v,
@@ -5488,16 +5569,15 @@ static void x86_cpuid_version_set_model(Object *obj, Visitor *v,
 {
     X86CPU *cpu = X86_CPU(obj);
     CPUX86State *env = &cpu->env;
-    const int64_t min = 0;
-    const int64_t max = 0xff;
-    int64_t value;
+    const uint64_t max = 0xff;
+    uint64_t value;
 
-    if (!visit_type_int(v, name, &value, errp)) {
+    if (!visit_type_uint64(v, name, &value, errp)) {
         return;
     }
-    if (value < min || value > max) {
-        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE, "",
-                   name ? name : "null", value, min, max);
+    if (value > max) {
+        error_setg(errp, "parameter '%s' can be at most %" PRIu64,
+                   name ? name : "null", max);
         return;
     }
 
@@ -5511,10 +5591,10 @@ static void x86_cpuid_version_get_stepping(Object *obj, Visitor *v,
 {
     X86CPU *cpu = X86_CPU(obj);
     CPUX86State *env = &cpu->env;
-    int64_t value;
+    uint64_t value;
 
     value = env->cpuid_version & 0xf;
-    visit_type_int(v, name, &value, errp);
+    visit_type_uint64(v, name, &value, errp);
 }
 
 static void x86_cpuid_version_set_stepping(Object *obj, Visitor *v,
@@ -5523,16 +5603,15 @@ static void x86_cpuid_version_set_stepping(Object *obj, Visitor *v,
 {
     X86CPU *cpu = X86_CPU(obj);
     CPUX86State *env = &cpu->env;
-    const int64_t min = 0;
-    const int64_t max = 0xf;
-    int64_t value;
+    const uint64_t max = 0xf;
+    uint64_t value;
 
-    if (!visit_type_int(v, name, &value, errp)) {
+    if (!visit_type_uint64(v, name, &value, errp)) {
         return;
     }
-    if (value < min || value > max) {
-        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE, "",
-                   name ? name : "null", value, min, max);
+    if (value > max) {
+        error_setg(errp, "parameter '%s' can be at most %" PRIu64,
+                   name ? name : "null", max);
         return;
     }
 
@@ -5626,16 +5705,15 @@ static void x86_cpuid_set_tsc_freq(Object *obj, Visitor *v, const char *name,
                                    void *opaque, Error **errp)
 {
     X86CPU *cpu = X86_CPU(obj);
-    const int64_t min = 0;
     const int64_t max = INT64_MAX;
     int64_t value;
 
     if (!visit_type_int(v, name, &value, errp)) {
         return;
     }
-    if (value < min || value > max) {
-        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE, "",
-                   name ? name : "null", value, min, max);
+    if (value < 0 || value > max) {
+        error_setg(errp, "parameter '%s' can be at most %" PRId64,
+                   name ? name : "null", max);
         return;
     }
 
@@ -5814,7 +5892,7 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
     }
 }
 
-static void x86_cpu_filter_features(X86CPU *cpu, bool verbose);
+static bool x86_cpu_filter_features(X86CPU *cpu, bool verbose);
 
 /* Build a list with the name of all features on a feature word array */
 static void x86_cpu_list_feature_names(FeatureWordArray features,
@@ -6124,7 +6202,7 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w)
 
     r &= ~unavail;
     if (cpu && cpu->migratable) {
-        r &= x86_cpu_get_migratable_flags(w);
+        r &= x86_cpu_get_migratable_flags(cpu, w);
     }
     return r;
 }
@@ -6304,6 +6382,9 @@ static void x86_cpu_load_model(X86CPU *cpu, X86CPUModel *model)
      * host cpu vendor for KVM and HVF.
      */
     object_property_set_str(OBJECT(cpu), "vendor", def->vendor, &error_abort);
+
+    object_property_set_uint(OBJECT(cpu), "avx10-version", def->avx10_version,
+                             &error_abort);
 
     x86_cpu_apply_version_props(cpu, model);
 
@@ -6833,6 +6914,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
         }
         break;
     }
+    case 0x24: {
+        *eax = 0;
+        *ebx = 0;
+        *ecx = 0;
+        *edx = 0;
+        if ((env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10) && count == 0) {
+            *ebx = env->features[FEAT_24_0_EBX] | env->avx10_version;
+        }
+        break;
+    }
     case 0x40000000:
         /*
          * CPUID code in kvm_arch_init_vcpu() ignores stuff
@@ -7008,6 +7099,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
             *edx = 0;
         }
         break;
+    case 0x80000022:
+        *eax = *ebx = *ecx = *edx = 0;
+        /* AMD Extended Performance Monitoring and Debug */
+        if (kvm_enabled() && cpu->enable_pmu &&
+            (env->features[FEAT_8000_0022_EAX] & CPUID_8000_0022_EAX_PERFMON_V2)) {
+            *eax |= CPUID_8000_0022_EAX_PERFMON_V2;
+            *ebx |= kvm_arch_get_supported_cpuid(cs->kvm_state, index, count,
+                                                 R_EBX) & 0xf;
+        }
+        break;
     case 0xC0000000:
         *eax = env->cpuid_xlevel2;
         *ebx = 0;
@@ -7041,8 +7142,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
         }
         break;
     case 0x80000021:
+        *eax = *ebx = *ecx = *edx = 0;
         *eax = env->features[FEAT_8000_0021_EAX];
-        *ebx = *ecx = *edx = 0;
+        *ebx = env->features[FEAT_8000_0021_EBX];
         break;
     default:
         /* reserved values: zero */
@@ -7065,6 +7167,23 @@ static void x86_cpu_set_sgxlepubkeyhash(CPUX86State *env)
 #endif
 }
 
+static bool cpuid_has_xsave_feature(CPUX86State *env, const ExtSaveArea *esa)
+{
+    if (!esa->size) {
+        return false;
+    }
+
+    if (env->features[esa->feature] & esa->bits) {
+        return true;
+    }
+    if (esa->feature == FEAT_7_0_EBX && esa->bits == CPUID_7_0_EBX_AVX512F
+        && (env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10)) {
+        return true;
+    }
+
+    return false;
+}
+
 static void x86_cpu_reset_hold(Object *obj, ResetType type)
 {
     CPUState *cs = CPU(obj);
@@ -7080,6 +7199,10 @@ static void x86_cpu_reset_hold(Object *obj, ResetType type)
     }
 
     memset(env, 0, offsetof(CPUX86State, end_reset_fields));
+
+    if (tcg_enabled()) {
+        cpu_init_fp_statuses(env);
+    }
 
     env->old_exception = -1;
 
@@ -7173,7 +7296,7 @@ static void x86_cpu_reset_hold(Object *obj, ResetType type)
         if (!((1 << i) & CPUID_XSTATE_XCR0_MASK)) {
             continue;
         }
-        if (env->features[esa->feature] & esa->bits) {
+        if (cpuid_has_xsave_feature(env, esa)) {
             xcr0 |= 1ull << i;
         }
     }
@@ -7311,7 +7434,7 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
     mask = 0;
     for (i = 0; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
         const ExtSaveArea *esa = &x86_ext_save_areas[i];
-        if (env->features[esa->feature] & esa->bits) {
+        if (cpuid_has_xsave_feature(env, esa)) {
             mask |= (1ULL << i);
         }
     }
@@ -7404,6 +7527,12 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
                 ~env->user_features[w] &
                 ~feature_word_info[w].no_autoenable_flags;
         }
+
+        if ((env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10) && !env->avx10_version) {
+            uint32_t eax, ebx, ecx, edx;
+            x86_cpu_get_supported_cpuid(0x24, 0, &eax, &ebx, &ecx, &edx);
+            env->avx10_version = ebx & 0xff;
+        }
     }
 
     for (i = 0; i < ARRAY_SIZE(feature_dependencies); i++) {
@@ -7467,6 +7596,11 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
             x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
         }
 
+        /* Advanced Vector Extensions 10 (AVX10) requires CPUID[0x24] */
+        if (env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10) {
+            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x24);
+        }
+
         /* SVM requires CPUID[0x8000000A] */
         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
@@ -7510,13 +7644,17 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
  * Finishes initialization of CPUID data, filters CPU feature
  * words based on host availability of each feature.
  *
- * Returns: 0 if all flags are supported by the host, non-zero otherwise.
+ * Returns: true if any flag is not supported by the host, false otherwise.
  */
-static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+static bool x86_cpu_filter_features(X86CPU *cpu, bool verbose)
 {
     CPUX86State *env = &cpu->env;
     FeatureWord w;
     const char *prefix = NULL;
+    bool have_filtered_features;
+
+    uint32_t eax_0, ebx_0, ecx_0, edx_0;
+    uint32_t eax_1, ebx_1, ecx_1, edx_1;
 
     if (verbose) {
         prefix = accel_uses_host_cpuid()
@@ -7538,13 +7676,10 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
      */
     if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
         kvm_enabled()) {
-        uint32_t eax_0, ebx_0, ecx_0, edx_0_unused;
-        uint32_t eax_1, ebx_1, ecx_1_unused, edx_1_unused;
-
         x86_cpu_get_supported_cpuid(0x14, 0,
-                                    &eax_0, &ebx_0, &ecx_0, &edx_0_unused);
+                                    &eax_0, &ebx_0, &ecx_0, &edx_0);
         x86_cpu_get_supported_cpuid(0x14, 1,
-                                    &eax_1, &ebx_1, &ecx_1_unused, &edx_1_unused);
+                                    &eax_1, &ebx_1, &ecx_1, &edx_1);
 
         if (!eax_0 ||
            ((ebx_0 & INTEL_PT_MINIMAL_EBX) != INTEL_PT_MINIMAL_EBX) ||
@@ -7564,6 +7699,28 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
             mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, prefix);
         }
     }
+
+    have_filtered_features = x86_cpu_have_filtered_features(cpu);
+
+    if (env->features[FEAT_7_1_EDX] & CPUID_7_1_EDX_AVX10) {
+        x86_cpu_get_supported_cpuid(0x24, 0,
+                                    &eax_0, &ebx_0, &ecx_0, &edx_0);
+        uint8_t version = ebx_0 & 0xff;
+
+        if (version < env->avx10_version) {
+            if (prefix) {
+                warn_report("%s: avx10.%d. Adjust to avx10.%d",
+                            prefix, env->avx10_version, version);
+            }
+            env->avx10_version = version;
+            have_filtered_features = true;
+        }
+    } else if (env->avx10_version && prefix) {
+        warn_report("%s: avx10.%d.", prefix, env->avx10_version);
+        have_filtered_features = true;
+    }
+
+    return have_filtered_features;
 }
 
 static void x86_cpu_hyperv_realize(X86CPU *cpu)
@@ -7661,14 +7818,14 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
         }
     }
 
-    x86_cpu_filter_features(cpu, cpu->check_cpuid || cpu->enforce_cpuid);
-
-    if (cpu->enforce_cpuid && x86_cpu_have_filtered_features(cpu)) {
-        error_setg(&local_err,
-                   accel_uses_host_cpuid() ?
+    if (x86_cpu_filter_features(cpu, cpu->check_cpuid || cpu->enforce_cpuid)) {
+        if (cpu->enforce_cpuid) {
+            error_setg(&local_err,
+                       accel_uses_host_cpuid() ?
                        "Host doesn't support requested features" :
                        "TCG doesn't support requested features");
-        goto out;
+            goto out;
+        }
     }
 
     /* On AMD CPUs, some CPUID[8000_0001].EDX bits must match the bits on
@@ -7831,6 +7988,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
 
     mce_init(cpu);
 
+    x86_cpu_gdb_init(cs);
     qemu_init_vcpu(cs);
 
     /*
@@ -7982,6 +8140,26 @@ static void x86_cpu_register_feature_bit_props(X86CPUClass *xcc,
 
 static void x86_cpu_post_initfn(Object *obj)
 {
+    static bool first = true;
+    uint64_t supported_xcr0;
+    int i;
+
+    if (first) {
+        first = false;
+
+        supported_xcr0 =
+            ((uint64_t) x86_cpu_get_supported_feature_word(NULL, FEAT_XSAVE_XCR0_HI) << 32) |
+            x86_cpu_get_supported_feature_word(NULL, FEAT_XSAVE_XCR0_LO);
+
+        for (i = XSTATE_SSE_BIT + 1; i < XSAVE_STATE_AREA_COUNT; i++) {
+            ExtSaveArea *esa = &x86_ext_save_areas[i];
+
+            if (!(supported_xcr0 & (1 << i))) {
+                esa->size = 0;
+            }
+        }
+    }
+
     accel_cpu_instance_init(CPU(obj));
 }
 
@@ -8291,8 +8469,10 @@ static Property x86_cpu_properties[] = {
                       HYPERV_FEAT_TLBFLUSH_DIRECT, 0),
     DEFINE_PROP_ON_OFF_AUTO("hv-no-nonarch-coresharing", X86CPU,
                             hyperv_no_nonarch_cs, ON_OFF_AUTO_OFF),
+#ifdef CONFIG_SYNDBG
     DEFINE_PROP_BIT64("hv-syndbg", X86CPU, hyperv_features,
                       HYPERV_FEAT_SYNDBG, 0),
+#endif
     DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
     DEFINE_PROP_BOOL("hv-enforce-cpuid", X86CPU, hyperv_enforce_cpuid, false),
 
@@ -8324,6 +8504,7 @@ static Property x86_cpu_properties[] = {
     DEFINE_PROP_UINT32("min-level", X86CPU, env.cpuid_min_level, 0),
     DEFINE_PROP_UINT32("min-xlevel", X86CPU, env.cpuid_min_xlevel, 0),
     DEFINE_PROP_UINT32("min-xlevel2", X86CPU, env.cpuid_min_xlevel2, 0),
+    DEFINE_PROP_UINT8("avx10-version", X86CPU, env.avx10_version, 0),
     DEFINE_PROP_UINT64("ucode-rev", X86CPU, ucode_rev, 0),
     DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
     DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor),

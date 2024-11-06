@@ -588,18 +588,14 @@ const PropertyInfo qdev_prop_losttickpolicy = {
 static void set_blocksize(Object *obj, Visitor *v, const char *name,
                           void *opaque, Error **errp)
 {
-    DeviceState *dev = DEVICE(obj);
     Property *prop = opaque;
     uint32_t *ptr = object_field_prop_ptr(obj, prop);
     uint64_t value;
-    Error *local_err = NULL;
 
     if (!visit_type_size(v, name, &value, errp)) {
         return;
     }
-    check_block_size(dev->id ? : "", name, value, &local_err);
-    if (local_err) {
-        error_propagate(errp, local_err);
+    if (!check_block_size(name, value, errp)) {
         return;
     }
     *ptr = value;
@@ -659,7 +655,7 @@ const PropertyInfo qdev_prop_fdc_drive_type = {
 const PropertyInfo qdev_prop_multifd_compression = {
     .name = "MultiFDCompression",
     .description = "multifd_compression values, "
-                   "none/zlib/zstd/qpl/uadk",
+                   "none/zlib/zstd/qpl/uadk/qatzip",
     .enum_table = &MultiFDCompression_lookup,
     .get = qdev_propinfo_get_enum,
     .set = qdev_propinfo_set_enum,
@@ -1188,12 +1184,12 @@ const PropertyInfo qdev_prop_uuid = {
 
 /* --- s390 cpu entitlement policy --- */
 
-QEMU_BUILD_BUG_ON(sizeof(CpuS390Entitlement) != sizeof(int));
+QEMU_BUILD_BUG_ON(sizeof(S390CpuEntitlement) != sizeof(int));
 
 const PropertyInfo qdev_prop_cpus390entitlement = {
-    .name  = "CpuS390Entitlement",
+    .name  = "S390CpuEntitlement",
     .description = "low/medium (default)/high",
-    .enum_table  = &CpuS390Entitlement_lookup,
+    .enum_table  = &S390CpuEntitlement_lookup,
     .get   = qdev_propinfo_get_enum,
     .set   = qdev_propinfo_set_enum,
     .set_default_value = qdev_propinfo_set_default_value_enum,

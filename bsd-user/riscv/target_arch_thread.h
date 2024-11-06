@@ -27,7 +27,7 @@ static inline void target_thread_set_upcall(CPURISCVState *regs,
 {
     abi_ulong sp;
 
-    sp = ROUND_DOWN(stack_base + stack_size,16);
+    sp = ROUND_DOWN(stack_base + stack_size, 16);
 
     regs->gpr[xSP] = sp;
     regs->pc = entry;
@@ -40,8 +40,8 @@ static inline void target_thread_init(struct target_pt_regs *regs,
 {
     regs->sepc = infop->entry;
     regs->regs[xRA] = infop->entry;
-    regs->regs[xA0] = infop->start_stack;               /* a0 */
-    regs->regs[xSP] = ROUND_DOWN(infop->start_stack,16);
+    regs->regs[xA0] = infop->start_stack;
+    regs->regs[xSP] = ROUND_DOWN(infop->start_stack, 16);
 }
 
 #endif /* TARGET_ARCH_THREAD_H */

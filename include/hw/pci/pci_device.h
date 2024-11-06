@@ -167,6 +167,13 @@ struct PCIDevice {
     /* ID of standby device in net_failover pair */
     char *failover_pair_id;
     uint32_t acpi_index;
+
+    /*
+     * Indirect DMA region bounce buffer size as configured for the device. This
+     * is a configuration parameter that is reflected into bus_master_as when
+     * realizing the device.
+     */
+    uint32_t max_bounce_buffer_size;
 };
 
 static inline int pci_intx(PCIDevice *pci_dev)

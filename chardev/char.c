@@ -333,7 +333,7 @@ static bool qemu_chr_is_busy(Chardev *s)
 {
     if (CHARDEV_IS_MUX(s)) {
         MuxChardev *d = MUX_CHARDEV(s);
-        return d->mux_cnt >= 0;
+        return d->mux_bitset != 0;
     } else {
         return s->be != NULL;
     }
@@ -425,6 +425,11 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
     }
     if (strstart(filename, "pipe:", &p)) {
         qemu_opt_set(opts, "backend", "pipe", &error_abort);
+        qemu_opt_set(opts, "path", p, &error_abort);
+        return opts;
+    }
+    if (strstart(filename, "pty:", &p)) {
+        qemu_opt_set(opts, "backend", "pty", &error_abort);
         qemu_opt_set(opts, "path", p, &error_abort);
         return opts;
     }
@@ -887,6 +892,9 @@ QemuOptsList qemu_chardev_opts = {
             .type = QEMU_OPT_BOOL,
         },{
             .name = "reconnect",
+            .type = QEMU_OPT_NUMBER,
+        },{
+            .name = "reconnect-ms",
             .type = QEMU_OPT_NUMBER,
         },{
             .name = "telnet",

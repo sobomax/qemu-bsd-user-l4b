@@ -71,6 +71,14 @@ typedef enum {
     sd_illegal = -2,
 } sd_rsp_type_t;
 
+typedef enum {
+    sd_spi,
+    sd_bc,     /* broadcast -- no response */
+    sd_bcr,    /* broadcast with response */
+    sd_ac,     /* addressed -- no data transfer */
+    sd_adtc,   /* addressed with data transfer */
+} sd_cmd_type_t;
+
 enum SDCardModes {
     sd_inactive,
     sd_card_identification_mode,
@@ -774,16 +782,9 @@ static uint32_t sd_blk_len(SDState *sd)
  */
 static uint32_t sd_bootpart_offset(SDState *sd)
 {
-    bool partitions_enabled;
     unsigned partition_access;
 
     if (!sd->boot_part_size || !sd_is_emmc(sd)) {
-        return 0;
-    }
-
-    partitions_enabled = sd->ext_csd[EXT_CSD_PART_CONFIG]
-                                   & EXT_CSD_PART_CONFIG_EN_MASK;
-    if (!partitions_enabled) {
         return 0;
     }
 
@@ -833,7 +834,9 @@ static void sd_reset(DeviceState *dev)
         sect = 0;
     }
     size = sect << HWBLOCK_SHIFT;
-    size -= sd_bootpart_offset(sd);
+    if (sd_is_emmc(sd)) {
+        size -= sd->boot_part_size * 2;
+    }
 
     sect = sd_addr_to_wpnum(size) + 1;
 
@@ -2819,7 +2822,7 @@ static void sdmmc_common_class_init(ObjectClass *klass, void *data)
 
     device_class_set_props(dc, sdmmc_common_properties);
     dc->vmsd = &sd_vmstate;
-    dc->reset = sd_reset;
+    device_class_set_legacy_reset(dc, sd_reset);
     dc->bus_type = TYPE_SD_BUS;
     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
 

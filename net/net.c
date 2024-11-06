@@ -542,6 +542,10 @@ void qemu_set_offload(NetClientState *nc, int csum, int tso4, int tso6,
 
 int qemu_get_vnet_hdr_len(NetClientState *nc)
 {
+    if (!nc) {
+        return 0;
+    }
+
     return nc->vnet_hdr_len;
 }
 
@@ -748,16 +752,6 @@ ssize_t qemu_receive_packet(NetClientState *nc, const uint8_t *buf, int size)
     }
 
     return qemu_net_queue_receive(nc->incoming_queue, buf, size);
-}
-
-ssize_t qemu_receive_packet_iov(NetClientState *nc, const struct iovec *iov,
-                                int iovcnt)
-{
-    if (!qemu_can_receive_packet(nc)) {
-        return 0;
-    }
-
-    return qemu_net_queue_receive_iov(nc->incoming_queue, iov, iovcnt);
 }
 
 ssize_t qemu_send_packet_raw(NetClientState *nc, const uint8_t *buf, int size)
