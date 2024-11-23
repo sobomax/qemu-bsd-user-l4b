@@ -1,7 +1,9 @@
 # Copyright (c) 2021 Warner Losh
 # SPDX-License-Identifier: BSD-2-Clause
 
+#if !defined(__linux__)
 #include <sys/syscall.h>
+#endif
 #define STDOUT_FILENO	1
 
 	.text

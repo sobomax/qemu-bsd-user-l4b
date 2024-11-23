@@ -20,13 +20,17 @@
 
 #include <sys/types.h>
 #include <sys/param.h>
+#if !defined(linux)
 #include <sys/disk.h>
 #include <sys/ioccom.h>
+#endif
 #include <sys/ioctl.h>
+#if !defined(linux)
 #include <sys/sockio.h>
 #include <sys/_termios.h>
 #include <sys/ttycom.h>
 #include <sys/filio.h>
+#endif
 
 #include <crypto/cryptodev.h>
 

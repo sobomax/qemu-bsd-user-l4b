@@ -20,6 +20,10 @@
 #ifndef BSD_FILE_H
 #define BSD_FILE_H
 
+#if defined(__linux__)
+#include <sys/file.h>
+#endif
+
 #include "qemu/path.h"
 
 #define LOCK_PATH(p, arg)                   \
@@ -281,6 +285,7 @@ static abi_long do_bsd_closefrom(abi_long arg1)
 /* revoke(2) */
 static abi_long do_bsd_revoke(abi_long arg1)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -289,6 +294,9 @@ static abi_long do_bsd_revoke(abi_long arg1)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* access(2) */
@@ -555,6 +563,7 @@ static abi_long do_bsd_sync(void)
 static abi_long do_bsd_mount(abi_long arg1, abi_long arg2, abi_long arg3,
         abi_long arg4)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p1, *p2;
 
@@ -571,11 +580,15 @@ static abi_long do_bsd_mount(abi_long arg1, abi_long arg2, abi_long arg3,
     UNLOCK_PATH2(p1, arg1, p2, arg2);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* unmount(2) */
 static abi_long do_bsd_unmount(abi_long arg1, abi_long arg2)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -584,12 +597,16 @@ static abi_long do_bsd_unmount(abi_long arg1, abi_long arg2)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* nmount(2) */
 static abi_long do_bsd_nmount(abi_long arg1, abi_long count,
         abi_long flags)
 {
+#if !defined(__linux__)
     abi_long ret;
     struct iovec *vec = lock_iovec(VERIFY_READ, arg1, count, 1);
 
@@ -601,6 +618,9 @@ static abi_long do_bsd_nmount(abi_long arg1, abi_long count,
     }
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* symlink(2) */
@@ -821,6 +841,7 @@ static abi_long do_bsd_fchownat(abi_long arg1, abi_long arg2,
 /* chflags(2) */
 static abi_long do_bsd_chflags(abi_long arg1, abi_long arg2)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -829,11 +850,15 @@ static abi_long do_bsd_chflags(abi_long arg1, abi_long arg2)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* lchflags(2) */
 static abi_long do_bsd_lchflags(abi_long arg1, abi_long arg2)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -842,12 +867,19 @@ static abi_long do_bsd_lchflags(abi_long arg1, abi_long arg2)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* fchflags(2) */
 static abi_long do_bsd_fchflags(abi_long arg1, abi_long arg2)
 {
+#if !defined(__linux__)
     return get_errno(fchflags(arg1, arg2));
+#else
+    abort();
+#endif
 }
 
 /* chroot(2) */
@@ -912,6 +944,7 @@ static abi_long do_bsd_pathconf(abi_long arg1, abi_long arg2)
 /* lpathconf(2) */
 static abi_long do_bsd_lpathconf(abi_long arg1, abi_long arg2)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -920,6 +953,9 @@ static abi_long do_bsd_lpathconf(abi_long arg1, abi_long arg2)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* fpathconf(2) */
@@ -931,6 +967,7 @@ static abi_long do_bsd_fpathconf(abi_long arg1, abi_long arg2)
 /* undelete(2) */
 static abi_long do_bsd_undelete(abi_long arg1)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -939,6 +976,9 @@ static abi_long do_bsd_undelete(abi_long arg1)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* poll(2) */
@@ -1031,6 +1071,7 @@ static abi_long do_bsd_pipe(void *cpu_env, abi_ulong pipedes)
 /* swapon(2) */
 static abi_long do_bsd_swapon(abi_long arg1)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -1039,12 +1080,16 @@ static abi_long do_bsd_swapon(abi_long arg1)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 #ifdef TARGET_FREEBSD_NR_freebsd13_swapoff
 /* swapoff(2) */
 static abi_long do_freebsd13_swapoff(abi_long arg1)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -1053,12 +1098,16 @@ static abi_long do_freebsd13_swapoff(abi_long arg1)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 #endif
 
 /* swapoff(2) */
 static abi_long do_bsd_swapoff(abi_long arg1, abi_long arg2)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -1071,6 +1120,9 @@ static abi_long do_bsd_swapoff(abi_long arg1, abi_long arg2)
     UNLOCK_PATH(p, arg1);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 #endif /* BSD_FILE_H */

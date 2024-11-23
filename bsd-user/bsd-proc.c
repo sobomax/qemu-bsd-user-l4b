@@ -20,7 +20,9 @@
 
 #include <sys/param.h>
 #include <sys/types.h>
+#if !defined(__linux__)
 #include <sys/cpuset.h>
+#endif
 #include <sys/resource.h>
 #include <sys/wait.h>
 
@@ -87,6 +89,7 @@ abi_long host_to_target_rusage(abi_ulong target_addr,
     return 0;
 }
 
+#if !defined(__linux__)
 abi_long host_to_target_wrusage(abi_ulong target_addr,
                                 const struct __wrusage *wrusage)
 {
@@ -101,6 +104,7 @@ abi_long host_to_target_wrusage(abi_ulong target_addr,
 
     return 0;
 }
+#endif
 
 /*
  * wait status conversion.
@@ -121,6 +125,7 @@ int host_to_target_waitstatus(int status)
 
 int bsd_get_ncpu(void)
 {
+#if !defined(__linux__)
     int ncpu = -1;
     cpuset_t mask;
 
@@ -141,5 +146,8 @@ int bsd_get_ncpu(void)
     }
 
     return ncpu;
+#else
+    fprintf(stderr, "bsd_get_ncpu: stub\n");
+    return 1;
+#endif
 }
-

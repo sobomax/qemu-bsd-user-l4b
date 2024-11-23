@@ -530,7 +530,7 @@ load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr, int fd,
     abi_ulong rbase, abi_ulong *baddrp)
 {
     struct elf_phdr *elf_ppnt;
-    abi_ulong baddr;
+    abi_ulong baddr = {};
     int i;
     bool first;
 

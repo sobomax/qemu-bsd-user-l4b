@@ -187,7 +187,11 @@ static inline abi_long do_bsd_madvise(abi_long arg1, abi_long arg2,
 static inline abi_long do_bsd_minherit(abi_long addr, abi_long len,
         abi_long inherit)
 {
+#if !defined(__linux__)
     return get_errno(minherit(g2h_untagged(addr), len, inherit));
+#else
+    abort();
+#endif
 }
 
 /* mincore(2) */

@@ -24,14 +24,18 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/sem.h>
+#if !defined(__linux__)
 #include <sys/uuid.h>
+#endif
 
 #include "qemu-bsd.h"
 
+#if !defined(__linux__)
 #ifdef MSGMAX
 static int bsd_msgmax = MSGMAX;
 #else
 static int bsd_msgmax;
+#endif
 #endif
 
 /* quotactl(2) */
@@ -52,6 +56,7 @@ static inline abi_long do_bsd_reboot(abi_long how)
 /* uuidgen(2) */
 static inline abi_long do_bsd_uuidgen(abi_ulong target_addr, int count)
 {
+#if !defined(__linux__)
     int i;
     abi_long ret;
     struct uuid *host_uuid;
@@ -81,6 +86,9 @@ static inline abi_long do_bsd_uuidgen(abi_ulong target_addr, int count)
 out:
     g_free(host_uuid);
     return ret;
+#else
+    abort();
+#endif
 }
 
 
@@ -122,6 +130,7 @@ static inline abi_long do_bsd_semop(int semid, abi_long ptr, unsigned nsops)
 static inline abi_long do_bsd___semctl(int semid, int semnum, int target_cmd,
         union target_semun target_su)
 {
+#if !defined(__linux__)
     union semun arg;
     struct semid_ds dsarg;
     unsigned short *array = NULL;
@@ -233,12 +242,17 @@ static inline abi_long do_bsd___semctl(int semid, int semnum, int target_cmd,
         break;
     }
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* msgctl(2) */
 static inline abi_long do_bsd_msgctl(int msgid, int target_cmd, abi_long ptr)
 {
+#if !defined(__linux__)
     struct msqid_ds dsarg;
+#endif
     abi_long ret = -TARGET_EINVAL;
     int host_cmd;
 
@@ -262,6 +276,7 @@ static inline abi_long do_bsd_msgctl(int msgid, int target_cmd, abi_long ptr)
     switch (host_cmd) {
     case IPC_STAT:
     case IPC_SET:
+#if !defined(__linux__)
         if (target_to_host_msqid_ds(&dsarg, ptr)) {
             return -TARGET_EFAULT;
         }
@@ -269,6 +284,9 @@ static inline abi_long do_bsd_msgctl(int msgid, int target_cmd, abi_long ptr)
         if (host_to_target_msqid_ds(ptr, &dsarg)) {
             return -TARGET_EFAULT;
         }
+#else
+	abort();
+#endif
         break;
 
     case IPC_RMID:
@@ -289,6 +307,7 @@ struct kern_mymsg {
 
 static inline abi_long bsd_validate_msgsz(abi_ulong msgsz)
 {
+#if !defined(__linux__)
     /* Fetch msgmax the first time we need it. */
     if (bsd_msgmax == 0) {
         size_t len = sizeof(bsd_msgmax);
@@ -302,6 +321,9 @@ static inline abi_long bsd_validate_msgsz(abi_ulong msgsz)
         return -TARGET_EINVAL;
     }
     return 0;
+#else
+    abort();
+#endif
 }
 
 /* msgsnd(2) */

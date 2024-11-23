@@ -317,7 +317,11 @@ static abi_ulong mmap_find_vma_aligned(abi_ulong start, abi_ulong size,
     prev = 0;
     flags = MAP_ANON | MAP_PRIVATE;
     if (alignment != 0) {
+#if !defined(__linux__)
         flags |= MAP_ALIGNED(alignment);
+#else
+	abort();
+#endif
     }
 
     for (;; prev = ptr) {

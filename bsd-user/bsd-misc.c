@@ -23,7 +23,9 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/sem.h>
+#if !defined(__linux__)
 #include <sys/uuid.h>
+#endif
 
 #include "qemu.h"
 #include "qemu-bsd.h"

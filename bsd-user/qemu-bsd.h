@@ -29,9 +29,14 @@
 #include <sys/shm.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#if !defined(__linux__)
 #include <sys/uuid.h>
+#endif
 #include <sys/wait.h>
 #include <netinet/in.h>
+
+struct __wrusage;
+struct uuid;
 
 /* bsd-proc.c */
 int target_to_host_resource(int code);

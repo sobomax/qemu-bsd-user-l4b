@@ -12,7 +12,7 @@
 #include "gdbstub/commands.h"
 #include "qemu.h"
 #include "internals.h"
-#ifdef CONFIG_LINUX
+#if defined(CONFIG_LINUX) && !defined(CONFIG_BSD_USER)
 #include "linux-user/loader.h"
 #include "linux-user/qemu.h"
 #endif
@@ -228,7 +228,7 @@ void gdb_handle_query_offsets(GArray *params, void *user_ctx)
     gdb_put_strbuf();
 }
 
-#if defined(CONFIG_LINUX)
+#if defined(CONFIG_LINUX) && !defined(CONFIG_BSD_USER)
 /* Partial user only duplicate of helper in gdbstub.c */
 static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
                                          uint8_t *buf, int len, bool is_write)
@@ -310,7 +310,7 @@ void gdb_handle_v_file_open(GArray *params, void *user_ctx)
     uint64_t flags = gdb_get_cmd_param(params, 1)->val_ull;
     uint64_t mode = gdb_get_cmd_param(params, 2)->val_ull;
 
-#ifdef CONFIG_LINUX
+#if defined(CONFIG_LINUX) && !defined(CONFIG_BSD_USER)
     int fd = do_guest_openat(cpu_env(gdbserver_state.g_cpu), 0, filename,
                              flags, mode, false);
 #else
@@ -369,7 +369,7 @@ void gdb_handle_v_file_readlink(GArray *params, void *user_ctx)
         return;
     }
 
-#ifdef CONFIG_LINUX
+#if defined(CONFIG_LINUX) && !defined(CONFIG_BSD_USER)
     ssize_t n = do_guest_readlink(filename, buf, BUFSIZ);
 #else
     ssize_t n = readlink(filename, buf, BUFSIZ);

@@ -1,4 +1,4 @@
-if not have_bsd_user
+if not have_bsd_user or host_os == 'linux'
    subdir_done()
 endif
 

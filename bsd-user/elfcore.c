@@ -22,7 +22,9 @@
 #include <err.h>
 #include <libgen.h>
 #include <sys/mman.h>
+#if !defined(__linux__)
 #include <sys/sysctl.h>
+#endif
 #include <sys/resource.h>
 
 #define ELF_NOTE_ROUNDSIZE  4
@@ -198,6 +200,7 @@ static inline void bswap_prstatus(target_prstatus_t *p) { }
 
 static abi_long fill_osreldate(int *osreldatep)
 {
+#if !defined(__linux__)
     abi_long ret;
     size_t len;
     int mib[2];
@@ -214,6 +217,9 @@ static abi_long fill_osreldate(int *osreldatep)
         *osreldatep = tswap32(*osreldatep);
         return 0;
     }
+#else
+    abort();
+#endif
 }
 
 /*
@@ -902,6 +908,7 @@ static abi_long fill_thread_info(struct elf_note_info *info, int signr,
 static abi_long fill_kiproc(TaskState *ts, pid_t pid,
         struct target_kinfo_proc *tkip)
 {
+#if !defined(__linux__)
     abi_long ret;
     size_t len = sizeof(*tkip);
     struct bsd_binprm *bprm = ts->bprm;
@@ -922,6 +929,9 @@ static abi_long fill_kiproc(TaskState *ts, pid_t pid,
 #endif
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 

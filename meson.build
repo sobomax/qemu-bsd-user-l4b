@@ -3164,7 +3164,7 @@ foreach target : target_dirs
     endif
     config_target += { 'CONFIG_LINUX_USER': 'y' }
   elif target.endswith('bsd-user')
-    if host_os not in bsd_oses
+    if host_os not in bsd_oses and host_os != 'linux'
       if default_targets
         continue
       endif
@@ -4059,7 +4059,7 @@ foreach target : target_dirs
       target_inc += include_directories('common-user/host/' / host_arch)
       dir = base_dir / abi
       arch_srcs += files(dir / 'signal.c', dir / 'target_arch_cpu.c')
-      arch_srcs += bsd_syscall_nr.process('/usr/include/sys/syscall.h',
+      arch_srcs += bsd_syscall_nr.process('/tmp/syscall.h',
 					  extra_args : targetos.to_upper())
     endif
     target_inc += include_directories(

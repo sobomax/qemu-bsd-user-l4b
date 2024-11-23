@@ -39,8 +39,13 @@ void target_to_host_ipc_perm__locked(struct ipc_perm *host_ip,
     __get_user(host_ip->uid,  &target_ip->uid);
     __get_user(host_ip->gid,  &target_ip->gid);
     __get_user(host_ip->mode, &target_ip->mode);
+#if !defined(__linux__)
     __get_user(host_ip->seq,  &target_ip->seq);
     __get_user(host_ip->key,  &target_ip->key);
+#else
+    __get_user(host_ip->__seq, &target_ip->seq);
+    __get_user(host_ip->__key,  &target_ip->key);
+#endif
 }
 
 abi_long target_to_host_shmid_ds(struct shmid_ds *host_sd,
@@ -75,8 +80,13 @@ void host_to_target_ipc_perm__locked(struct target_ipc_perm *target_ip,
     __put_user(host_ip->uid,  &target_ip->uid);
     __put_user(host_ip->gid,  &target_ip->gid);
     __put_user(host_ip->mode, &target_ip->mode);
+#if !defined(__linux__)
     __put_user(host_ip->seq,  &target_ip->seq);
     __put_user(host_ip->key,  &target_ip->key);
+#else
+    __put_user(host_ip->__seq,  &target_ip->seq);
+    __put_user(host_ip->__key,  &target_ip->key);
+#endif
 }
 
 abi_long host_to_target_shmid_ds(abi_ulong target_addr,

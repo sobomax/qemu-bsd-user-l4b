@@ -17,6 +17,16 @@
 #ifndef QEMU_H
 #define QEMU_H
 
+#if defined(__linux__)
+#define	__packed	__attribute__((__packed__))
+#define	__aligned(x)	__attribute__((__aligned__(x)))
+#undef	si_pid
+#undef	si_uid
+#undef	si_status
+#undef	si_addr
+#undef	si_value
+#endif
+
 #include <sys/param.h>
 
 #include "qemu/int128.h"
@@ -28,7 +38,9 @@
 
 #include "user/abitypes.h"
 
+#if !defined(__linux__)
 extern char **environ;
+#endif
 
 #include "user/thunk.h"
 #include "target_arch.h"
@@ -177,7 +189,9 @@ struct bsd_binprm {
         int (*core_dump)(int, CPUArchState *);
 };
 
+#if !defined(LINUX_USER_LOADER_H)
 void do_init_thread(struct target_pt_regs *regs, struct image_info *infop);
+#endif
 abi_ulong loader_build_argptr(int envc, int argc, abi_ulong sp,
                               abi_ulong stringp);
 int loader_exec(const char *filename, char **argv, char **envp,
