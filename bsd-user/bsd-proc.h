@@ -42,6 +42,7 @@ static inline abi_long do_bsd_exit(void *cpu_env, abi_long arg1)
 /* getgroups(2) */
 static inline abi_long do_bsd_getgroups(abi_long gidsetsize, abi_long arg2)
 {
+#if !defined(__linux__)
     abi_long ret;
     uint32_t *target_grouplist;
     g_autofree gid_t *grouplist;
@@ -62,11 +63,15 @@ static inline abi_long do_bsd_getgroups(abi_long gidsetsize, abi_long arg2)
         }
     }
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* setgroups(2) */
 static inline abi_long do_bsd_setgroups(abi_long gidsetsize, abi_long arg2)
 {
+#if !defined(__linux__)
     uint32_t *target_grouplist;
     g_autofree gid_t *grouplist;
     int i;
@@ -81,6 +86,9 @@ static inline abi_long do_bsd_setgroups(abi_long gidsetsize, abi_long arg2)
     }
     unlock_user(target_grouplist, arg2, 0);
     return get_errno(setgroups(gidsetsize, grouplist));
+#else
+    abort();
+#endif
 }
 
 /* umask(2) */
@@ -92,6 +100,7 @@ static inline abi_long do_bsd_umask(abi_long arg1)
 /* setlogin(2) */
 static inline abi_long do_bsd_setlogin(abi_long arg1)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -103,11 +112,15 @@ static inline abi_long do_bsd_setlogin(abi_long arg1)
     unlock_user(p, arg1, 0);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* getlogin(2) */
 static inline abi_long do_bsd_getlogin(abi_long arg1, abi_long arg2)
 {
+#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -119,6 +132,9 @@ static inline abi_long do_bsd_getlogin(abi_long arg1, abi_long arg2)
     unlock_user(p, arg1, arg2);
 
     return ret;
+#else
+    abort();
+#endif
 }
 
 /* getrusage(2) */
@@ -356,7 +372,11 @@ static inline abi_long do_bsd_setsid(void)
 /* issetugid(2) */
 static inline abi_long do_bsd_issetugid(void)
 {
+#if !defined(__linux__)
     return get_errno(issetugid());
+#else
+    abort();
+#endif
 }
 
 /* profil(2) */

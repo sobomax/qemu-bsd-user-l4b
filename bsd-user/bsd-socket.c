@@ -65,7 +65,9 @@ abi_long target_to_host_sockaddr(struct sockaddr *addr, abi_ulong target_addr,
 
     memcpy(addr, target_saddr, len);
     addr->sa_family = sa_family;        /* type uint8_t */
+#if !defined(__linux__)
     addr->sa_len = target_saddr->sa_len;    /* type uint8_t */
+#endif
     unlock_user(target_saddr, target_addr, 0);
 
     return 0;
@@ -82,7 +84,11 @@ abi_long host_to_target_sockaddr(abi_ulong target_addr, struct sockaddr *addr,
     }
     memcpy(target_saddr, addr, len);
     target_saddr->sa_family = addr->sa_family;  /* type uint8_t */
+#if !defined(__linux__)
     target_saddr->sa_len = addr->sa_len;        /* type uint8_t */
+#else
+    target_saddr->sa_len = len;
+#endif
     unlock_user(target_saddr, target_addr, len);
 
     return 0;

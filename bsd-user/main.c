@@ -20,13 +20,17 @@
 
 #include "qemu/osdep.h"
 #include <sys/resource.h>
+#if !defined(__linux__)
 #include <sys/sysctl.h>
+#endif
 
 #include "qemu/help-texts.h"
 #include "qemu/units.h"
 #include "qemu/accel.h"
 #include "qemu-version.h"
+#if !defined(__linux__)
 #include <machine/trap.h>
+#endif
 
 #include "qapi/error.h"
 #include "qemu.h"

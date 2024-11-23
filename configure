@@ -865,6 +865,7 @@ if [ -n "$host_arch" ] && [ -d "$source_path/common-user/host/$host_arch" ]; the
     if [ "$bsd_user" != no ]; then
         if [ "$bsd_user" = "" ]; then
             test $host_os = freebsd && bsd_user=yes
+	    test $host_os = linux && bsd_user=yes
         fi
         if [ "$bsd_user" = yes ] && ! [ -d "$source_path/bsd-user/$host_os" ]; then
             error_exit "bsd-user not supported on this host OS"

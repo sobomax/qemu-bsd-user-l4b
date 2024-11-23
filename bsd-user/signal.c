@@ -114,6 +114,7 @@ static void host_to_target_sigset_internal(target_sigset_t *d,
 
 void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
 {
+#if !defined(__linux__)
     target_sigset_t d1;
     int i;
 
@@ -121,6 +122,9 @@ void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
     for (i = 0; i < _SIG_WORDS; i++) {
         d->__bits[i] = tswap32(d1.__bits[i]);
     }
+#else
+    abort();
+#endif
 }
 
 static void target_to_host_sigset_internal(sigset_t *d,
@@ -147,6 +151,7 @@ void target_to_host_sigset(sigset_t *d, const target_sigset_t *s)
     target_to_host_sigset_internal(d, &s1);
 }
 
+#if !defined(__linux__)
 static bool has_trapno(int tsig)
 {
     return tsig == TARGET_SIGILL ||
@@ -155,6 +160,7 @@ static bool has_trapno(int tsig)
         tsig == TARGET_SIGBUS ||
         tsig == TARGET_SIGTRAP;
 }
+#endif
 
 /* Siginfo conversion. */
 
@@ -164,6 +170,7 @@ static bool has_trapno(int tsig)
 static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
         const siginfo_t *info)
 {
+#if !defined(__linux__)
     int sig = host_to_target_signal(info->si_signo);
     int si_code = info->si_code;
     int si_type;
@@ -260,6 +267,9 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
         break;
     }
     tinfo->si_code = deposit32(si_code, 24, 8, si_type);
+#else
+    abort();
+#endif
 }
 
 static void tswap_siginfo(target_siginfo_t *tinfo, const target_siginfo_t *info)
@@ -345,6 +355,7 @@ int block_signals(void)
 abi_long target_to_host_sigevent(struct sigevent *host_sevp,
                                                abi_ulong target_addr)
 {
+#if !defined(__linux__)
     struct target_sigevent *target_sevp;
 
     if (!lock_user_struct(VERIFY_READ, target_sevp, target_addr, 1)) {
@@ -366,6 +377,9 @@ abi_long target_to_host_sigevent(struct sigevent *host_sevp,
 
     unlock_user_struct(target_sevp, target_addr, 1);
     return 0;
+#else
+    abort();
+#endif
 }
 
 /*
@@ -511,6 +525,7 @@ void force_sig_fault(int sig, int code, abi_ulong addr)
 
 static void host_signal_handler(int host_sig, siginfo_t *info, void *puc)
 {
+#if !defined(__linux__)
     CPUState *cpu = thread_cpu;
     TaskState *ts = get_task_state(cpu);
     target_siginfo_t tinfo;
@@ -615,6 +630,9 @@ static void host_signal_handler(int host_sig, siginfo_t *info, void *puc)
 
     /* Interrupt the virtual CPU as soon as possible. */
     cpu_exit(thread_cpu);
+#else
+    abort();
+#endif
 }
 
 /* do_sigaltstack() returns target values and errnos. */

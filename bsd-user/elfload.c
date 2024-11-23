@@ -534,7 +534,7 @@ load_elf_sections(const char *image_name, const struct elfhdr *hdr,
                   abi_ulong *baddrp)
 {
     struct elf_phdr *elf_ppnt;
-    abi_ulong baddr;
+    abi_ulong baddr = {};
     int i;
     bool first;
     Error *err = NULL;
