@@ -42,7 +42,6 @@
 #include "target_os_vmparam.h"
 #include "target_os_user.h"
 
-#if !defined(__linux__)
 /*
  * Length for the fixed length types.
  * 0 means variable length for strings and structures
@@ -78,7 +77,6 @@ static const int host_ctl_size[CTLTYPE + 1] = {
 	[CTLTYPE_U32] = sizeof(uint32_t),
 	[CTLTYPE_U64] = sizeof(uint64_t),
 };
-#endif
 
 #ifdef TARGET_ABI32
 /*
@@ -94,7 +92,6 @@ static abi_ulong cap_memory(uint64_t mem)
 }
 #endif
 
-#if !defined(__linux__)
 static abi_ulong scale_to_guest_pages(uint64_t pages)
 {
     /* Scale pages from host to guest */
@@ -105,7 +102,6 @@ static abi_ulong scale_to_guest_pages(uint64_t pages)
 #endif
     return pages;
 }
-#endif
 
 #ifdef TARGET_ABI32
 /* Used only for TARGET_ABI32 */
@@ -794,11 +790,13 @@ host_to_target_copy_sockaddrs(int addrs, char *hbuf, char *tbuf)
     }
     return tlen;
 }
+#endif
 
 static abi_long
 do_sysctl_net_routetable_iflistl(int32_t *snamep, size_t namelen, size_t olen,
                                  char *tbuf, size_t *tlen)
 {
+#if !defined(__linux__)
     abi_long ret;
 
     char *bp, *ep, *tp;
@@ -994,8 +992,10 @@ do_sysctl_net_routetable_iflistl(int32_t *snamep, size_t namelen, size_t olen,
     fflush(stdout);
 
     return ret;
-}
+#else
+    abort();
 #endif
+}
 
 /*
  * The following should maybe go some place else.  Also, see the note about
@@ -1059,6 +1059,7 @@ host_to_target_vfc_flags(int flags)
 #endif
     return ret;
 }
+#endif
 
 /*
  * This uses the undocumented oidfmt interface to find the kind of a requested
@@ -1067,6 +1068,7 @@ host_to_target_vfc_flags(int flags)
  */
 static int oidfmt(int *oid, int len, char *fmt, uint32_t *kind)
 {
+#if !defined(__linux__)
     int qoid[CTL_MAXNAME + 2];
     uint8_t buf[BUFSIZ];
     int i;
@@ -1090,6 +1092,9 @@ static int oidfmt(int *oid, int len, char *fmt, uint32_t *kind)
         strcpy(fmt, (char *)(buf + sizeof(uint32_t)));
     }
     return 0;
+#else
+    return -TARGET_ENOENT;
+#endif
 }
 
 /*
@@ -1182,7 +1187,6 @@ static void h2g_old_sysctl(void *holdp, size_t *holdlen, uint32_t kind)
     }
 #endif
 }
-#endif
 
 /*
  * Convert the undocmented name2oid sysctl data for the target.
@@ -1202,11 +1206,30 @@ static inline void sysctl_oidfmt(uint32_t *holdp)
     holdp[0] = tswap32(holdp[0]);
 }
 
+#if defined(__linux__)
+static inline int sysctlnametomib(const char *name, int *mibp, size_t *sizep)
+{
+	abort();
+}
+
+static inline int sysctlbyname(const char *name, void *oldp, size_t *oldlenp,
+         const void *newp, size_t newlen)
+{
+	abort();
+}
+
+static inline int sysctl(const int *name, u_int namelen, void *oldp, size_t *oldlenp,
+	const void *newp, size_t newlen)
+{
+	return -TARGET_ENOENT;
+}
+#endif
+
 static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
         int32_t namelen, void *holdp, size_t *holdlenp, void *hnewp,
         size_t newlen)
 {
-#if !defined(__linux__)
+#if !defined(__linux__) || 1
     uint32_t kind = 0;
     abi_long ret;
     size_t holdlen, oldlen;
@@ -1304,6 +1327,7 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
 
     case CTL_VFS:
     {
+#if !defined(__linux__)
         static int oid_vfs_conflist;
 
         if (!oid_vfs_conflist) {
@@ -1355,6 +1379,9 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
             ret = 0;
             goto out;
         }
+#else
+	abort();
+#endif
     }
     break;
 
