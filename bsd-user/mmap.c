@@ -268,7 +268,7 @@ static int mmap_frag(abi_ulong real_start,
     if (prot1 == 0) {
         /* no page was there, so we allocate one. See also above. */
         void *p = mmap(host_start, qemu_host_page_size, target_prot,
-                       flags | ((fd != -1) ? MAP_ANON : 0), -1, 0);
+                       flags | ((fd == -1) ? MAP_ANON : 0), -1, 0);
         if (p == MAP_FAILED) {
             return -1;
         }
@@ -646,7 +646,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int target_prot,
          * qemu_real_host_page_size
          */
         p = mmap(g2h_untagged(start), host_len, target_prot,
-                 flags | MAP_FIXED | ((fd != -1) ? MAP_ANON : 0), -1, 0);
+                 flags | MAP_FIXED | ((fd == -1) ? MAP_ANON : 0), -1, 0);
         if (p == MAP_FAILED) {
             goto fail;
         }
