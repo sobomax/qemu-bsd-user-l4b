@@ -375,7 +375,7 @@ static inline abi_long do_bsd_issetugid(void)
 #if !defined(__linux__)
     return get_errno(issetugid());
 #else
-    abort();
+    return (geteuid() != getuid() || getegid() != getgid());
 #endif
 }
 
