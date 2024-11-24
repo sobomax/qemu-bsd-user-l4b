@@ -126,8 +126,9 @@ static abi_long fill_prpsinfo(TaskState *ts, target_prpsinfo_t **prpsinfo)
 {
     struct bsd_binprm *bprm = ts->bprm;
     char *p, **argv = bprm->argv;
-    int i, sz, argc = bprm->argc;
+    int i, argc = bprm->argc;
     size_t len;
+    ssize_t sz;
     target_prpsinfo_t *pr;
 
     pr = g_malloc0(sizeof(*pr));
@@ -146,7 +147,7 @@ static abi_long fill_prpsinfo(TaskState *ts, target_prpsinfo_t **prpsinfo)
         len = strlen(argv[i]);
         p += len;
         sz -= len;
-        if (sz >= 0) {
+        if (sz <= 0) {
             break;
         }
         strncat(p, " ", sz);
