@@ -97,18 +97,14 @@ static inline abi_long do_freebsd11_lstat(abi_long arg1, abi_long arg2)
 /* fstat(2) */
 static inline abi_long do_freebsd11_fstat(abi_long arg1, abi_long arg2)
 {
-#if !defined(__linux__)
     abi_long ret;
-    struct freebsd11_stat st;
+    struct stat st;
 
-    ret = get_errno(freebsd11_fstat(arg1, &st));
+    ret = get_errno(fstat(arg1, &st));
     if (!is_error(ret))  {
-        ret = h2t_freebsd11_stat(arg2, &st);
+	    ret = h2t_freebsd11_stat(arg2, &st);
     }
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* fstat(2) */

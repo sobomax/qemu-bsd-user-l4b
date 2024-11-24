@@ -25,10 +25,10 @@
  * stat conversion
  */
 abi_long h2t_freebsd11_stat(abi_ulong target_addr,
-        struct freebsd11_stat *host_st)
+        struct stat *host_st)
 {
-#if !defined(__linux__)
     struct target_freebsd11_stat *target_st;
+    const abi_ulong STUB = 0;
 
     if (!lock_user_struct(VERIFY_WRITE, target_st, target_addr, 0)) {
         return -TARGET_EFAULT;
@@ -50,24 +50,21 @@ abi_long h2t_freebsd11_stat(abi_ulong target_addr,
     __put_user(host_st->st_size, &target_st->st_size);
     __put_user(host_st->st_blocks, &target_st->st_blocks);
     __put_user(host_st->st_blksize, &target_st->st_blksize);
-    __put_user(host_st->st_flags, &target_st->st_flags);
-    __put_user(host_st->st_gen, &target_st->st_gen);
+    __put_user(STUB, &target_st->st_flags);
+    __put_user(STUB, &target_st->st_gen);
     /* st_lspare not used */
-    __put_user(host_st->st_birthtim.tv_sec, &target_st->st_birthtim.tv_sec);
-    __put_user(host_st->st_birthtim.tv_nsec, &target_st->st_birthtim.tv_nsec);
+    __put_user(host_st->st_ctim.tv_sec, &target_st->st_birthtim.tv_sec);
+    __put_user(host_st->st_ctim.tv_nsec, &target_st->st_birthtim.tv_nsec);
     unlock_user_struct(target_st, target_addr, 1);
 
     return 0;
-#else
-    abort();
-#endif
 }
 
 abi_long h2t_freebsd_stat(abi_ulong target_addr,
         struct stat *host_st)
 {
-#if !defined(__linux__)
     struct target_stat *target_st;
+    const abi_ulong STUB = 0;
 
     if (!lock_user_struct(VERIFY_WRITE, target_st, target_addr, 0)) {
         return -TARGET_EFAULT;
@@ -95,20 +92,17 @@ abi_long h2t_freebsd_stat(abi_ulong target_addr,
 #ifdef TARGET_HAS_STAT_TIME_T_EXT
 /*    __put_user(host_st->st_birthtim_ext, &target_st->st_birthtim_ext); XXX */
 #endif
-    __put_user(host_st->st_birthtim.tv_sec, &target_st->st_birthtim.tv_sec);
-    __put_user(host_st->st_birthtim.tv_nsec, &target_st->st_birthtim.tv_nsec);
+    __put_user(host_st->st_ctim.tv_sec, &target_st->st_birthtim.tv_sec);
+    __put_user(host_st->st_ctim.tv_nsec, &target_st->st_birthtim.tv_nsec);
 
     __put_user(host_st->st_size, &target_st->st_size);
     __put_user(host_st->st_blocks, &target_st->st_blocks);
     __put_user(host_st->st_blksize, &target_st->st_blksize);
-    __put_user(host_st->st_flags, &target_st->st_flags);
-    __put_user(host_st->st_gen, &target_st->st_gen);
+    __put_user(STUB, &target_st->st_flags);
+    __put_user(STUB, &target_st->st_gen);
     unlock_user_struct(target_st, target_addr, 1);
 
     return 0;
-#else
-    abort();
-#endif
 }
 
 abi_long h2t_freebsd11_nstat(abi_ulong target_addr,

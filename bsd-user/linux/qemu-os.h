@@ -287,7 +287,7 @@ abi_long h2t_freebsd_cmsg(struct target_msghdr *target_msgh,
 
 /* os-stat.c */
 abi_long h2t_freebsd11_stat(abi_ulong target_addr,
-        struct freebsd11_stat *host_st);
+        struct stat *host_st);
 abi_long h2t_freebsd11_nstat(abi_ulong target_addr,
         struct freebsd11_stat *host_st);
 abi_long t2h_freebsd_fhandle(fhandle_t *host_fh, abi_ulong target_addr);
