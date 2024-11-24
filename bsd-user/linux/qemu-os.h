@@ -120,6 +120,7 @@ typedef struct fhandle  fhandle_t;
 #define       SO_NOSIGPIPE    0x00000800      /* no SIGPIPE from EPIPE */
 #define       SO_BINTIME      0x00002000      /* timestamp received dgram traffic */
 #define       SO_LISTENINCQLEN        0x1013  /* socket's incomplete queue length */
+#define       NET_RT_IFLISTL  5               /* Survey interface list */
 #define UMTX_OP_SHM             25
 #define PAGE_SHIFT 12
 #define PAGE_SIZE  (1<<PAGE_SHIFT)
@@ -146,6 +147,76 @@ typedef struct fhandle  fhandle_t;
 #define UMTX_OP_SEM_WAIT        19      /* deprecated */
 #define UMTX_OP_SEM_WAKE        20      /* deprecated */
 #define        EJUSTRETURN     (-2)            /* don't modify regs, just return */
+#define       CTL_MAXNAME     24      /* largest number of components supported */
+#define       CTL_KERN        1               /* "high kernel": proc, limits */
+#define       CTL_NET         4               /* network, see socket.h */
+#define       CTL_HW          6               /* generic cpu/io */
+#define       CTL_VFS         3               /* filesystem, mount type is next */
+#define       HW_NCPU          3              /* int: number of cpus */
+#define       HW_MACHINE       1              /* string: machine class */
+#define       HW_MACHINE_ARCH 11              /* string: machine architecture */
+#define       KERN_PROC               14      /* struct: process entries */
+#define       KERN_PROC_ALL           0       /* everything */
+#define       KERN_PROC_PROC          8       /* only return procs */
+#define       KERN_PROC_PID           1       /* by process id */
+#define       KERN_PROC_PGRP          2       /* by process group id */
+#define       KERN_PROC_INC_THREAD    0x10
+#define       KERN_PROC_PATHNAME      12      /* path to executable */
+#define       KERN_PROC_ARGS          7       /* get/set arguments/proctitle */
+#define       KERN_PROC_SESSION       3       /* by session of pid */
+#define       KERN_PROC_TTY           4       /* by controlling tty */
+#define       KERN_PROC_RUID          6       /* by real uid */
+#define       KERN_PROC_FILEDESC      33      /* File descriptors for process */
+#define       KERN_PROC_UID           5       /* by effective uid */
+#define       KERN_PROC_VMMAP         32      /* VM map entries for process */
+#define       KERN_USRSTACK           33      /* int: address of USRSTACK */
+#define       KERN_PS_STRINGS         32      /* int: address of PS_STRINGS */
+#define       CTL_SYSCTL      0               /* "magic" numbers */
+#define       CTL_SYSCTL_NEXT         2       /* next OID, honoring CTLFLAG_SKIP */
+#define       CTL_SYSCTL_NAME2OID     3       /* int array of name */
+#define       CTL_SYSCTL_OIDFMT       4       /* OID's kind and format */
+#define       CTL_SYSCTL_OIDDESCR     5       /* OID's description */
+#define       CTL_SYSCTL_OIDLABEL     6       /* aggregation label */
+#define       CTL_SYSCTL_NEXTNOSKIP   7       /* next OID, ignoring CTLFLAG_SKIP */
+/* 'CTLTYPE' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE
+#define CTLTYPE         0xf     /* mask for the type */
+/* 'CTLTYPE_INT' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_INT
+#define CTLTYPE_INT     2       /* name describes an integer */
+/* 'CTLTYPE_UINT' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_UINT
+#define CTLTYPE_UINT    6       /* name describes an unsigned integer */
+/* 'CTLTYPE_LONG' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_LONG
+#define CTLTYPE_LONG    7       /* name describes a long */
+/* 'CTLTYPE_ULONG' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_ULONG
+#define CTLTYPE_ULONG   8       /* name describes an unsigned long */
+/* 'CTLTYPE_S8' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_S8
+#define CTLTYPE_S8      0xc     /* name describes a signed 8-bit number */
+/* 'CTLTYPE_S16' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_S16
+#define CTLTYPE_S16     0xd     /* name describes a signed 16-bit number */
+/* 'CTLTYPE_S32' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_S32
+#define CTLTYPE_S32     0xe     /* name describes a signed 32-bit number */
+/* 'CTLTYPE_S64' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_S64
+#define CTLTYPE_S64     4       /* name describes a signed 64-bit number */
+/* 'CTLTYPE_U8' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_U8
+#define CTLTYPE_U8      0xa     /* name describes an unsigned 8-bit number */
+/* 'CTLTYPE_U16' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_U16
+#define CTLTYPE_U16     0xb     /* name describes an unsigned 16-bit number */
+/* 'CTLTYPE_U32' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_U32
+#define CTLTYPE_U32     0xf     /* name describes an unsigned 32-bit number */
+/* 'CTLTYPE_U64' found in: /usr/include/sys/sysctl.h */
+#undef CTLTYPE_U64
+#define CTLTYPE_U64     9       /* name describes an unsigned 64-bit number */
 
 typedef       __uint32_t      fflags_t;
 
