@@ -296,6 +296,7 @@ static abi_ulong mmap_find_vma_aligned(abi_ulong start, abi_ulong size,
     abi_ulong addr;
     int flags;
     int wrapped, repeat;
+    abi_ulong alloc_size;
 
     /* If 'start' == 0, then a default start address is used. */
     if (start == 0) {
@@ -304,7 +305,7 @@ static abi_ulong mmap_find_vma_aligned(abi_ulong start, abi_ulong size,
         start &= qemu_host_page_mask;
     }
 
-    size = HOST_PAGE_ALIGN(size);
+    alloc_size = size = HOST_PAGE_ALIGN(size);
 
     if (reserved_va) {
         return mmap_find_vma_reserved(start, size,
@@ -320,7 +321,7 @@ static abi_ulong mmap_find_vma_aligned(abi_ulong start, abi_ulong size,
 #if !defined(__linux__)
         flags |= MAP_ALIGNED(alignment);
 #else
-	abort();
+	alloc_size = size + (1 << alignment);
 #endif
     }
 
@@ -332,13 +333,29 @@ static abi_ulong mmap_find_vma_aligned(abi_ulong start, abi_ulong size,
          *  - mremap() with MREMAP_FIXED flag
          *  - shmat() with SHM_REMAP flag
          */
-        ptr = mmap(g2h_untagged(addr), size, PROT_NONE,
+        ptr = mmap(g2h_untagged(addr), alloc_size, PROT_NONE,
                    flags, -1, 0);
 
         /* ENOMEM, if host address space has no memory */
         if (ptr == MAP_FAILED) {
             return (abi_ulong)-1;
         }
+
+#if defined(__linux__)
+	if (alignment != 0) {
+		abi_ulong asize = (1 << alignment);
+		abi_ulong _ptr = (abi_ulong)ptr;
+		abi_ulong aligned_addr = (_ptr + asize - 1) & ~(asize - 1);
+		abi_ulong trail_free = (_ptr + alloc_size) - (aligned_addr + size);
+		if (aligned_addr != _ptr) {
+			assert(munmap(ptr, aligned_addr - _ptr) == 0);
+			ptr = (void *)aligned_addr;
+		}
+		if (trail_free != 0) {
+			 assert(munmap((void *)(aligned_addr + size), trail_free) == 0);
+		}
+	}
+#endif
 
         /*
          * Count the number of sequential returns of the same address.
