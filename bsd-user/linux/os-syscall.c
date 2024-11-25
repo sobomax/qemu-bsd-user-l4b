@@ -61,9 +61,11 @@ struct kevent;
 #endif
 
 /* Used in os-thread */
+#if !defined(__linux__)
 safe_syscall1(int, thr_suspend, struct timespec *, timeout);
 safe_syscall5(int, _umtx_op, void *, obj, int, op, unsigned long, val, void *,
     uaddr, void *, uaddr2);
+#endif
 
 /* used in os-time */
 safe_syscall2(int, nanosleep, const struct timespec *, rqtp, struct timespec *,
@@ -71,9 +73,11 @@ safe_syscall2(int, nanosleep, const struct timespec *, rqtp, struct timespec *,
 safe_syscall4(int, clock_nanosleep, clockid_t, clock_id, int, flags,
     const struct timespec *, rqtp, struct timespec *, rmtp);
 
+#if !defined(__linux__)
 safe_syscall6(int, kevent, int, kq, const struct kevent *, changelist,
     int, nchanges, struct kevent *, eventlist, int, nevents,
     const struct timespec *, timeout);
+#endif
 
 /* BSD dependent syscall shims */
 #include "os-stat.h"
@@ -86,25 +90,42 @@ safe_syscall4(int, openat, int, fd, const char *, path, int, flags, mode_t,
     mode);
 
 safe_syscall3(ssize_t, read, int, fd, void *, buf, size_t, nbytes);
+#if !defined(__linux__)
 safe_syscall4(ssize_t, pread, int, fd, void *, buf, size_t, nbytes, off_t,
     offset);
+#else
+safe_syscall4(ssize_t, pread64, int, fd, void *, buf, size_t, nbytes, off_t,
+    offset);
+#endif
 safe_syscall3(ssize_t, readv, int, fd, const struct iovec *, iov, int, iovcnt);
 safe_syscall4(ssize_t, preadv, int, fd, const struct iovec *, iov, int, iovcnt,
     off_t, offset);
 
 safe_syscall3(ssize_t, write, int, fd, void *, buf, size_t, nbytes);
+#if !defined(__linux__)
 safe_syscall4(ssize_t, pwrite, int, fd, void *, buf, size_t, nbytes, off_t,
     offset);
+#else
+safe_syscall4(ssize_t, pwrite64, int, fd, void *, buf, size_t, nbytes, off_t,
+    offset);
+#endif
 safe_syscall3(ssize_t, writev, int, fd, const struct iovec *, iov, int, iovcnt);
 safe_syscall4(ssize_t, pwritev, int, fd, const struct iovec *, iov, int, iovcnt,
     off_t, offset);
 
 safe_syscall5(int, select, int, nfds, fd_set *, readfs, fd_set *, writefds,
     fd_set *, exceptfds, struct timeval *, timeout);
+#if !defined(__linux__)
 safe_syscall6(int, pselect, int, nfds, fd_set * restrict, readfs,
     fd_set * restrict, writefds, fd_set * restrict, exceptfds,
     const struct timespec * restrict, timeout,
     const sigset_t * restrict, newsigmask);
+#else
+safe_syscall6(int, pselect6, int, nfds, fd_set * restrict, readfs,
+    fd_set * restrict, writefds, fd_set * restrict, exceptfds,
+    const struct timespec * restrict, timeout,
+    const sigset_t * restrict, newsigmask);
+#endif
 
 safe_syscall6(ssize_t, recvfrom, int, fd, void *, buf, size_t, len, int, flags,
     struct sockaddr * restrict, from, socklen_t * restrict, fromlen);
@@ -127,8 +148,10 @@ int g_posix_timers[32] = { 0, } ;
 /* used in os-proc */
 safe_syscall4(pid_t, wait4, pid_t, wpid, int *, status, int, options,
     struct rusage *, rusage);
+#if !defined(__linux__)
 safe_syscall6(pid_t, wait6, idtype_t, idtype, id_t, id, int *, status, int,
     options, struct __wrusage *, wrusage, siginfo_t *, infop);
+#endif
 
 /*
  * errno conversion.

@@ -117,6 +117,7 @@ static inline abi_long do_freebsd_thr_kill2(pid_t pid, long id, int sig)
 
 static inline abi_long do_freebsd_thr_suspend(abi_ulong target_ts)
 {
+#if !defined(__linux__)
     abi_long ret;
     struct timespec ts;
 
@@ -129,6 +130,9 @@ static inline abi_long do_freebsd_thr_suspend(abi_ulong target_ts)
         ret = get_errno(safe_thr_suspend(NULL));
     }
     return ret;
+#else
+    abort();
+#endif
 }
 
 static inline abi_long do_freebsd_thr_wake(long tid)
