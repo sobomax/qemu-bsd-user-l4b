@@ -33,10 +33,18 @@ ssize_t safe_sendto(int s, const void *buf, size_t len, int flags,
     const struct sockaddr *to, socklen_t tolen);
 int safe_select(int nfds, fd_set *readfs, fd_set *writefds, fd_set *exceptfds,
     struct timeval *timeout);
+#if !defined(__linux__)
 int safe_pselect(int nfds, fd_set *restrict readfds,
     fd_set *restrict writefds, fd_set *restrict exceptfds,
     const struct timespec *restrict timeout,
     const sigset_t *restrict newsigmask);
+#else
+int safe_pselect6(int nfds, fd_set *restrict readfds,
+    fd_set *restrict writefds, fd_set *restrict exceptfds,
+    const struct timespec *restrict timeout,
+    const sigset_t *restrict newsigmask);
+#define safe_pselect safe_pselect6
+#endif
 
 /* bind(2) */
 static inline abi_long do_bsd_bind(int sockfd, abi_ulong target_addr,

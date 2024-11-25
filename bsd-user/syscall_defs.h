@@ -832,36 +832,41 @@ struct target_procctl_reaper_kill {
     uint32_t rk_pad0[15];
 };
 
+#if !defined(__linux__)
+#define safe_name(name) SYS_##name
+#else
+#define safe_name(name) __NR_##name
+#endif
 
 #define safe_syscall0(type, name) \
 type safe_##name(void) \
 { \
-    return safe_syscall(SYS_##name); \
+    return safe_syscall(safe_name(name)); \
 }
 
 #define safe_syscall1(type, name, type1, arg1) \
 type safe_##name(type1 arg1) \
 { \
-    return safe_syscall(SYS_##name, arg1); \
+    return safe_syscall(safe_name(name), arg1); \
 }
 
 #define safe_syscall2(type, name, type1, arg1, type2, arg2) \
 type safe_##name(type1 arg1, type2 arg2) \
 { \
-    return safe_syscall(SYS_##name, arg1, arg2); \
+    return safe_syscall(safe_name(name), arg1, arg2); \
 }
 
 #define safe_syscall3(type, name, type1, arg1, type2, arg2, type3, arg3) \
 type safe_##name(type1 arg1, type2 arg2, type3 arg3) \
 { \
-    return safe_syscall(SYS_##name, arg1, arg2, arg3); \
+    return safe_syscall(safe_name(name), arg1, arg2, arg3); \
 }
 
 #define safe_syscall4(type, name, type1, arg1, type2, arg2, type3, arg3, \
     type4, arg4) \
 type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
 { \
-    return safe_syscall(SYS_##name, arg1, arg2, arg3, arg4); \
+    return safe_syscall(safe_name(name), arg1, arg2, arg3, arg4); \
 }
 
 #define safe_syscall5(type, name, type1, arg1, type2, arg2, type3, arg3, \
@@ -869,7 +874,7 @@ type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
 type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
     type5 arg5) \
 { \
-    return safe_syscall(SYS_##name, arg1, arg2, arg3, arg4, arg5); \
+    return safe_syscall(safe_name(name), arg1, arg2, arg3, arg4, arg5); \
 }
 
 #define safe_syscall6(type, name, type1, arg1, type2, arg2, type3, arg3, \
@@ -877,11 +882,11 @@ type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
 type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
     type5 arg5, type6 arg6) \
 { \
-    return safe_syscall(SYS_##name, arg1, arg2, arg3, arg4, arg5, arg6); \
+    return safe_syscall(safe_name(name), arg1, arg2, arg3, arg4, arg5, arg6); \
 }
 
-#define safe_ioctl(...) safe_syscall(SYS_ioctl, __VA_ARGS__)
-#define safe_fcntl(...) safe_syscall(SYS_fcntl, __VA_ARGS__)
+#define safe_ioctl(...) safe_syscall(safe_name(ioctl), __VA_ARGS__)
+#define safe_fcntl(...) safe_syscall(safe_name(fcntl), __VA_ARGS__)
 
 struct target_pollfd {
     int32_t fd;         /* file descriptor */
@@ -890,8 +895,14 @@ struct target_pollfd {
 };
 
 /* So far all target and host bitmasks are the same */
+#if !defined(__linux__)
 #undef  target_to_host_bitmask
 #define target_to_host_bitmask(x, tbl) (x)
+#else
+static const bitmask_transtbl mmap_flags_tbl[0];
+static const bitmask_transtbl ipc_flags_tbl[0];
+extern const bitmask_transtbl fcntl_flags_tbl[19];
+#endif
 #undef  host_to_target_bitmask
 #define host_to_target_bitmask(x, tbl) (x)
 

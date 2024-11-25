@@ -62,12 +62,22 @@ int safe_open(const char *path, int flags, mode_t mode);
 int safe_openat(int fd, const char *path, int flags, mode_t mode);
 
 ssize_t safe_read(int fd, void *buf, size_t nbytes);
+#if !defined(__linux__)
 ssize_t safe_pread(int fd, void *buf, size_t nbytes, off_t offset);
+#else
+ssize_t safe_pread64(int fd, void *buf, size_t nbytes, off_t offset);
+#define safe_pread safe_pread64
+#endif
 ssize_t safe_readv(int fd, const struct iovec *iov, int iovcnt);
 ssize_t safe_preadv(int fd, const struct iovec *iov, int iovcnt, off_t offset);
 
 ssize_t safe_write(int fd, void *buf, size_t nbytes);
+#if !defined(__linux__)
 ssize_t safe_pwrite(int fd, void *buf, size_t nbytes, off_t offset);
+#else
+ssize_t safe_pwrite64(int fd, void *buf, size_t nbytes, off_t offset);
+#define safe_pwrite safe_pwrite64
+#endif
 ssize_t safe_writev(int fd, const struct iovec *iov, int iovcnt);
 ssize_t safe_pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset);
 
