@@ -52,11 +52,11 @@ typedef struct target_siginfo {
     int32_t si_signo;   /* signal number */
     int32_t si_errno;   /* errno association */
     int32_t si_code;    /* signal code */
-    int32_t si_pid;     /* sending process */
-    int32_t si_uid;     /* sender's ruid */
-    int32_t si_status;  /* exit value */
-    abi_ulong si_addr;  /* faulting instruction */
-    union target_sigval si_value;   /* signal value */
+    int32_t t_si_pid;     /* sending process */
+    int32_t t_si_uid;     /* sender's ruid */
+    int32_t t_si_status;  /* exit value */
+    abi_ulong t_si_addr;  /* faulting instruction */
+    union target_sigval t_si_value;   /* signal value */
     union {
         struct {
             int32_t _trapno;    /* machine specific trap code */

@@ -71,8 +71,7 @@ static inline abi_long do_bsd_mmap(void *cpu_env, abi_long arg1, abi_long arg2,
         arg6 = arg7;
         arg7 = arg8;
     }
-    return get_errno(target_mmap(arg1, arg2, arg3,
-                                 target_to_host_bitmask(arg4, mmap_flags_tbl),
+    return get_errno(target_mmap(arg1, arg2, arg3, arg4,
                                  arg5, target_arg64(arg6, arg7)));
 }
 

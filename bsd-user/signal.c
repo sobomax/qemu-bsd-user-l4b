@@ -24,6 +24,10 @@
 #include "exec/page-protection.h"
 #include "user/tswap-target.h"
 #include "gdbstub/user.h"
+
+#include <sys/ucontext.h>
+#include <sys/resource.h>
+
 #include "signal-common.h"
 #include "os-time.h"
 #include "trace.h"
@@ -114,7 +118,6 @@ static void host_to_target_sigset_internal(target_sigset_t *d,
 
 void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
 {
-#if !defined(__linux__)
     target_sigset_t d1;
     int i;
 
@@ -122,9 +125,6 @@ void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
     for (i = 0; i < _SIG_WORDS; i++) {
         d->__bits[i] = tswap32(d1.__bits[i]);
     }
-#else
-    abort();
-#endif
 }
 
 static void target_to_host_sigset_internal(sigset_t *d,
@@ -194,10 +194,10 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
     tinfo->si_signo = sig;
     tinfo->si_errno = info->si_errno;
     tinfo->si_code = info->si_code;
-    tinfo->si_pid = info->si_pid;
-    tinfo->si_uid = info->si_uid;
-    tinfo->si_status = info->si_status;
-    tinfo->si_addr = (abi_ulong)(unsigned long)info->si_addr;
+    tinfo->t_si_pid = info->si_pid;
+    tinfo->t_si_uid = info->si_uid;
+    tinfo->t_si_status = info->si_status;
+    tinfo->t_si_addr = (abi_ulong)(unsigned long)info->si_addr;
     /*
      * si_value is opaque to kernel. On all FreeBSD platforms,
      * sizeof(sival_ptr) >= sizeof(sival_int) so the following
@@ -280,16 +280,16 @@ static void tswap_siginfo(target_siginfo_t *tinfo, const target_siginfo_t *info)
     __put_user(info->si_signo, &tinfo->si_signo);
     __put_user(info->si_errno, &tinfo->si_errno);
     __put_user(si_code, &tinfo->si_code); /* Zero out si_type, it's internal */
-    __put_user(info->si_pid, &tinfo->si_pid);
-    __put_user(info->si_uid, &tinfo->si_uid);
-    __put_user(info->si_status, &tinfo->si_status);
-    __put_user(info->si_addr, &tinfo->si_addr);
+    __put_user(info->t_si_pid, &tinfo->t_si_pid);
+    __put_user(info->t_si_uid, &tinfo->t_si_uid);
+    __put_user(info->t_si_status, &tinfo->t_si_status);
+    __put_user(info->t_si_addr, &tinfo->t_si_addr);
     /*
      * Unswapped, because we passed it through mostly untouched.  si_value is
      * opaque to the kernel, so we didn't bother with potentially wasting cycles
      * to swap it into host byte order.
      */
-    tinfo->si_value.sival_ptr = info->si_value.sival_ptr;
+    tinfo->t_si_value.sival_ptr = info->t_si_value.sival_ptr;
 
     /*
      * We can use our internal marker of which fields in the structure
@@ -519,13 +519,12 @@ void force_sig_fault(int sig, int code, abi_ulong addr)
     info.si_signo = sig;
     info.si_errno = 0;
     info.si_code = code;
-    info.si_addr = addr;
+    info.t_si_addr = addr;
     queue_signal(cpu_env(cpu), sig, QEMU_SI_FAULT, &info);
 }
 
 static void host_signal_handler(int host_sig, siginfo_t *info, void *puc)
 {
-#if !defined(__linux__)
     CPUState *cpu = thread_cpu;
     TaskState *ts = get_task_state(cpu);
     target_siginfo_t tinfo;
@@ -630,9 +629,6 @@ static void host_signal_handler(int host_sig, siginfo_t *info, void *puc)
 
     /* Interrupt the virtual CPU as soon as possible. */
     cpu_exit(thread_cpu);
-#else
-    abort();
-#endif
 }
 
 /* do_sigaltstack() returns target values and errnos. */
@@ -849,12 +845,12 @@ static void setup_frame(int sig, int code, struct target_sigaction *ka,
         frame->sf_si.si_signo = tinfo->si_signo;
         frame->sf_si.si_errno = tinfo->si_errno;
         frame->sf_si.si_code = tinfo->si_code;
-        frame->sf_si.si_pid = tinfo->si_pid;
-        frame->sf_si.si_uid = tinfo->si_uid;
-        frame->sf_si.si_status = tinfo->si_status;
-        frame->sf_si.si_addr = tinfo->si_addr;
+        frame->sf_si.t_si_pid = tinfo->t_si_pid;
+        frame->sf_si.t_si_uid = tinfo->t_si_uid;
+        frame->sf_si.t_si_status = tinfo->t_si_status;
+        frame->sf_si.t_si_addr = tinfo->t_si_addr;
         /* see host_to_target_siginfo_noswap() for more details */
-        frame->sf_si.si_value.sival_ptr = tinfo->si_value.sival_ptr;
+        frame->sf_si.t_si_value.sival_ptr = tinfo->t_si_value.sival_ptr;
         /*
          * At this point, whatever is in the _reason union is complete
          * and in target order, so just copy the whole thing over, even

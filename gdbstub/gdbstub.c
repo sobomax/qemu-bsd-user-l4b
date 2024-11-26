@@ -1876,7 +1876,7 @@ static const GdbCmdParseEntry gdb_gen_query_table[] = {
         .schema = "s:l,l0"
     },
 #if defined(CONFIG_USER_ONLY)
-#if defined(CONFIG_LINUX) && 0
+#if defined(CONFIG_LINUX)
     {
         .handler = gdb_handle_query_xfer_auxv,
         .cmd = "Xfer:auxv:read::",

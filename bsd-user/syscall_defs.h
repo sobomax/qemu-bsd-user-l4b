@@ -899,7 +899,6 @@ struct target_pollfd {
 #undef  target_to_host_bitmask
 #define target_to_host_bitmask(x, tbl) (x)
 #else
-static const bitmask_transtbl mmap_flags_tbl[0];
 static const bitmask_transtbl ipc_flags_tbl[0];
 extern const bitmask_transtbl fcntl_flags_tbl[19];
 #endif
