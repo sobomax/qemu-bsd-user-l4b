@@ -20,6 +20,8 @@
 #ifndef BSD_USER_FREEBSD_OS_STAT_H
 #define BSD_USER_FREEBSD_OS_STAT_H
 
+#include <sys/statfs.h>
+
 int freebsd11_stat(const char *path, struct freebsd11_stat *stat);
 __sym_compat(stat, freebsd11_stat, FBSD_1.0);
 int freebsd11_lstat(const char *path, struct freebsd11_stat *stat);
@@ -408,19 +410,15 @@ static inline abi_long do_freebsd_statfs(abi_long arg1, abi_long arg2)
 /* fstatfs(2) */
 static inline abi_long do_freebsd11_fstatfs(abi_long fd, abi_ulong target_addr)
 {
-#if !defined(__linux__)
     abi_long ret;
-    struct freebsd11_statfs host_stfs;
+    struct statfs host_stfs;
 
-    ret = get_errno(freebsd11_fstatfs(fd, &host_stfs));
+    ret = get_errno(fstatfs(fd, &host_stfs));
     if (is_error(ret)) {
         return ret;
     }
 
-    return h2t_freebsd11_statfs(target_addr, &host_stfs);
-#else
-    abort();
-#endif
+    return h2t_freebsd_statfs(target_addr, &host_stfs);
 }
 
 /* fstatfs(2) */

@@ -16,6 +16,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <sys/statfs.h>
+
 #include "qemu/osdep.h"
 
 #include "qemu.h"
@@ -192,20 +195,20 @@ abi_long h2t_freebsd11_statfs(abi_ulong target_addr,
     if (!lock_user_struct(VERIFY_WRITE, target_statfs, target_addr, 0)) {
         return -TARGET_EFAULT;
     }
-    __put_user(host_statfs->f_version, &target_statfs->f_version);
+    __put_user(STATFS_VERSION, &target_statfs->f_version);
     __put_user(host_statfs->f_type, &target_statfs->f_type);
     __put_user(host_statfs->f_flags, &target_statfs->f_flags);
     __put_user(host_statfs->f_bsize, &target_statfs->f_bsize);
-    __put_user(host_statfs->f_iosize, &target_statfs->f_iosize);
+    __put_user(host_statfs->f_bsize, &target_statfs->f_iosize);
     __put_user(host_statfs->f_blocks, &target_statfs->f_blocks);
     __put_user(host_statfs->f_bfree, &target_statfs->f_bfree);
     __put_user(host_statfs->f_bavail, &target_statfs->f_bavail);
     __put_user(host_statfs->f_files, &target_statfs->f_files);
     __put_user(host_statfs->f_ffree, &target_statfs->f_ffree);
-    __put_user(host_statfs->f_syncwrites, &target_statfs->f_syncwrites);
-    __put_user(host_statfs->f_asyncwrites, &target_statfs->f_asyncwrites);
-    __put_user(host_statfs->f_syncreads, &target_statfs->f_syncreads);
-    __put_user(host_statfs->f_asyncreads, &target_statfs->f_asyncreads);
+    __put_user(STUB, &target_statfs->f_syncwrites);
+    __put_user(STUB, &target_statfs->f_asyncwrites);
+    __put_user(STUB, &target_statfs->f_syncreads);
+    __put_user(STUB, &target_statfs->f_asyncreads);
     /* uint64_t f_spare[10]; */
     __put_user(host_statfs->f_namemax, &target_statfs->f_namemax);
     __put_user(host_statfs->f_owner, &target_statfs->f_owner);
@@ -228,43 +231,43 @@ abi_long h2t_freebsd11_statfs(abi_ulong target_addr,
 abi_long h2t_freebsd_statfs(abi_ulong target_addr,
         struct statfs *host_statfs)
 {
-#if !defined(__linux__)
     struct target_statfs *target_statfs;
+    const abi_int STUB = 0;
+    const char STUB_fstypename[] = "ext4";
+    const char STUB_mntfromname[] = "/dev/null";
+    const char STUB_mntonname[] = "/";
 
     if (!lock_user_struct(VERIFY_WRITE, target_statfs, target_addr, 0)) {
         return -TARGET_EFAULT;
     }
-    __put_user(host_statfs->f_version, &target_statfs->f_version);
+    __put_user(STATFS_VERSION, &target_statfs->f_version);
     __put_user(host_statfs->f_type, &target_statfs->f_type);
     __put_user(host_statfs->f_flags, &target_statfs->f_flags);
     __put_user(host_statfs->f_bsize, &target_statfs->f_bsize);
-    __put_user(host_statfs->f_iosize, &target_statfs->f_iosize);
+    __put_user(host_statfs->f_bsize, &target_statfs->f_iosize);
     __put_user(host_statfs->f_blocks, &target_statfs->f_blocks);
     __put_user(host_statfs->f_bfree, &target_statfs->f_bfree);
     __put_user(host_statfs->f_bavail, &target_statfs->f_bavail);
     __put_user(host_statfs->f_files, &target_statfs->f_files);
     __put_user(host_statfs->f_ffree, &target_statfs->f_ffree);
-    __put_user(host_statfs->f_syncwrites, &target_statfs->f_syncwrites);
-    __put_user(host_statfs->f_asyncwrites, &target_statfs->f_asyncwrites);
-    __put_user(host_statfs->f_syncreads, &target_statfs->f_syncreads);
-    __put_user(host_statfs->f_asyncreads, &target_statfs->f_asyncreads);
+    __put_user(STUB, &target_statfs->f_syncwrites);
+    __put_user(STUB, &target_statfs->f_asyncwrites);
+    __put_user(STUB, &target_statfs->f_syncreads);
+    __put_user(STUB, &target_statfs->f_asyncreads);
     /* uint64_t f_spare[10]; */
-    __put_user(host_statfs->f_namemax, &target_statfs->f_namemax);
-    __put_user(host_statfs->f_owner, &target_statfs->f_owner);
-    __put_user(host_statfs->f_fsid.val[0], &target_statfs->f_fsid.val[0]);
-    __put_user(host_statfs->f_fsid.val[1], &target_statfs->f_fsid.val[1]);
+    __put_user(MNAMELEN, &target_statfs->f_namemax);
+    __put_user(STUB, &target_statfs->f_owner);
+    __put_user(host_statfs->f_fsid.__val[0], &target_statfs->f_fsid.val[0]);
+    __put_user(host_statfs->f_fsid.__val[1], &target_statfs->f_fsid.val[1]);
     /* char f_charspace[80]; */
-    strncpy(target_statfs->f_fstypename, host_statfs->f_fstypename,
-        sizeof(target_statfs->f_fstypename));
-    strncpy(target_statfs->f_mntfromname, host_statfs->f_mntfromname,
-        sizeof(target_statfs->f_mntfromname));
-    strncpy(target_statfs->f_mntonname, host_statfs->f_mntonname,
-        sizeof(target_statfs->f_mntonname));
+    strncpy(target_statfs->f_fstypename, STUB_fstypename,
+        strlen(STUB_fstypename) + 1);
+    strncpy(target_statfs->f_mntfromname, STUB_mntfromname,
+        strlen(STUB_mntfromname) + 1);
+    strncpy(target_statfs->f_mntonname, STUB_mntonname,
+        strlen(STUB_mntonname) + 1);
     unlock_user_struct(target_statfs, target_addr, 1);
     return 0;
-#else
-    abort();
-#endif
 }
 
 /*

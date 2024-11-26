@@ -20,11 +20,6 @@
 #if defined(__linux__)
 #define	__packed	__attribute__((__packed__))
 #define	__aligned(x)	__attribute__((__aligned__(x)))
-#undef	si_pid
-#undef	si_uid
-#undef	si_status
-#undef	si_addr
-#undef	si_value
 #endif
 
 #include <sys/param.h>
@@ -84,6 +79,11 @@ struct image_info {
     abi_ulong arg_start;
     abi_ulong arg_end;
     uint32_t  elf_flags;
+#if defined(__linux__)
+    /* For compat with user-mode GDB */
+    abi_ulong       saved_auxv;
+    abi_ulong       auxv_len;
+#endif
 };
 
 struct emulated_sigtable {

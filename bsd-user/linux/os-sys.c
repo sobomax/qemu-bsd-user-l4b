@@ -1548,7 +1548,11 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
     }
 #endif
 
+#if !defined(__linux__)
     ret = get_errno(sysctl(snamep, namelen, holdp, &holdlen, hnewp, newlen));
+#else
+    ret = -TARGET_ENOENT;
+#endif
     if (!ret && (holdp != 0)) {
 
         /*

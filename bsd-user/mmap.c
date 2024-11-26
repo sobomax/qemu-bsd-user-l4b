@@ -23,7 +23,7 @@ static const int host_MAP_ANON = MAP_ANON;
 static const int host_MAP_FIXED = MAP_FIXED;
 static const int host_MAP_PRIVATE = MAP_PRIVATE;
 static const int host_MAP_SHARED = MAP_SHARED;
-static const int host_MAP_STACK = MAP_STACK;
+static const int host_MAP_GROWSDOWN = MAP_GROWSDOWN;
 static const int host_MAP_EXCL = MAP_FIXED_NOREPLACE;
 static const int host_MAP_POPULATE = MAP_POPULATE;
 #endif
@@ -34,10 +34,10 @@ static const int host_MAP_POPULATE = MAP_POPULATE;
 #include "qemu.h"
 
 #if !defined(__linux__)
-#define mmap_flags_t2h(f) (f)
+#define mmap_flags_t2h(fd, fl) (fl)
 #else
 static int
-mmap_flags_t2h(int target_flags)
+mmap_flags_t2h(int fd, int target_flags)
 {
 	int host_flags = 0;
 
@@ -54,16 +54,20 @@ mmap_flags_t2h(int target_flags)
 		host_flags |= host_MAP_ANON;
 	}
 	if (target_flags & MAP_STACK) {
-		host_flags |= host_MAP_STACK;
+		host_flags |= host_MAP_GROWSDOWN;
 	}
 	if (target_flags & MAP_EXCL) {
 		host_flags |= host_MAP_EXCL;
 	}
 	if (target_flags & MAP_PREFAULT_READ) {
+		/* Not sure if this is the one, but seems harmless */
 		host_flags |= host_MAP_POPULATE;
 	}
 	if (!(target_flags & (MAP_PRIVATE|MAP_SHARED))) {
 		host_flags |= host_MAP_PRIVATE;
+	}
+	if (fd == -1 && !(target_flags & MAP_ANON)) {
+		host_flags |= host_MAP_ANON;
 	}
 	return host_flags;
 }
@@ -262,7 +266,7 @@ static int mmap_frag(abi_ulong real_start,
         /* no page was there, so we allocate one. See also above. */
         int _flags = flags | ((fd != -1) ? MAP_ANON : 0);
         void *p = mmap(host_start, qemu_host_page_size, prot,
-                       mmap_flags_t2h(_flags), -1, 0);
+                       mmap_flags_t2h(fd, _flags), -1, 0);
         if (p == MAP_FAILED) {
             return -1;
         }
@@ -383,7 +387,7 @@ static abi_ulong mmap_find_vma_aligned(abi_ulong start, abi_ulong size,
          *  - shmat() with SHM_REMAP flag
          */
         ptr = mmap(g2h_untagged(addr), alloc_size, PROT_NONE,
-                   mmap_flags_t2h(flags), -1, 0);
+                   mmap_flags_t2h(-1, flags), -1, 0);
 
         /* ENOMEM, if host address space has no memory */
         if (ptr == MAP_FAILED) {
@@ -576,15 +580,6 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
     real_start = start & qemu_host_page_mask;
     host_offset = offset & qemu_host_page_mask;
 
-#if defined(__linux__)
-    static int nforcefixed = 100;
-    int is_fixed = (flags & MAP_FIXED);
-    if (!is_fixed && fd == 3 && start != 0 && nforcefixed > 0) {
-	    flags |= MAP_FIXED;
-	    nforcefixed--;
-    }
-#endif
-
     /*
      * If the user is asking for the kernel to find a location, do that
      * before we truncate the length for mapping files below.
@@ -642,18 +637,14 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
         host_len = len + offset - host_offset;
         host_len = HOST_PAGE_ALIGN(host_len);
 
-#if !defined(__linux__)
 	int _flags = flags | ((fd != -1) ? MAP_ANON : 0);
-#else
-	int _flags = flags | MAP_ANON;
-#endif
         /*
          * Note: we prefer to control the mapping address. It is
          * especially important if qemu_host_page_size >
          * qemu_real_host_page_size
          */
         p = mmap(g2h_untagged(start), host_len, prot,
-                 mmap_flags_t2h(_flags | MAP_FIXED), -1, 0);
+                 mmap_flags_t2h(-1, _flags | MAP_FIXED), -1, 0);
         if (p == MAP_FAILED) {
             goto fail;
         }
@@ -662,7 +653,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
         if (fd != -1) {
 	    //assert(munmap(g2h_untagged(start), len) == 0);
             p = mmap(g2h_untagged(start), len, prot,
-                     mmap_flags_t2h(flags | MAP_FIXED), fd, host_offset);
+                     mmap_flags_t2h(fd, flags | MAP_FIXED), fd, host_offset);
             if (p == MAP_FAILED) {
                 munmap(g2h_untagged(start), host_len);
                 goto fail;
@@ -767,7 +758,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
                 offset1 = offset + real_start - start;
             }
             p = mmap(g2h_untagged(real_start), real_end - real_start,
-                     prot, mmap_flags_t2h(flags), fd, offset1);
+                     prot, mmap_flags_t2h(fd, flags), fd, offset1);
             if (p == MAP_FAILED) {
                 goto fail;
             }
@@ -826,7 +817,7 @@ void mmap_reserve(abi_ulong start, abi_ulong size)
     }
     if (real_start != real_end) {
         mmap(g2h_untagged(real_start), real_end - real_start, PROT_NONE,
-             mmap_flags_t2h(MAP_FIXED | MAP_ANON | MAP_PRIVATE), -1, 0);
+             mmap_flags_t2h(-1, MAP_FIXED | MAP_ANON | MAP_PRIVATE), -1, 0);
     }
 }
 

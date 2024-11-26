@@ -2,6 +2,8 @@
 /* From Git revision: 74b6c983723cf3d3e277f10780ad081e32c80e80 branch: releng/14.1 */
 
 /* Defines: */
+#undef _SIG_WORDS /* found in: sys/_sigset.h */
+#define	_SIG_WORDS	4
 #undef EJUSTRETURN /* found in: sys/errno.h */
 #define	EJUSTRETURN	(-2)		/* don't modify regs, just return */
 #undef O_ACCMODE /* found in: sys/fcntl.h */
@@ -64,8 +66,14 @@
 #define	MAP_ALIGNMENT_MASK	MAP_ALIGNED(0xff)
 #undef SHM_ANON /* found in: sys/mman.h */
 #define	SHM_ANON		((char *)1)
+#undef STATFS_VERSION /* found in: sys/mount.h */
+#define	STATFS_VERSION	0x20140518	/* current version number */
+#undef MNAMELEN /* found in: sys/mount.h */
+#define	MNAMELEN	1024		/* size of on/from name bufs */
 #undef __FreeBSD_version /* found in: sys/param.h */
 #define __FreeBSD_version 1401000
+#undef P_OSREL_MAP_GUARD /* found in: sys/param.h */
+#define	P_OSREL_MAP_GUARD		1200035
 #undef INFTIM /* found in: sys/poll.h */
 #define	INFTIM		(-1)
 #undef NET_RT_IFLISTL /* found in: sys/socket.h */
@@ -1008,6 +1016,8 @@
 #define	CTLTYPE_U32	0xf	/* name describes an unsigned 32-bit number */
 #undef CTLTYPE_U64 /* found in: sys/sysctl.h */
 #define	CTLTYPE_U64	9	/* name describes an unsigned 64-bit number */
+#undef KERN_OSRELDATE /* found in: sys/sysctl.h */
+#define	KERN_OSRELDATE		24	/* int: kernel release date */
 #undef UMTX_OP_SHM /* found in: sys/umtx.h */
 #define	UMTX_OP_SHM		25
 #undef UMTX_OP_WAIT_UINT /* found in: sys/umtx.h */

@@ -12,9 +12,13 @@
 #include "gdbstub/commands.h"
 #include "qemu.h"
 #include "internals.h"
-#if defined(CONFIG_LINUX) && !defined(CONFIG_BSD_USER)
+#if defined(CONFIG_LINUX)
+#if !defined(CONFIG_BSD_USER)
 #include "linux-user/loader.h"
 #include "linux-user/qemu.h"
+#else
+#include "bsd-user/qemu.h"
+#endif
 #endif
 
 /*
@@ -228,7 +232,7 @@ void gdb_handle_query_offsets(GArray *params, void *user_ctx)
     gdb_put_strbuf();
 }
 
-#if defined(CONFIG_LINUX) && !defined(CONFIG_BSD_USER)
+#if defined(CONFIG_LINUX)
 /* Partial user only duplicate of helper in gdbstub.c */
 static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
                                          uint8_t *buf, int len, bool is_write)
