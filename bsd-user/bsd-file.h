@@ -964,7 +964,8 @@ static abi_long do_bsd_lpathconf(abi_long arg1, abi_long arg2)
 
     return ret;
 #else
-    abort();
+    fprintf(stderr, "do_bsd_lpathconf: stub\n");
+    return -TARGET_ENOENT;
 #endif
 }
 
