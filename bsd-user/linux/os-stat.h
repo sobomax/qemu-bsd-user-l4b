@@ -30,7 +30,6 @@ int freebsd11_fstat(int fd, struct freebsd11_stat *stat);
 __sym_compat(fstat, freebsd11_fstat, FBSD_1.0);
 int freebsd11_fstatat(int fd, const char *path, struct freebsd11_stat *stat,
         int flag);
-__sym_compat(fstatat, freebsd11_fstatat, FBSD_1.1);
 
 int freebsd11_fhstat(const fhandle_t *fhandle, struct freebsd11_stat *stat);
 __sym_compat(fhstat, freebsd11_fhstat, FBSD_1.0);
@@ -59,41 +58,33 @@ __sym_compat(nfstat, freebsd11_nfstat, FBSD_1.0);
 /* stat(2) */
 static inline abi_long do_freebsd11_stat(abi_long arg1, abi_long arg2)
 {
-#if !defined(__linux__)
     abi_long ret;
     void *p;
-    struct freebsd11_stat st;
+    struct stat st;
 
     LOCK_PATH(p, arg1);
-    ret = get_errno(freebsd11_stat(path(p), &st));
+    ret = get_errno(stat(path(p), &st));
     UNLOCK_PATH(p, arg1);
     if (!is_error(ret)) {
         ret = h2t_freebsd11_stat(arg2, &st);
     }
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* lstat(2) */
 static inline abi_long do_freebsd11_lstat(abi_long arg1, abi_long arg2)
 {
-#if !defined(__linux__)
     abi_long ret;
     void *p;
-    struct freebsd11_stat st;
+    struct stat st;
 
     LOCK_PATH(p, arg1);
-    ret = get_errno(freebsd11_lstat(path(p), &st));
+    ret = get_errno(lstat(path(p), &st));
     UNLOCK_PATH(p, arg1);
     if (!is_error(ret)) {
         ret = h2t_freebsd11_stat(arg2, &st);
     }
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* fstat(2) */
@@ -126,21 +117,20 @@ static inline abi_long do_freebsd_fstat(abi_long arg1, abi_long arg2)
 static inline abi_long do_freebsd11_fstatat(abi_long arg1, abi_long arg2,
         abi_long arg3, abi_long arg4)
 {
-#if !defined(__linux__)
     abi_long ret;
     void *p;
-    struct freebsd11_stat st;
+    struct stat st;
 
     LOCK_PATH(p, arg2);
-    ret = get_errno(freebsd11_fstatat(arg1, p, &st, arg4));
+    if (arg1 == AT_FDCWD)
+        arg1 = HOST_AT_FDCWD;
+    abi_long hflags = target_to_host_bitmask(arg4, at_flags_tbl);
+    ret = get_errno(fstatat(arg1, p, &st, hflags));
     UNLOCK_PATH(p, arg2);
     if (!is_error(ret) && arg3) {
         ret = h2t_freebsd11_stat(arg3, &st);
     }
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* fstatat(2) */
@@ -152,7 +142,10 @@ static inline abi_long do_freebsd_fstatat(abi_long arg1, abi_long arg2,
     struct stat st;
 
     LOCK_PATH(p, arg2);
-    ret = get_errno(fstatat(arg1, p, &st, arg4));
+    if (arg1 == AT_FDCWD)
+        arg1 = HOST_AT_FDCWD;
+    abi_long hflags = target_to_host_bitmask(arg4, at_flags_tbl);
+    ret = get_errno(fstatat(arg1, p, &st, hflags));
     UNLOCK_PATH(p, arg2);
     if (!is_error(ret) && arg3) {
         ret = h2t_freebsd_stat(arg3, &st);
@@ -558,35 +551,61 @@ static inline abi_long do_freebsd11_getdents(abi_long arg1,
 #endif
 }
 
+#define ALIGN(p, a) (((p) + ((a) - 1)) & ~((a) - 1))
+#define aligned_alloca(n, a) ({void *_x = alloca(n + a - 1); (void *)ALIGN((uintptr_t)_x, (a));})
+
 /* getdirecentries(2) */
 static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
         abi_ulong arg2, abi_long nbytes, abi_ulong arg4)
 {
-#if !defined(__linux__)
     abi_long ret;
     struct freebsd11_dirent *dirp;
+    struct dirent *adirp;
     long basep;
 
     dirp = lock_user(VERIFY_WRITE, arg2, nbytes, 0);
     if (dirp == NULL) {
         return -TARGET_EFAULT;
     }
-    ret = get_errno(freebsd11_getdirentries(arg1, (char *)dirp, nbytes, &basep));
+    adirp = aligned_alloca(nbytes, __alignof__(struct freebsd11_dirent));
+    if (adirp == NULL) {
+        return -TARGET_ENOMEM;
+    }
+    ret = get_errno(getdirentries(arg1, (char *)adirp, nbytes, &basep));
     if (!is_error(ret)) {
-        struct freebsd11_dirent *de;
+        struct freebsd11_dirent *tde = dirp;
+        struct dirent *hde = adirp;
         int len = ret;
+        ret = 0;
         int reclen;
 
-        de = dirp;
         while (len > 0) {
-            reclen = de->d_reclen;
+            reclen = hde->d_reclen;
             if (reclen > len) {
                 return -TARGET_EFAULT;
             }
-            de->d_reclen = tswap16(reclen);
-            de->d_fileno = tswap32(de->d_fileno);
+            int namelen = reclen - offsetof(typeof(*hde), d_name);
+            int target_reclen = ALIGN(offsetof(typeof(*tde), d_name) + namelen, __alignof__(typeof(*tde)));
+            if ((nbytes - ret) < target_reclen) {
+                if (ret == 0)
+                    return -TARGET_EINVAL;
+                break;
+            }
+            *tde = (typeof(*tde)){0};
+            abi_long tft = host_to_target_bitmask(DTTOIF(hde->d_type), fcntl_flags_tbl);
+            tde->d_type = IFTODT(tft);
+            tde->d_fileno = tswap32(hde->d_fileno);
+            tde->d_reclen = tswap16(target_reclen);
+            char *ep = memchr(hde->d_name, '\0', namelen);
+            if (ep > hde->d_name) {
+                int sl = ep - hde->d_name;
+                memcpy(tde->d_name, hde->d_name, sl + 1);
+                tde->d_namlen = tswap16(sl);
+            }
             len -= reclen;
-            de = (struct freebsd11_dirent *)((void *)de + reclen);
+            ret += target_reclen;
+            tde = (typeof(tde))((void *)tde + target_reclen);
+            hde = (typeof(hde))((void *)hde + reclen);
         }
     }
     unlock_user(dirp, arg2, ret);
@@ -596,9 +615,6 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
         }
     }
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* getdirecentries(2) */
@@ -650,11 +666,11 @@ static inline abi_long do_freebsd_getdirentries(abi_long arg1,
 static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         abi_ulong arg3)
 {
-#if !defined(__linux__)
     abi_long ret;
     int host_cmd;
     struct flock fl;
     struct target_freebsd_flock *target_fl;
+    const abi_long STUB = 0;
 
     host_cmd = target_to_host_fcntl_cmd(arg2);
     if (host_cmd < 0) {
@@ -670,7 +686,6 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         __get_user(fl.l_start, &target_fl->l_start);
         __get_user(fl.l_len, &target_fl->l_len);
         __get_user(fl.l_pid, &target_fl->l_pid);
-        __get_user(fl.l_sysid, &target_fl->l_sysid);
         unlock_user_struct(target_fl, arg3, 0);
         ret = get_errno(safe_fcntl(arg1, host_cmd, &fl));
         if (!is_error(ret)) {
@@ -682,7 +697,7 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
             __put_user(fl.l_start, &target_fl->l_start);
             __put_user(fl.l_len, &target_fl->l_len);
             __put_user(fl.l_pid, &target_fl->l_pid);
-            __put_user(fl.l_sysid, &target_fl->l_sysid);
+            __put_user(STUB, &target_fl->l_sysid);
             unlock_user_struct(target_fl, arg3, 1);
         }
         break;
@@ -697,7 +712,6 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         __get_user(fl.l_start, &target_fl->l_start);
         __get_user(fl.l_len, &target_fl->l_len);
         __get_user(fl.l_pid, &target_fl->l_pid);
-        __get_user(fl.l_sysid, &target_fl->l_sysid);
         unlock_user_struct(target_fl, arg3, 0);
         ret = get_errno(safe_fcntl(arg1, host_cmd, &fl));
         break;
@@ -719,9 +733,6 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         break;
     }
     return ret;
-#else
-    abort();
-#endif
 }
 
 #if defined(__FreeBSD_version) && __FreeBSD_version >= 1300080

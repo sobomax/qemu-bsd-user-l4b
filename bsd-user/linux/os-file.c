@@ -1,24 +1,5 @@
 #include <fcntl.h>
 
-#define tgt(x) static const typeof(x) HOST_##x = x
-
-tgt(O_ACCMODE);
-tgt(O_WRONLY);
-tgt(O_RDWR);
-tgt(O_CREAT);
-tgt(O_EXCL);
-tgt(O_NOCTTY);
-tgt(O_TRUNC);
-tgt(O_APPEND);
-tgt(O_NONBLOCK);
-tgt(O_SYNC);
-tgt(O_DSYNC);
-tgt(O_DIRECTORY);
-tgt(O_NOFOLLOW);
-tgt(O_DIRECT);
-tgt(O_CLOEXEC);
-tgt(O_PATH);
-
 #include "qemu/osdep.h"
 #include "qemu.h"
 
@@ -55,5 +36,13 @@ const bitmask_transtbl fcntl_flags_tbl[19] = {
   { O_DIRECT,    O_DIRECT,    HOST_O_DIRECT,    HOST_O_DIRECT,    },
   { O_CLOEXEC,   O_CLOEXEC,   HOST_O_CLOEXEC,   HOST_O_CLOEXEC    },
   { O_PATH,      O_PATH,      HOST_O_PATH,      HOST_O_PATH       },
+};
+
+const bitmask_transtbl at_flags_tbl[5] = {
+  { AT_EACCESS,          AT_EACCESS,          HOST_AT_EACCESS,          HOST_AT_EACCESS          },
+  { AT_SYMLINK_NOFOLLOW, AT_SYMLINK_NOFOLLOW, HOST_AT_SYMLINK_NOFOLLOW, HOST_AT_SYMLINK_NOFOLLOW },
+  { AT_SYMLINK_FOLLOW,   AT_SYMLINK_FOLLOW,   HOST_AT_SYMLINK_FOLLOW,   HOST_AT_SYMLINK_FOLLOW   },
+  { AT_REMOVEDIR,        AT_REMOVEDIR,        HOST_AT_REMOVEDIR,        HOST_AT_REMOVEDIR        },
+  { AT_EMPTY_PATH,       AT_EMPTY_PATH,       HOST_AT_EMPTY_PATH,       HOST_AT_EMPTY_PATH       },
 };
 
