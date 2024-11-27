@@ -1,171 +1,91 @@
-===========
-QEMU README
-===========
+=======================
+BSD-USER 4 LINUX README
+=======================
 
-QEMU is a generic and open source machine & userspace emulator and
-virtualizer.
+The bsd-user-4-linux fork of QEMU. Documentation can be found hosted online at
+`<https://www.qemu.org/documentation/>`_ for the upstream project.
 
-QEMU is capable of emulating a complete machine in software without any
-need for hardware virtualization support. By using dynamic translation,
-it achieves very good performance. QEMU can also integrate with the Xen
-and KVM hypervisors to provide emulated hardware while allowing the
-hypervisor to manage the CPU. With hypervisor support, QEMU can achieve
-near native performance for CPUs. When QEMU emulates CPUs directly it is
-capable of running operating systems made for one machine (e.g. an ARMv7
-board) on a different machine (e.g. an x86_64 PC board).
+The bsd-user-4-linux ports the BSD user-mode emulation for the QEMU project,
+so that it can run on Linux as well. There are a number of changes that need
+to be upstreamed, however.
 
-QEMU is also capable of providing userspace API virtualization for Linux
-and BSD kernel interfaces. This allows binaries compiled against one
-architecture ABI (e.g. the Linux PPC64 ABI) to be run on a host using a
-different architecture ABI (e.g. the Linux x86_64 ABI). This does not
-involve any hardware emulation, simply CPU and syscall emulation.
+It is a "fork of a fork", based off excellent job done by Warner Losh & Co
+fixing and improving bsd-user support.
 
-QEMU aims to fit into a variety of use cases. It can be invoked directly
-by users wishing to have full control over its behaviour and settings.
-It also aims to facilitate integration into higher level management
-layers, by providing a stable command line interface and monitor API.
-It is commonly invoked indirectly via the libvirt library when using
-open source applications such as oVirt, OpenStack and virt-manager.
+Warner's project is available at `<https://github.com/qemu-bsd-user/qemu-bsd-user>`_.
 
-QEMU as a whole is released under the GNU General Public License,
-version 2. For full licensing details, consult the LICENSE file.
-
-
-Documentation
-=============
-
-Documentation can be found hosted online at
-`<https://www.qemu.org/documentation/>`_. The documentation for the
-current development version that is available at
-`<https://www.qemu.org/docs/master/>`_ is generated from the ``docs/``
-folder in the source tree, and is built by `Sphinx
-<https://www.sphinx-doc.org/en/master/>`_.
-
-
-Building
-========
-
-QEMU is multi-platform software intended to be buildable on all modern
-Linux platforms, OS-X, Win32 (via the Mingw64 toolchain) and a variety
-of other UNIX targets. The simple steps to build QEMU are:
-
-
-.. code-block:: shell
-
-  mkdir build
-  cd build
-  ../configure
-  make
-
-Additional information can also be found online via the QEMU website:
-
-* `<https://wiki.qemu.org/Hosts/Linux>`_
-* `<https://wiki.qemu.org/Hosts/Mac>`_
-* `<https://wiki.qemu.org/Hosts/W32>`_
-
-
-Submitting patches
+Goal and Objective
 ==================
 
-The QEMU source code is maintained under the GIT version control system.
+Implement enough support for the FreeBSD to be able to compile itself
+on Linux using FreeBSD native toolchain.
+
+Little bit down the road, ability to do a package building.
+
+Getting Started
+===============
+
+To get started, you'd need a fairly recent Ubuntu. I am developing and
+testing with 24.04, but other versions might do just fine.
 
 .. code-block:: shell
 
-   git clone https://gitlab.com/qemu-project/qemu.git
+  # apt update
+  # apt install [TO BE DETERMINED]
 
-When submitting patches, one common approach is to use 'git
-format-patch' and/or 'git send-email' to format & send the mail to the
-qemu-devel@nongnu.org mailing list. All patches submitted must contain
-a 'Signed-off-by' line from the author. Patches should follow the
-guidelines set out in the `style section
-<https://www.qemu.org/docs/master/devel/style.html>`_ of
-the Developers Guide.
-
-Additional information on submitting patches can be found online via
-the QEMU website:
-
-* `<https://wiki.qemu.org/Contribute/SubmitAPatch>`_
-* `<https://wiki.qemu.org/Contribute/TrivialPatches>`_
-
-The QEMU website is also maintained under source control.
+Next, you'll need to clone this repo. I like to use the directory 'bsd-user'
+for the fork.
 
 .. code-block:: shell
 
-  git clone https://gitlab.com/qemu-project/qemu-web.git
+  % mkdir git
+  % cd git
+  % git clone -b blitz git@github.com:sobomax/qemu-bsd-user-l4b.git bsd-user
+  % cd bsd-user
+  % mkdir 00-bsd-user
+  % cd 00-bsd-user
+  % ../configure --disable-system --static --target-list=x86_64-bsd-user
+  % gmake
 
-* `<https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/>`_
+The above takes a little while to build. I disable the qemu-system-* binaries
+since they take a longer time to build and aren't relevant to bsd-user. Other
+than the args to configure, this is the standard way you build qemu.
 
-A 'git-publish' utility was created to make above process less
-cumbersome, and is highly recommended for making regular contributions,
-or even just for sending consecutive patch series revisions. It also
-requires a working 'git send-email' setup, and by default doesn't
-automate everything, so you may want to go through the above steps
-manually for once.
+Usage
+=====
 
-For installation instructions, please go to:
+To use BSDlator, you would need to grab a recent FreeBSD binary release (I am
+using FreeBSD 14.1, but other versions might work too) and unpack it
+into some suitable directory within your Linux system.
 
-*  `<https://github.com/stefanha/git-publish>`_
-
-The workflow with 'git-publish' is:
-
-.. code-block:: shell
-
-  $ git checkout master -b my-feature
-  $ # work on new commits, add your 'Signed-off-by' lines to each
-  $ git publish
-
-Your patch series will be sent and tagged as my-feature-v1 if you need to refer
-back to it in the future.
-
-Sending v2:
+Then you can run FreeBSD binary by providing the path to that directory as
+an -L argument for a qemu, so it knows where to locate the libraries and other
+files followed by the path to a binary and corresponding command line
+arguments.
 
 .. code-block:: shell
 
-  $ git checkout my-feature # same topic branch
-  $ # making changes to the commits (using 'git rebase', for example)
-  $ git publish
+  % qemu-x86_64 -L /usr/lib/freebsd ~/.local/bin/ls -l
 
-Your patch series will be sent with 'v2' tag in the subject and the git tip
-will be tagged as my-feature-v2.
+  do_bsd_lpathconf: stub
+  ls: ./Makefile: No such file or directory
+  total 13140
+  lrwxrwxrwx   1 1000 sshrpc       31 Nov 23  2024 Makefile -> /tmp/qemu-bsd-user-l4b/Makefile
+  -rw-rw-r--   1 1000 sshrpc     8028 Nov 25  2024 Makefile.mtest
+  -rw-rw-r--   1 1000 sshrpc    86230 Nov 25  2024 Makefile.ninja
+  -rw-rw-r--   1 1000 sshrpc      107 Nov 23  2024 Makefile.prereqs
+  -rw-rw-r--   1 1000 sshrpc      690 Nov 23  2024 aarch64-linux-user-config-target.h
+  -rw-rw-r--   1 1000 sshrpc      696 Nov 23  2024 aarch64_be-linux-user-config-target.h
+  drwxrwxr-x   3 1000 sshrpc        3 Nov 23  2024 accel
+  -rw-rw-r--   1 1000 sshrpc      555 Nov 23  2024 alpha-linux-user-config-target.h
 
-Bug reporting
-=============
+Status
+======
 
-The QEMU project uses GitLab issues to track bugs. Bugs
-found when running code built from QEMU git or upstream released sources
-should be reported via:
+Most of the basic syscalls are working. Dynamic linking, shared library support, and so on.
+Things that are missing at the moment:
 
-* `<https://gitlab.com/qemu-project/qemu/-/issues>`_
-
-If using QEMU via an operating system vendor pre-built binary package, it
-is preferable to report bugs to the vendor's own bug tracker first. If
-the bug is also known to affect latest upstream code, it can also be
-reported via GitLab.
-
-For additional information on bug reporting consult:
-
-* `<https://wiki.qemu.org/Contribute/ReportABug>`_
-
-
-ChangeLog
-=========
-
-For version history and release notes, please visit
-`<https://wiki.qemu.org/ChangeLog/>`_ or look at the git history for
-more detailed information.
-
-
-Contact
-=======
-
-The QEMU community can be contacted in a number of ways, with the two
-main methods being email and IRC:
-
-* `<mailto:qemu-devel@nongnu.org>`_
-* `<https://lists.nongnu.org/mailman/listinfo/qemu-devel>`_
-* #qemu on irc.oftc.net
-
-Information on additional methods of contacting the community can be
-found online via the QEMU website:
-
-* `<https://wiki.qemu.org/Contribute/StartHere>`_
+* IPC and networking;
+* Terminal and process control;
+* ioctl()'s;
+* Threading.
