@@ -4060,9 +4060,14 @@ foreach target : target_dirs
       dir = base_dir / abi
       arch_srcs += files(dir / 'signal.c', dir / 'target_arch_cpu.c')
       if host_os in bsd_oses
-          arch_srcs += bsd_syscall_nr.process('/usr/include/sys/syscall.h',
-					  extra_args : targetos.to_upper())
+        sc_src = '/usr/include/sys/syscall.h'
+      else
+        sc_src = 'bsd-user/linux/target_os_defs.h'
       endif
+      arch_srcs += custom_target('syscall_nr.h',
+                     output: 'syscall_nr.h', input: sc_src,
+                     command: [meson.current_source_dir() / 'bsd-user/syscallhdr.sh', '@INPUT@',
+                       '@OUTPUT@', targetos.to_upper()])
     endif
     target_inc += include_directories(
       base_dir,
