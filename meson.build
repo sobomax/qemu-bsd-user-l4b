@@ -4059,8 +4059,10 @@ foreach target : target_dirs
       target_inc += include_directories('common-user/host/' / host_arch)
       dir = base_dir / abi
       arch_srcs += files(dir / 'signal.c', dir / 'target_arch_cpu.c')
-      arch_srcs += bsd_syscall_nr.process('/tmp/syscall.h',
+      if host_os in bsd_oses
+          arch_srcs += bsd_syscall_nr.process('/usr/include/sys/syscall.h',
 					  extra_args : targetos.to_upper())
+      endif
     endif
     target_inc += include_directories(
       base_dir,
