@@ -1229,7 +1229,6 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
         int32_t namelen, void *holdp, size_t *holdlenp, void *hnewp,
         size_t newlen)
 {
-#if !defined(__linux__) || 1
     uint32_t kind = 0;
     abi_long ret;
     size_t holdlen, oldlen;
@@ -1257,6 +1256,16 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
 #endif
     case CTL_KERN:
         switch (snamep[1]) {
+#if defined(__linux__)
+        case KERN_ARND:
+            if (oldlen) {
+		(*(abi_ulong *)holdp) = tswapal(0x42434445);
+	    }
+	    holdlen = sizeof(abi_ulong);
+	    ret = 0;
+	    goto out;
+#endif
+
         case KERN_USRSTACK:
             if (oldlen) {
                 (*(abi_ulong *)holdp) = tswapal(TARGET_USRSTACK);
@@ -1635,9 +1644,6 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
 out:
     *holdlenp = holdlen;
     return ret;
-#else
-    abort();
-#endif
 }
 
 /*
