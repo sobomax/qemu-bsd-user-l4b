@@ -3740,7 +3740,7 @@ static const typeof(WTRAPPED) HOST_WTRAPPED = WTRAPPED;
 #undef WTRAPPED
 #define WTRAPPED	32	/* Wait for a process to hit a trap or */
 
-/* Struct definitions (from last to first): */
+/* Struct definitions: */
 
 /* 'freebsd11_dirent' found in: sys/dirent.h */
 struct freebsd11_dirent {
@@ -3760,13 +3760,13 @@ struct fiodgname_arg {
 /* Forward declarations: */
 struct ifg_req;
 struct ifstat;
-struct lagg_reqport;
-struct ifdrv;
-struct lacp_opreq;
-struct lagg_reqall;
 struct ifmediareq;
 struct ifgroupreq;
+struct ifdrv;
+struct lacp_opreq;
+struct lagg_reqport;
 struct lagg_reqflags;
+struct lagg_reqall;
 
 /* Defines: */
 #if defined(ETHER_ADDR_LEN) && !defined(HOST_ETHER_ADDR_LEN)
@@ -3797,7 +3797,17 @@ static const typeof(IF_NAMESIZE) HOST_IF_NAMESIZE = IF_NAMESIZE;
 #undef SIOCGLAGGFLAGS /* found in: net/if_lagg.h */
 #define SIOCGLAGGFLAGS		_IOWR('i', 145, struct lagg_reqflags)
 
-/* Struct definitions (from last to first): */
+/* Struct definitions: */
+
+/* 'ifg_req' found in: net/if.h */
+struct ifg_req {
+	union {
+		char			 ifgrqu_group[IFNAMSIZ];
+		char			 ifgrqu_member[IFNAMSIZ];
+	} ifgrq_ifgrqu;
+#define	ifgrq_group	ifgrq_ifgrqu.ifgrqu_group
+#define	ifgrq_member	ifgrq_ifgrqu.ifgrqu_member
+};
 
 /* 'ifstat' found in: net/if.h */
 struct ifstat {
@@ -3814,16 +3824,6 @@ struct ifmediareq {
 	int	ifm_active;		/* active options */
 	int	ifm_count;		/* # entries in ifm_ulist array */
 	int	*ifm_ulist;		/* media words */
-};
-
-/* 'ifg_req' found in: net/if.h */
-struct ifg_req {
-	union {
-		char			 ifgrqu_group[IFNAMSIZ];
-		char			 ifgrqu_member[IFNAMSIZ];
-	} ifgrq_ifgrqu;
-#define	ifgrq_group	ifgrq_ifgrqu.ifgrqu_group
-#define	ifgrq_member	ifgrq_ifgrqu.ifgrqu_member
 };
 
 /* 'ifgroupreq' found in: net/if.h */
@@ -3939,13 +3939,13 @@ static const typeof(IP_ONESBCAST) HOST_IP_ONESBCAST = IP_ONESBCAST;
 #define SIOCGVH	_IOWR('i', 246, struct ifreq)
 
 /* Forward declarations: */
-struct in6_ndireq;
-struct in6_ifreq;
-struct in6_ifstat;
 struct in6_addrlifetime;
+struct in6_ifstat;
 struct icmp6_ifstat;
-struct in6_ndifreq;
 struct nd_ifinfo;
+struct in6_ifreq;
+struct in6_ndireq;
+struct in6_ndifreq;
 
 /* Defines: */
 #if defined(IPV6_MULTICAST_HOPS) && !defined(HOST_IPV6_MULTICAST_HOPS)
@@ -4024,7 +4024,7 @@ static const typeof(IPV6_MSFILTER) HOST_IPV6_MSFILTER = IPV6_MSFILTER;
 #undef SIOCGDEFIFACE_IN6 /* found in: netinet6/in6_var.h */
 #define SIOCGDEFIFACE_IN6	_IOWR('i', 86, struct in6_ndifreq)
 
-/* Struct definitions (from last to first): */
+/* Struct definitions: */
 
 /* 'in6_addrlifetime' found in: netinet6/in6_var.h */
 struct in6_addrlifetime {
@@ -4148,23 +4148,6 @@ struct icmp6_ifstat {
 	uint64_t ifs6_out_mlddone;
 };
 
-/* 'in6_ifreq' found in: netinet6/in6_var.h */
-struct	in6_ifreq {
-	char	ifr_name[IFNAMSIZ];
-	union {
-		struct	sockaddr_in6 ifru_addr;
-		struct	sockaddr_in6 ifru_dstaddr;
-		int	ifru_flags;
-		int	ifru_flags6;
-		int	ifru_metric;
-		caddr_t	ifru_data;
-		struct in6_addrlifetime ifru_lifetime;
-		struct in6_ifstat ifru_stat;
-		struct icmp6_ifstat ifru_icmp6stat;
-		u_int32_t ifru_scope_id[16];
-	} ifr_ifru;
-};
-
 /* 'nd_ifinfo' found in: netinet6/nd6.h */
 struct nd_ifinfo {
 	u_int32_t linkmtu;		/* LinkMTU */
@@ -4180,6 +4163,23 @@ struct nd_ifinfo {
 	u_int8_t randomseed0[8]; /* upper 64 bits of MD5 digest */
 	u_int8_t randomseed1[8]; /* lower 64 bits (usually the EUI64 IFID) */
 	u_int8_t randomid[8];	/* current random ID */
+};
+
+/* 'in6_ifreq' found in: netinet6/in6_var.h */
+struct	in6_ifreq {
+	char	ifr_name[IFNAMSIZ];
+	union {
+		struct	sockaddr_in6 ifru_addr;
+		struct	sockaddr_in6 ifru_dstaddr;
+		int	ifru_flags;
+		int	ifru_flags6;
+		int	ifru_metric;
+		caddr_t	ifru_data;
+		struct in6_addrlifetime ifru_lifetime;
+		struct in6_ifstat ifru_stat;
+		struct icmp6_ifstat ifru_icmp6stat;
+		u_int32_t ifru_scope_id[16];
+	} ifr_ifru;
 };
 
 /* 'in6_ndireq' found in: netinet6/nd6.h */
@@ -4201,7 +4201,7 @@ struct session_op;
 #undef CIOCGSESSION /* found in: opencrypto/cryptodev.h */
 #define CIOCGSESSION	_IOWR('c', 101, struct session_op)
 
-/* Struct definitions (from last to first): */
+/* Struct definitions: */
 
 /* 'session_op' found in: opencrypto/cryptodev.h */
 struct session_op {
@@ -4223,7 +4223,7 @@ struct ieee80211req;
 #undef SIOCG80211 /* found in: net80211/ieee80211_ioctl.h */
 #define SIOCG80211		_IOWR('i', 235, struct ieee80211req)
 
-/* Struct definitions (from last to first): */
+/* Struct definitions: */
 
 /* 'ieee80211req' found in: net80211/ieee80211_ioctl.h */
 struct ieee80211req {
