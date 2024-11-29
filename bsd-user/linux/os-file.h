@@ -27,8 +27,8 @@
 /* pipe2(2) */
 static inline abi_long do_bsd_pipe2(void *cpu_env, abi_ulong pipedes, int flags)
 {
-#if !defined(__linux__)
     int host_pipe[2];
+    flags = target_to_host_bitmask(flags, fcntl_flags_tbl);
     int host_ret = pipe2(host_pipe, flags);
     /* XXXss - flags should be translated from target to host. */
 
@@ -47,9 +47,6 @@ static inline abi_long do_bsd_pipe2(void *cpu_env, abi_ulong pipedes, int flags)
         return -TARGET_EFAULT;
     }
     return 0;
-#else
-    abort();
-#endif
 }
 
 /* chflagsat(2) */
