@@ -3444,6 +3444,11 @@ static const typeof(KERN_OSRELDATE) HOST_KERN_OSRELDATE = KERN_OSRELDATE;
 #endif /* target found in: sys/sysctl.h */
 #undef KERN_OSRELDATE
 #define KERN_OSRELDATE		24	/* int: kernel release date */
+#if defined(KERN_ARND) && !defined(HOST_KERN_ARND)
+static const typeof(KERN_ARND) HOST_KERN_ARND = KERN_ARND;
+#endif /* target found in: sys/sysctl.h */
+#undef KERN_ARND
+#define KERN_ARND		37	/* int: from arc4rand() */
 #if defined(TIOCSETD) && !defined(HOST_TIOCSETD)
 static const typeof(TIOCSETD) HOST_TIOCSETD = TIOCSETD;
 #endif /* target found in: sys/ttycom.h */
@@ -3753,15 +3758,15 @@ struct fiodgname_arg {
 };
 
 /* Forward declarations: */
-struct lagg_reqflags;
-struct lacp_opreq;
-struct lagg_reqport;
-struct ifgroupreq;
-struct ifstat;
 struct ifg_req;
-struct lagg_reqall;
+struct ifstat;
+struct lagg_reqport;
 struct ifdrv;
+struct lacp_opreq;
+struct lagg_reqall;
 struct ifmediareq;
+struct ifgroupreq;
+struct lagg_reqflags;
 
 /* Defines: */
 #if defined(ETHER_ADDR_LEN) && !defined(HOST_ETHER_ADDR_LEN)
@@ -3934,13 +3939,13 @@ static const typeof(IP_ONESBCAST) HOST_IP_ONESBCAST = IP_ONESBCAST;
 #define SIOCGVH	_IOWR('i', 246, struct ifreq)
 
 /* Forward declarations: */
-struct nd_ifinfo;
-struct in6_addrlifetime;
 struct in6_ndireq;
-struct icmp6_ifstat;
-struct in6_ifstat;
-struct in6_ndifreq;
 struct in6_ifreq;
+struct in6_ifstat;
+struct in6_addrlifetime;
+struct icmp6_ifstat;
+struct in6_ndifreq;
+struct nd_ifinfo;
 
 /* Defines: */
 #if defined(IPV6_MULTICAST_HOPS) && !defined(HOST_IPV6_MULTICAST_HOPS)

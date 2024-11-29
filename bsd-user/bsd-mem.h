@@ -189,7 +189,13 @@ static inline abi_long do_bsd_minherit(abi_long addr, abi_long len,
 #if !defined(__linux__)
     return get_errno(minherit(g2h_untagged(addr), len, inherit));
 #else
-    return -TARGET_EINVAL;
+    /*
+     * Pretend it has succeeded, libc uses it in arc4random(),
+     * and crashes hard if that fails. At some point we might have
+     * some facility to recognize calls coming from libc and narrow this
+     * hack, returning error otherwise.
+     */
+    return 0;
 #endif
 }
 
