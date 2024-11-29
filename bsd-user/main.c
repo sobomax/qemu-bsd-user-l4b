@@ -110,6 +110,9 @@ unsigned long target_dflssiz = TARGET_DFLSSIZ;   /* initial data size limit */
 unsigned long target_maxssiz = TARGET_MAXSSIZ;   /* max stack size */
 unsigned long target_sgrowsiz = TARGET_SGROWSIZ; /* amount to grow stack */
 
+const char *exec_path;
+static char real_exec_path[PATH_MAX];
+
 /* Helper routines for implementing atomic operations. */
 
 void fork_start(void)
@@ -469,6 +472,12 @@ int main(int argc, char **argv)
     if (argv0) {
         argv[optind] = argv0;
     }
+
+#if !defined(__linux__)
+    exec_path = (char *)getprogname();
+#else
+    exec_path = realpath(argv[0], real_exec_path);
+#endif
 
     if (!trace_init_backends()) {
         exit(1);

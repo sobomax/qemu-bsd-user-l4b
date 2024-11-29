@@ -189,7 +189,7 @@ static inline abi_long do_bsd_minherit(abi_long addr, abi_long len,
 #if !defined(__linux__)
     return get_errno(minherit(g2h_untagged(addr), len, inherit));
 #else
-    abort();
+    return -TARGET_EINVAL;
 #endif
 }
 

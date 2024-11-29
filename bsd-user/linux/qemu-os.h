@@ -32,7 +32,14 @@
 #endif
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <sys/termios.h>
 #include <netinet/in.h>
+
+#undef ifr_name
+#undef SIGRTMAX
+#define SIGRTMAX __SIGRTMAX
+#undef SIGRTMIN
+#define SIGRTMIN __SIGRTMIN
 
 #include "target_os_defs.h"
 

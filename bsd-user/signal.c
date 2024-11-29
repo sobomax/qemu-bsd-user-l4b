@@ -34,6 +34,41 @@
 #include "hw/core/tcg-cpu-ops.h"
 #include "host-signal.h"
 
+#if defined(__linux__)
+struct target_sigfault {
+    void *_addr; /* faulting insn/memory ref. */
+
+#define __ADDR_BND_PKEY_PAD  (__alignof__(void *) < sizeof(short) ? \
+                              sizeof(short) : __alignof__(void *))
+    union {
+        /* used on alpha and sparc */
+        int _trapno;    /* TRAP # which caused the signal */
+        /*
+         * used when si_code=BUS_MCEERR_AR or
+         * used when si_code=BUS_MCEERR_AO
+         */
+        short _addr_lsb; /* LSB of the reported address */
+        /* used when si_code=SEGV_BNDERR */
+        struct {
+            char _dummy_bnd[__ADDR_BND_PKEY_PAD];
+            void *_lower;
+            void *_upper;
+        } _addr_bnd;
+        /* used when si_code=SEGV_PKUERR */
+        struct {
+            char _dummy_pkey[__ADDR_BND_PKEY_PAD];
+            __u32 _pkey;
+        } _addr_pkey;
+        /* used when si_code=TRAP_PERF */
+        struct {
+            unsigned long _data;
+            __u32 _type;
+            __u32 _flags;
+        } _perf;
+    };
+};
+#endif
+
 /* target_siginfo_t must fit in gdbstub's siginfo save area. */
 QEMU_BUILD_BUG_ON(sizeof(target_siginfo_t) > MAX_SIGINFO_LENGTH);
 
@@ -60,11 +95,51 @@ static inline int sas_ss_flags(TaskState *ts, unsigned long sp)
  */
 int host_to_target_signal(int sig)
 {
+#if defined(__linux__)
+    switch (sig) {
+        case HOST_SIGBUS:  return TARGET_SIGBUS;
+        case HOST_SIGUSR1: return TARGET_SIGUSR1;
+        case HOST_SIGUSR2: return TARGET_SIGUSR2;
+        case HOST_SIGSYS:  return TARGET_SIGSYS;
+        case HOST_SIGURG:  return TARGET_SIGURG;
+        case HOST_SIGSTOP: return TARGET_SIGSTOP;
+        case HOST_SIGTSTP: return TARGET_SIGTSTP;
+        case HOST_SIGCONT: return TARGET_SIGCONT;
+        case HOST_SIGCHLD: return TARGET_SIGCHLD;
+        case HOST_SIGIO:   return TARGET_SIGIO;
+    }
+    if (sig >= HOST_SIGRTMIN && sig <= HOST_SIGRTMAX) {
+        sig += (HOST_SIGRTMIN - TARGET_SIGRTMIN);
+        assert(sig >= TARGET_SIGRTMIN && sig <= TARGET_SIGRTMAX);
+    }
+#endif
     return sig;
 }
 
 int target_to_host_signal(int sig)
 {
+#if defined(__linux__)
+    switch (sig) {
+        case TARGET_SIGBUS:  return HOST_SIGBUS;
+        case TARGET_SIGUSR1: return HOST_SIGUSR1;
+        case TARGET_SIGUSR2: return HOST_SIGUSR2;
+        case TARGET_SIGSYS:  return HOST_SIGSYS;
+        case TARGET_SIGURG:  return HOST_SIGURG;
+        case TARGET_SIGSTOP: return HOST_SIGSTOP;
+        case TARGET_SIGTSTP: return HOST_SIGTSTP;
+        case TARGET_SIGCONT: return HOST_SIGCONT;
+        case TARGET_SIGCHLD: return HOST_SIGCHLD;
+        case TARGET_SIGIO:   return HOST_SIGIO;
+    }
+    if (sig >= TARGET_SIGRTMIN && sig <= TARGET_SIGRTMAX) {
+        sig -= (HOST_SIGRTMIN - TARGET_SIGRTMIN);
+        assert(sig >= HOST_SIGRTMIN);
+        if (sig > HOST_SIGRTMAX)
+            return -1;
+    }
+    if (sig >= HOST_NSIG)
+        return -1;
+#endif	       
     return sig;
 }
 
@@ -151,7 +226,6 @@ void target_to_host_sigset(sigset_t *d, const target_sigset_t *s)
     target_to_host_sigset_internal(d, &s1);
 }
 
-#if !defined(__linux__)
 static bool has_trapno(int tsig)
 {
     return tsig == TARGET_SIGILL ||
@@ -160,7 +234,6 @@ static bool has_trapno(int tsig)
         tsig == TARGET_SIGBUS ||
         tsig == TARGET_SIGTRAP;
 }
-#endif
 
 /* Siginfo conversion. */
 
@@ -170,7 +243,6 @@ static bool has_trapno(int tsig)
 static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
         const siginfo_t *info)
 {
-#if !defined(__linux__)
     int sig = host_to_target_signal(info->si_signo);
     int si_code = info->si_code;
     int si_type;
@@ -203,7 +275,7 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
      * sizeof(sival_ptr) >= sizeof(sival_int) so the following
      * always will copy the larger element.
      */
-    tinfo->si_value.sival_ptr =
+    tinfo->t_si_value.sival_ptr =
         (abi_ulong)(unsigned long)info->si_value.sival_ptr;
 
     switch (si_code) {
@@ -213,7 +285,9 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
          * more specific signal info will set).
          */
     case SI_USER:
+#if !defined(__linux__)
     case SI_LWP:
+#endif
     case SI_KERNEL:
     case SI_QUEUE:
     case SI_ASYNCIO:
@@ -224,13 +298,23 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
         si_type = QEMU_SI_NOINFO;
         break;
     case SI_TIMER:
+#if !defined(__linux__)
         tinfo->_reason._timer._timerid = info->_reason._timer._timerid;
         tinfo->_reason._timer._overrun = info->_reason._timer._overrun;
+#else
+	tinfo->_reason._timer._timerid = info->si_timerid;
+	tinfo->_reason._timer._overrun = info->si_overrun;
+#endif
+
         si_type = QEMU_SI_TIMER;
         break;
     case SI_MESGQ:
+#if !defined(__linux__)
         tinfo->_reason._mesgq._mqd = info->_reason._mesgq._mqd;
         si_type = QEMU_SI_MESGQ;
+#else
+	abort();
+#endif
         break;
     default:
         /*
@@ -239,7 +323,12 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
          */
         si_type = QEMU_SI_NOINFO;
         if (has_trapno(sig)) {
+#if !defined(__linux__)
             tinfo->_reason._fault._trapno = info->_reason._fault._trapno;
+#else
+            struct target_sigfault *sfp = (typeof(sfp))(&info->_sifields);
+	    tinfo->_reason._fault._trapno = sfp->_trapno;
+#endif
             si_type = QEMU_SI_FAULT;
         }
 #ifdef TARGET_SIGPOLL
@@ -257,7 +346,7 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
          * capsicum is somewhere between weak and non-existent, but if we get
          * one, then we know what to save.
          */
-#ifdef QEMU_SI_CAPSICUM
+#if defined(QEMU_SI_CAPSICUM) && !defined(__linux__)
         if (sig == TARGET_SIGTRAP) {
             tinfo->_reason._capsicum._syscall =
                 info->_reason._capsicum._syscall;
@@ -267,9 +356,6 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
         break;
     }
     tinfo->si_code = deposit32(si_code, 24, 8, si_type);
-#else
-    abort();
-#endif
 }
 
 static void tswap_siginfo(target_siginfo_t *tinfo, const target_siginfo_t *info)
@@ -937,7 +1023,8 @@ void signal_init(void)
 
     for (i = 1; i <= TARGET_NSIG; i++) {
         host_sig = target_to_host_signal(i);
-        sigaction(host_sig, NULL, &oact);
+	if (host_sig != -1)
+            sigaction(host_sig, NULL, &oact);
         if (oact.sa_sigaction == (void *)SIG_IGN) {
             sigact_table[i - 1]._sa_handler = TARGET_SIG_IGN;
         } else if (oact.sa_sigaction == (void *)SIG_DFL) {
@@ -951,7 +1038,7 @@ void signal_init(void)
          * trap all signals because it affects syscall interrupt
          * behavior.  But do trap all default-fatal signals.
          */
-        if (fatal_signal(i)) {
+        if (host_sig != -1 && fatal_signal(i)) {
             sigaction(host_sig, &act, NULL);
         }
     }

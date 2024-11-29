@@ -28,6 +28,16 @@
 
 #include "target_arch_cpu.h"
 
+static const bitmask_transtbl wait4_opts_tbl[] = {
+#if defined(__linux__)
+    { WNOHANG, WNOHANG, HOST_WNOHANG, HOST_WNOHANG },
+    { WUNTRACED, WUNTRACED, HOST_WUNTRACED, HOST_WUNTRACED },
+    { WCONTINUED, WCONTINUED, HOST_WCONTINUED, HOST_WCONTINUED },
+    { WNOWAIT, WNOWAIT, HOST_WNOWAIT, HOST_WNOWAIT },
+    { WEXITED, WEXITED, HOST_WEXITED, HOST_WEXITED },
+#endif
+};
+
 pid_t safe_wait4(pid_t wpid, int *status, int options, struct rusage *rusage);
 pid_t safe_wait6(idtype_t idtype, id_t id, int *status, int options,
     struct __wrusage *wrusage, siginfo_t *infop);
@@ -55,13 +65,14 @@ static inline abi_long do_freebsd_wait4(abi_long arg1, abi_ulong target_status,
         abi_long arg3, abi_ulong target_rusage)
 {
     abi_long ret;
+    int h_opts = target_to_host_bitmask(arg3, wait4_opts_tbl);
     int status;
     struct rusage rusage, *rusage_ptr = NULL;
 
     if (target_rusage) {
         rusage_ptr = &rusage;
     }
-    ret = get_errno(safe_wait4(arg1, &status, arg3, rusage_ptr));
+    ret = get_errno(safe_wait4(arg1, &status, h_opts, rusage_ptr));
 
     if (ret < 0) {
         return ret;
