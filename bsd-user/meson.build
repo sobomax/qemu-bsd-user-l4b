@@ -34,7 +34,3 @@ endif
 subdir(host_os)
 
 specific_ss.add_all(when: 'CONFIG_BSD_USER', if_true: bsd_user_ss)
-
-bsd_syscall_nr = generator(sh,
-			   arguments: [ meson.current_source_dir() / 'syscallhdr.sh', '@INPUT@', '@OUTPUT@', '@EXTRA_ARGS@'],
-			   output: '@BASENAME@_nr.h')
