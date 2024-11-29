@@ -30,15 +30,20 @@
 #include <sys/_termios.h>
 #include <sys/ttycom.h>
 #include <sys/filio.h>
-#endif
 
 #include <crypto/cryptodev.h>
+#else
+#include <termios.h>
+#endif
 
 #include <net/ethernet.h>
 #include <net/if.h>
+#if !defined(__linux__)
 #include <net/if_var.h>
 #include <net/if_types.h>
+#endif
 #include <net/route.h>
+#if !defined(__linux__)
 #include <net/if_dl.h>
 #include <net/if_gif.h>
 #include <net/if_gre.h>
@@ -46,13 +51,16 @@
 #include <net/if_media.h>
 #include <net/pfvar.h>
 #include <net/if_pfsync.h>
+#endif
 #include <net/ethernet.h>
 #include <netinet/icmp6.h>
 #include <netinet/in.h>
+#if !defined(__linux__)
 #include <netinet/ip_carp.h>
 #include <netinet6/in6_var.h>
 #include <netinet6/nd6.h>
 #include <net80211/ieee80211_ioctl.h>
+#endif
 
 #include <stdio.h>
 
@@ -78,40 +86,40 @@ static void target_to_host_termios(void *dst, const void *src)
     host->c_lflag = target_to_host_bitmask(tswap32(target->c_lflag), lflag_tbl);
 
     memset(host->c_cc, 0, sizeof(host->c_cc));
-    host->c_cc[VEOF] = target->c_cc[TARGET_VEOF];
-    host->c_cc[VEOL] = target->c_cc[TARGET_VEOL];
+    host->c_cc[HOST_VEOF] = target->c_cc[TARGET_VEOF];
+    host->c_cc[HOST_VEOL] = target->c_cc[TARGET_VEOL];
 #ifdef VEOL2
-    host->c_cc[VEOL2] = target->c_cc[TARGET_VEOL2];
+    host->c_cc[HOST_VEOL2] = target->c_cc[TARGET_VEOL2];
 #endif
-    host->c_cc[VERASE] = target->c_cc[TARGET_VERASE];
+    host->c_cc[HOST_VERASE] = target->c_cc[TARGET_VERASE];
 #ifdef VWERASE
-    host->c_cc[VWERASE] = target->c_cc[TARGET_VWERASE];
+    host->c_cc[HOST_VWERASE] = target->c_cc[TARGET_VWERASE];
 #endif
-    host->c_cc[VKILL] = target->c_cc[TARGET_VKILL];
+    host->c_cc[HOST_VKILL] = target->c_cc[TARGET_VKILL];
 #ifdef VREPRINT
-    host->c_cc[VREPRINT] = target->c_cc[TARGET_VREPRINT];
+    host->c_cc[HOST_VREPRINT] = target->c_cc[TARGET_VREPRINT];
 #endif
 #ifdef VERASE2
-    host->c_cc[VERASE2] = target->c_cc[TARGET_VERASE2];
+    host->c_cc[HOST_VERASE2] = target->c_cc[TARGET_VERASE2];
 #endif
-    host->c_cc[VINTR] = target->c_cc[TARGET_VINTR];
-    host->c_cc[VQUIT] = target->c_cc[TARGET_VQUIT];
-    host->c_cc[VSUSP] = target->c_cc[TARGET_VSUSP];
+    host->c_cc[HOST_VINTR] = target->c_cc[TARGET_VINTR];
+    host->c_cc[HOST_VQUIT] = target->c_cc[TARGET_VQUIT];
+    host->c_cc[HOST_VSUSP] = target->c_cc[TARGET_VSUSP];
 #ifdef VDSUSP
-    host->c_cc[VDSUSP] = target->c_cc[TARGET_VDSUSP];
+    host->c_cc[HOST_VDSUSP] = target->c_cc[TARGET_VDSUSP];
 #endif
-    host->c_cc[VSTART] = target->c_cc[TARGET_VSTART];
-    host->c_cc[VSTOP] = target->c_cc[TARGET_VSTOP];
+    host->c_cc[HOST_VSTART] = target->c_cc[TARGET_VSTART];
+    host->c_cc[HOST_VSTOP] = target->c_cc[TARGET_VSTOP];
 #ifdef VLNEXT
-    host->c_cc[VLNEXT] = target->c_cc[TARGET_VLNEXT];
+    host->c_cc[HOST_VLNEXT] = target->c_cc[TARGET_VLNEXT];
 #endif
 #ifdef VDISCARD
-    host->c_cc[VDISCARD] = target->c_cc[TARGET_VDISCARD];
+    host->c_cc[HOST_VDISCARD] = target->c_cc[TARGET_VDISCARD];
 #endif
-    host->c_cc[VMIN] = target->c_cc[TARGET_VMIN];
-    host->c_cc[VTIME] = target->c_cc[TARGET_VTIME];
+    host->c_cc[HOST_VMIN] = target->c_cc[TARGET_VMIN];
+    host->c_cc[HOST_VTIME] = target->c_cc[TARGET_VTIME];
 #ifdef VSTATUS
-    host->c_cc[VSTATUS] = target->c_cc[TARGET_VSTATUS];
+    host->c_cc[HOST_VSTATUS] = target->c_cc[TARGET_VSTATUS];
 #endif
 
     host->c_ispeed = tswap32(target->c_ispeed);
@@ -129,40 +137,40 @@ static void host_to_target_termios(void *dst, const void *src)
     target->c_lflag = tswap32(host_to_target_bitmask(host->c_lflag, lflag_tbl));
 
     memset(target->c_cc, 0, sizeof(target->c_cc));
-    target->c_cc[TARGET_VEOF] = host->c_cc[VEOF];
-    target->c_cc[TARGET_VEOL] = host->c_cc[VEOL];
+    target->c_cc[TARGET_VEOF] = host->c_cc[HOST_VEOF];
+    target->c_cc[TARGET_VEOL] = host->c_cc[HOST_VEOL];
 #ifdef VEOL2
-    target->c_cc[TARGET_VEOL2] = host->c_cc[VEOL2];
+    target->c_cc[TARGET_VEOL2] = host->c_cc[HOST_VEOL2];
 #endif
-    target->c_cc[TARGET_VERASE] = host->c_cc[VERASE];
+    target->c_cc[TARGET_VERASE] = host->c_cc[HOST_VERASE];
 #ifdef VWERASE
-    target->c_cc[TARGET_VWERASE] = host->c_cc[VWERASE];
+    target->c_cc[TARGET_VWERASE] = host->c_cc[HOST_VWERASE];
 #endif
-    target->c_cc[TARGET_VKILL] = host->c_cc[VKILL];
+    target->c_cc[TARGET_VKILL] = host->c_cc[HOST_VKILL];
 #ifdef VREPRINT
-    target->c_cc[TARGET_VREPRINT] = host->c_cc[VREPRINT];
+    target->c_cc[TARGET_VREPRINT] = host->c_cc[HOST_VREPRINT];
 #endif
 #ifdef VERASE2
-    target->c_cc[TARGET_VERASE2] = host->c_cc[VERASE2];
+    target->c_cc[TARGET_VERASE2] = host->c_cc[HOST_VERASE2];
 #endif
-    target->c_cc[TARGET_VINTR] = host->c_cc[VINTR];
-    target->c_cc[TARGET_VQUIT] = host->c_cc[VQUIT];
-    target->c_cc[TARGET_VSUSP] = host->c_cc[VSUSP];
+    target->c_cc[TARGET_VINTR] = host->c_cc[HOST_VINTR];
+    target->c_cc[TARGET_VQUIT] = host->c_cc[HOST_VQUIT];
+    target->c_cc[TARGET_VSUSP] = host->c_cc[HOST_VSUSP];
 #ifdef VDSUSP
-    target->c_cc[TARGET_VDSUSP] = host->c_cc[VDSUSP];
+    target->c_cc[TARGET_VDSUSP] = host->c_cc[HOST_VDSUSP];
 #endif
-    target->c_cc[TARGET_VSTART] = host->c_cc[VSTART];
-    target->c_cc[TARGET_VSTOP] = host->c_cc[VSTOP];
+    target->c_cc[TARGET_VSTART] = host->c_cc[HOST_VSTART];
+    target->c_cc[TARGET_VSTOP] = host->c_cc[HOST_VSTOP];
 #ifdef VLNEXT
-    target->c_cc[TARGET_VLNEXT] = host->c_cc[VLNEXT];
+    target->c_cc[TARGET_VLNEXT] = host->c_cc[HOST_VLNEXT];
 #endif
 #ifdef VDISCARD
-    target->c_cc[TARGET_VDISCARD] = host->c_cc[VDISCARD];
+    target->c_cc[TARGET_VDISCARD] = host->c_cc[HOST_VDISCARD];
 #endif
-    target->c_cc[TARGET_VMIN] = host->c_cc[VMIN];
-    target->c_cc[TARGET_VTIME] = host->c_cc[VTIME];
+    target->c_cc[TARGET_VMIN] = host->c_cc[HOST_VMIN];
+    target->c_cc[TARGET_VTIME] = host->c_cc[HOST_VTIME];
 #ifdef VSTATUS
-    target->c_cc[TARGET_VSTATUS] = host->c_cc[VSTATUS];
+    target->c_cc[TARGET_VSTATUS] = host->c_cc[HOST_VSTATUS];
 #endif
 
     target->c_ispeed = tswap32(host->c_ispeed);
@@ -212,6 +220,7 @@ typedef struct IOCTLEntry IOCTLEntry;
 
 #define MAX_STRUCT_SIZE 4096
 
+#if !defined(__linux__)
 static abi_long do_ioctl_unsupported(__unused const IOCTLEntry *ie,
                                      __unused uint8_t *buf_temp,
                                      __unused int fd, __unused abi_long cmd,
@@ -219,6 +228,7 @@ static abi_long do_ioctl_unsupported(__unused const IOCTLEntry *ie,
 
 static abi_long do_ioctl_in6_ifreq_sockaddr_int(const IOCTLEntry *ie,
         uint8_t *buf_temp, int fd, abi_long cmd, abi_long arg);
+#endif
 
 static IOCTLEntry ioctl_entries[] = {
 #define IOC_    0x0000
@@ -226,9 +236,11 @@ static IOCTLEntry ioctl_entries[] = {
 #define IOC_W   0x0002
 #define IOC_RW  (IOC_R | IOC_W)
 #define IOCTL(cmd, access, ...) \
-    { TARGET_ ## cmd, cmd, #cmd, access, 0, { __VA_ARGS__ } },
+    { TARGET_ ## cmd, HOST_ ##cmd, #cmd, access, 0, { __VA_ARGS__ } },
+#define IOCTL2(cmd, hcmd, access, ...) \
+    { TARGET_ ## cmd, hcmd, #cmd, access, 0, { __VA_ARGS__ } },
 #define IOCTL_SPECIAL(cmd, access, dofn, ...) \
-    { TARGET_ ## cmd, cmd, #cmd, access, dofn, { __VA_ARGS__ } },
+    { TARGET_ ## cmd, HOST_ ##cmd, #cmd, access, dofn, { __VA_ARGS__ } },
 #define IOCTL_SPECIAL_UNIMPL(cmd, access, dofn, ...) \
     { TARGET_ ## cmd, 0, #cmd, access, dofn, { __VA_ARGS__ } },
 #include "os-ioctl-cmds.h"
@@ -259,6 +271,7 @@ static void log_unsupported_ioctl(unsigned long cmd)
              IOCPARM_LEN(cmd));
 }
 
+#if !defined(__linux__)
 static abi_long do_ioctl_unsupported(__unused const IOCTLEntry *ie,
                                      __unused uint8_t *buf_temp,
                                      __unused int fd, __unused abi_long cmd,
@@ -309,6 +322,7 @@ static abi_long do_ioctl_in6_ifreq_sockaddr_int(const IOCTLEntry *ie,
 
     return ret;
 }
+#endif
 
 abi_long do_bsd_ioctl(int fd, abi_long cmd, abi_long arg)
 {

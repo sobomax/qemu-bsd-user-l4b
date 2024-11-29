@@ -22,7 +22,7 @@ static inline uintptr_t host_signal_pc(ucontext_t *uc)
 #if !defined(__linux__)
     return uc->uc_mcontext.mc_rip;
 #else
-    abort();
+    return uc->uc_mcontext.gregs[REG_RIP];
 #endif
 }
 

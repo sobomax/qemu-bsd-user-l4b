@@ -275,6 +275,23 @@ abi_long h2t_freebsd_statfs(abi_ulong target_addr,
  */
 abi_long target_to_host_fcntl_cmd(int cmd)
 {
+#if defined(__linux__)
+    switch (cmd) {
+        case TARGET_F_DUPFD: return HOST_F_DUPFD;
+        case TARGET_F_DUPFD_CLOEXEC: return HOST_F_DUPFD_CLOEXEC;
+        case TARGET_F_GETFD: return HOST_F_GETFD;
+        case TARGET_F_SETFD: return HOST_F_SETFD;
+        case TARGET_F_GETFL: return HOST_F_GETFL;
+        case TARGET_F_SETFL: return HOST_F_SETFL;
+        case TARGET_F_GETOWN: return HOST_F_GETOWN;
+        case TARGET_F_SETOWN: return HOST_F_SETOWN;
+        case TARGET_F_GETLK: return HOST_F_GETLK;
+        case TARGET_F_SETLK: return HOST_F_SETLK;
+        case TARGET_F_SETLKW: return HOST_F_SETLKW;
+        default:
+            return -TARGET_EINVAL;
+    }
+#endif
     return cmd;
 }
 

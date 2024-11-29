@@ -7,6 +7,7 @@ bsd_user_ss = ss.source_set()
 common_user_inc += include_directories('include')
 
 bsd_user_ss.add(files(
+  'bsd-ioctl.c',
   'bsd-mem.c',
   'bsd-proc.c',
   'bsd-socket.c',
@@ -21,7 +22,7 @@ bsd_user_ss.add(files(
 
 elf = cc.find_library('elf', required: true)
 if host_os != 'linux'
-  bsd_user_ss.add(files('bsd-ioctl.c', 'bsd-misc.c'))
+  bsd_user_ss.add(files('bsd-misc.c'))
   procstat = cc.find_library('procstat', required: true)
   kvm = cc.find_library('kvm', required: true)
   bsd_user_ss.add(elf, procstat, kvm)

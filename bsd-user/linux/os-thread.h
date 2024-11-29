@@ -40,20 +40,19 @@ int safe__umtx_op(void *, int, unsigned long, void *, void *);
 
 static inline abi_long do_freebsd_thr_self(abi_ulong target_id)
 {
-#if !defined(__linux__)
-    abi_long ret;
+    abi_long ret = 0;
     long tid;
-
+#if !defined(__linux__)
     ret = get_errno(thr_self(&tid));
+#else
+    tid = gettid();
+#endif
     if (!is_error(ret)) {
         if (put_user_sal(tid, target_id)) {
             return -TARGET_EFAULT;
         }
     }
     return ret;
-#else
-    abort();
-#endif
 }
 
 static inline abi_long do_freebsd_thr_exit(CPUArchState *cpu_env,
@@ -98,10 +97,10 @@ static inline abi_long do_freebsd_thr_exit(CPUArchState *cpu_env,
 static inline abi_long do_freebsd_thr_kill(long id, int sig)
 {
 #if !defined(__linux__)
-
     return get_errno(thr_kill(id, target_to_host_signal(sig)));
 #else
-    abort();
+    pid_t pid = getpid();
+    return get_errno(tgkill(pid, id, target_to_host_signal(sig)));
 #endif
 }
 

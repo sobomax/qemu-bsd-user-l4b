@@ -1237,14 +1237,12 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         ret = do_freebsd__umtx_op(arg1, arg2, arg3, arg4, arg5);
         break;
 
-#if !defined(__linux__)
         /*
          * ioctl(2)
          */
     case TARGET_FREEBSD_NR_ioctl: /* ioctl(2) */
         ret = do_bsd_ioctl(arg1, arg2, arg3);
         break;
-#endif
 
         /*
          * stat system calls
@@ -1727,9 +1725,5 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
 
 void syscall_init(void)
 {
-#if !defined(__linux__)
     init_bsd_ioctl();
-#else
-    fprintf(stderr, "syscall_init: stub\n");
-#endif
 }

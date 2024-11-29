@@ -30,6 +30,8 @@ struct kinfo_proc;
 
 #include "qemu.h"
 
+extern const char *exec_path;
+
 /*
  * execve/fexecve
  */
@@ -68,12 +70,8 @@ abi_long freebsd_exec_common(abi_ulong path_or_fd, abi_ulong guest_argp,
 
     qarg0 = argp = g_new0(char *, argc + 9);
     /* save the first argument for the emulator */
-#if !defined(__linux__)
-    *argp++ = (char *)getprogname();
-    *argp++ = (char *)getprogname();
-#else
-    abort();
-#endif
+    *argp++ = (char *)exec_path;
+    *argp++ = (char *)exec_path;
     envp = g_new0(char *, envc + 1);
     for (gp = guest_argp, q = argp; gp; gp += sizeof(abi_ulong), q++) {
         if (get_user_ual(addr, gp)) {
