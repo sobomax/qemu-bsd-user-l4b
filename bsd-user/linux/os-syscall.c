@@ -167,12 +167,113 @@ abi_long get_errno(abi_long ret)
 
 int host_to_target_errno(int err)
 {
-    /*
-     * All the BSDs have the property that the error numbers are uniform across
-     * all architectures for a given BSD, though they may vary between different
-     * BSDs.
-     */
-    return err;
+    switch (err) {
+        case E2BIG: return TARGET_E2BIG;
+        case EACCES: return TARGET_EACCES;
+        case EADDRINUSE: return TARGET_EADDRINUSE;
+        case EADDRNOTAVAIL: return TARGET_EADDRNOTAVAIL;
+        case EAFNOSUPPORT: return TARGET_EAFNOSUPPORT;
+        case EAGAIN: return TARGET_EAGAIN;
+        case EALREADY: return TARGET_EALREADY;
+        //case EAUTH: return TARGET_EAUTH;
+        case EBADF: return TARGET_EBADF;
+        case EBADMSG: return TARGET_EBADMSG;
+        //case EBADRPC: return TARGET_EBADRPC;
+        case EBUSY: return TARGET_EBUSY;
+        case ECANCELED: return TARGET_ECANCELED;
+        //case ECAPMODE: return TARGET_ECAPMODE;
+        case ECHILD: return TARGET_ECHILD;
+        case ECONNABORTED: return TARGET_ECONNABORTED;
+        case ECONNREFUSED: return TARGET_ECONNREFUSED;
+        case ECONNRESET: return TARGET_ECONNRESET;
+        case EDEADLK: return TARGET_EDEADLK;
+        case EDESTADDRREQ: return TARGET_EDESTADDRREQ;
+        //case EDIRIOCTL: return TARGET_EDIRIOCTL;
+        case EDOM: return TARGET_EDOM;
+        //case EDOOFUS: return TARGET_EDOOFUS;
+        case EDQUOT: return TARGET_EDQUOT;
+        case EEXIST: return TARGET_EEXIST;
+        case EFAULT: return TARGET_EFAULT;
+        case EFBIG: return TARGET_EFBIG;
+        //case EFTYPE: return TARGET_EFTYPE;
+        //case EHOSTDOWN: return TARGET_EHOSTDOWN;
+        case EHOSTUNREACH: return TARGET_EHOSTUNREACH;
+        case EIDRM: return TARGET_EIDRM;
+        case EILSEQ: return TARGET_EILSEQ;
+        case EINPROGRESS: return TARGET_EINPROGRESS;
+        //case EINTEGRITY: return TARGET_EINTEGRITY;
+        case EINTR: return TARGET_EINTR;
+        case EINVAL: return TARGET_EINVAL;
+        case EIO: return TARGET_EIO;
+        case EISCONN: return TARGET_EISCONN;
+        case EISDIR: return TARGET_EISDIR;
+        //case EJUSTRETURN: return TARGET_EJUSTRETURN;
+        //case ELAST: return TARGET_ELAST;
+        case ELOOP: return TARGET_ELOOP;
+        case EMFILE: return TARGET_EMFILE;
+        case EMLINK: return TARGET_EMLINK;
+        case EMSGSIZE: return TARGET_EMSGSIZE;
+        case EMULTIHOP: return TARGET_EMULTIHOP;
+        case ENAMETOOLONG: return TARGET_ENAMETOOLONG;
+        //case ENEEDAUTH: return TARGET_ENEEDAUTH;
+        case ENETDOWN: return TARGET_ENETDOWN;
+        case ENETRESET: return TARGET_ENETRESET;
+        case ENETUNREACH: return TARGET_ENETUNREACH;
+        case ENFILE: return TARGET_ENFILE;
+        //case ENOATTR: return TARGET_ENOATTR;
+        case ENOBUFS: return TARGET_ENOBUFS;
+        case ENODEV: return TARGET_ENODEV;
+        case ENOENT: return TARGET_ENOENT;
+        case ENOEXEC: return TARGET_ENOEXEC;
+        //case ENOIOCTL: return TARGET_ENOIOCTL;
+        case ENOLCK: return TARGET_ENOLCK;
+        case ENOLINK: return TARGET_ENOLINK;
+        case ENOMEM: return TARGET_ENOMEM;
+        case ENOMSG: return TARGET_ENOMSG;
+        case ENOPROTOOPT: return TARGET_ENOPROTOOPT;
+        case ENOSPC: return TARGET_ENOSPC;
+        case ENOSYS: return TARGET_ENOSYS;
+        case ENOTBLK: return TARGET_ENOTBLK;
+        //case ENOTCAPABLE: return TARGET_ENOTCAPABLE;
+        case ENOTCONN: return TARGET_ENOTCONN;
+        case ENOTDIR: return TARGET_ENOTDIR;
+        case ENOTEMPTY: return TARGET_ENOTEMPTY;
+        case ENOTRECOVERABLE: return TARGET_ENOTRECOVERABLE;
+        case ENOTSOCK: return TARGET_ENOTSOCK;
+        case ENOTSUP: return TARGET_ENOTSUP;
+        case ENOTTY: return TARGET_ENOTTY;
+        case ENXIO: return TARGET_ENXIO;
+        case EOVERFLOW: return TARGET_EOVERFLOW;
+        case EOWNERDEAD: return TARGET_EOWNERDEAD;
+        case EPERM: return TARGET_EPERM;
+        //case EPFNOSUPPORT: return TARGET_EPFNOSUPPORT;
+        case EPIPE: return TARGET_EPIPE;
+        //case EPROCLIM: return TARGET_EPROCLIM;
+        //case EPROCUNAVAIL: return TARGET_EPROCUNAVAIL;
+        //case EPROGMISMATCH: return TARGET_EPROGMISMATCH;
+        //case EPROGUNAVAIL: return TARGET_EPROGUNAVAIL;
+        case EPROTO: return TARGET_EPROTO;
+        case EPROTONOSUPPORT: return TARGET_EPROTONOSUPPORT;
+        case EPROTOTYPE: return TARGET_EPROTOTYPE;
+        case ERANGE: return TARGET_ERANGE;
+        //case ERELOOKUP: return TARGET_ERELOOKUP;
+        //case EREMOTE: return TARGET_EREMOTE;
+        //case ERESTART: return TARGET_ERESTART;
+        case EROFS: return TARGET_EROFS;
+        //case ERPCMISMATCH: return TARGET_ERPCMISMATCH;
+        //case ESHUTDOWN: return TARGET_ESHUTDOWN;
+        //case ESOCKTNOSUPPORT: return TARGET_ESOCKTNOSUPPORT;
+        case ESPIPE: return TARGET_ESPIPE;
+        case ESRCH: return TARGET_ESRCH;
+        case ESTALE: return TARGET_ESTALE;
+        case ETIMEDOUT: return TARGET_ETIMEDOUT;
+        //case ETOOMANYREFS: return TARGET_ETOOMANYREFS;
+        case ETXTBSY: return TARGET_ETXTBSY;
+        //case EUSERS: return TARGET_EUSERS;
+        case EXDEV: return TARGET_EXDEV;
+    }
+
+    abort();
 }
 
 bool is_error(abi_long ret)

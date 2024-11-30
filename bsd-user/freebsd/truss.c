@@ -135,9 +135,9 @@ static void print_syscall_ret(TaskState *ts, abi_ulong ret, abi_ulong ret2, int 
     for (i = 0; i < 6 - (len / 8); i++)
         fprintf(ts->outfile, "\t");
 
-    if (error == ERESTART)
+    if (error == TARGET_ERESTART)
         fprintf(ts->outfile, " ERESTART\n");
-    else if (error == EJUSTRETURN)
+    else if (error == TARGET_EJUSTRETURN)
         fprintf(ts->outfile, " EJUSTRETURN\n");
     else if (error != 0) {
         fprintf(ts->outfile, " ERR#%d '%s'\n", error, strerror(error));
