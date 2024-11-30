@@ -3874,6 +3874,21 @@ static const typeof(KERN_ARND) HOST_KERN_ARND = KERN_ARND;
 #endif /* found in: sys/sysctl.h */
 #undef KERN_ARND
 #define KERN_ARND		37	/* int: from arc4rand() */
+#if defined(KERN_OSTYPE) && !defined(HOST_KERN_OSTYPE)
+static const typeof(KERN_OSTYPE) HOST_KERN_OSTYPE = KERN_OSTYPE;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_OSTYPE
+#define KERN_OSTYPE		 1	/* string: system version */
+#if defined(KERN_OSRELEASE) && !defined(HOST_KERN_OSRELEASE)
+static const typeof(KERN_OSRELEASE) HOST_KERN_OSRELEASE = KERN_OSRELEASE;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_OSRELEASE
+#define KERN_OSRELEASE		 2	/* string: system release */
+#if defined(KERN_VERSION) && !defined(HOST_KERN_VERSION)
+static const typeof(KERN_VERSION) HOST_KERN_VERSION = KERN_VERSION;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_VERSION
+#define KERN_VERSION		 4	/* string: compile time info */
 #if defined(TIOCSETD) && !defined(HOST_TIOCSETD)
 static const typeof(TIOCSETD) HOST_TIOCSETD = TIOCSETD;
 #endif /* found in: sys/ttycom.h */
