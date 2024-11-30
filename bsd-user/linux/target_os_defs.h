@@ -8,489 +8,904 @@ struct fiodgname_arg;
 /* Defines: */
 #if defined(_SIG_WORDS) && !defined(HOST__SIG_WORDS)
 static const typeof(_SIG_WORDS) HOST__SIG_WORDS = _SIG_WORDS;
-#endif /* target found in: sys/_sigset.h */
+#endif /* found in: sys/_sigset.h */
 #undef _SIG_WORDS
 #define _SIG_WORDS	4
 #if defined(BRKINT) && !defined(HOST_BRKINT)
 static const typeof(BRKINT) HOST_BRKINT = BRKINT;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef BRKINT
 #define BRKINT		0x00000002	/* map BREAK to SIGINTR */
 #if defined(ICRNL) && !defined(HOST_ICRNL)
 static const typeof(ICRNL) HOST_ICRNL = ICRNL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ICRNL
 #define ICRNL		0x00000100	/* map CR to NL (ala CRMOD) */
 #if defined(IGNBRK) && !defined(HOST_IGNBRK)
 static const typeof(IGNBRK) HOST_IGNBRK = IGNBRK;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IGNBRK
 #define IGNBRK		0x00000001	/* ignore BREAK condition */
 #if defined(IGNCR) && !defined(HOST_IGNCR)
 static const typeof(IGNCR) HOST_IGNCR = IGNCR;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IGNCR
 #define IGNCR		0x00000080	/* ignore CR */
 #if defined(IGNPAR) && !defined(HOST_IGNPAR)
 static const typeof(IGNPAR) HOST_IGNPAR = IGNPAR;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IGNPAR
 #define IGNPAR		0x00000004	/* ignore (discard) parity errors */
 #if defined(IMAXBEL) && !defined(HOST_IMAXBEL)
 static const typeof(IMAXBEL) HOST_IMAXBEL = IMAXBEL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IMAXBEL
 #define IMAXBEL		0x00002000	/* ring bell on input queue full */
 #if defined(INLCR) && !defined(HOST_INLCR)
 static const typeof(INLCR) HOST_INLCR = INLCR;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef INLCR
 #define INLCR		0x00000040	/* map NL into CR */
 #if defined(INPCK) && !defined(HOST_INPCK)
 static const typeof(INPCK) HOST_INPCK = INPCK;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef INPCK
 #define INPCK		0x00000010	/* enable checking of parity errors */
 #if defined(ISTRIP) && !defined(HOST_ISTRIP)
 static const typeof(ISTRIP) HOST_ISTRIP = ISTRIP;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ISTRIP
 #define ISTRIP		0x00000020	/* strip 8th bit off chars */
 #if defined(IUTF8) && !defined(HOST_IUTF8)
 static const typeof(IUTF8) HOST_IUTF8 = IUTF8;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IUTF8
 #define IUTF8		0x00004000	/* assume input is utf-8 encoded */
 #if defined(IXANY) && !defined(HOST_IXANY)
 static const typeof(IXANY) HOST_IXANY = IXANY;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IXANY
 #define IXANY		0x00000800	/* any char will restart after stop */
 #if defined(IXOFF) && !defined(HOST_IXOFF)
 static const typeof(IXOFF) HOST_IXOFF = IXOFF;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IXOFF
 #define IXOFF		0x00000400	/* enable input flow control */
 #if defined(IXON) && !defined(HOST_IXON)
 static const typeof(IXON) HOST_IXON = IXON;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IXON
 #define IXON		0x00000200	/* enable output flow control */
 #if defined(OCRNL) && !defined(HOST_OCRNL)
 static const typeof(OCRNL) HOST_OCRNL = OCRNL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef OCRNL
 #define OCRNL		0x00000010	/* map CR to NL on output */
 #if defined(ONLCR) && !defined(HOST_ONLCR)
 static const typeof(ONLCR) HOST_ONLCR = ONLCR;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ONLCR
 #define ONLCR		0x00000002	/* map NL to CR-NL (ala CRMOD) */
 #if defined(ONLRET) && !defined(HOST_ONLRET)
 static const typeof(ONLRET) HOST_ONLRET = ONLRET;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ONLRET
 #define ONLRET		0x00000040	/* NL performs CR function */
 #if defined(ONOCR) && !defined(HOST_ONOCR)
 static const typeof(ONOCR) HOST_ONOCR = ONOCR;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ONOCR
 #define ONOCR		0x00000020	/* no CR output at column 0 */
 #if defined(OPOST) && !defined(HOST_OPOST)
 static const typeof(OPOST) HOST_OPOST = OPOST;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef OPOST
 #define OPOST		0x00000001	/* enable following output processing */
 #if defined(PARMRK) && !defined(HOST_PARMRK)
 static const typeof(PARMRK) HOST_PARMRK = PARMRK;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef PARMRK
 #define PARMRK		0x00000008	/* mark parity and framing errors */
 #if defined(TAB0) && !defined(HOST_TAB0)
 static const typeof(TAB0) HOST_TAB0 = TAB0;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef TAB0
 #define TAB0	    0x00000000	    /* no tab delay and expansion */
 #if defined(TAB3) && !defined(HOST_TAB3)
 static const typeof(TAB3) HOST_TAB3 = TAB3;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef TAB3
 #define TAB3	    0x00000004	    /* expand tabs to spaces */
 #if defined(TABDLY) && !defined(HOST_TABDLY)
 static const typeof(TABDLY) HOST_TABDLY = TABDLY;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef TABDLY
 #define TABDLY		0x00000004	/* tab delay mask */
 #if defined(B0) && !defined(HOST_B0)
 static const typeof(B0) HOST_B0 = B0;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B0
 #define B0	0
 #if defined(B50) && !defined(HOST_B50)
 static const typeof(B50) HOST_B50 = B50;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B50
 #define B50	50
 #if defined(B75) && !defined(HOST_B75)
 static const typeof(B75) HOST_B75 = B75;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B75
 #define B75	75
 #if defined(B110) && !defined(HOST_B110)
 static const typeof(B110) HOST_B110 = B110;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B110
 #define B110	110
 #if defined(B134) && !defined(HOST_B134)
 static const typeof(B134) HOST_B134 = B134;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B134
 #define B134	134
 #if defined(B150) && !defined(HOST_B150)
 static const typeof(B150) HOST_B150 = B150;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B150
 #define B150	150
 #if defined(B200) && !defined(HOST_B200)
 static const typeof(B200) HOST_B200 = B200;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B200
 #define B200	200
 #if defined(B300) && !defined(HOST_B300)
 static const typeof(B300) HOST_B300 = B300;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B300
 #define B300	300
 #if defined(B600) && !defined(HOST_B600)
 static const typeof(B600) HOST_B600 = B600;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B600
 #define B600	600
 #if defined(B1200) && !defined(HOST_B1200)
 static const typeof(B1200) HOST_B1200 = B1200;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B1200
 #define B1200	1200
 #if defined(B1800) && !defined(HOST_B1800)
 static const typeof(B1800) HOST_B1800 = B1800;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B1800
 #define B1800	1800
 #if defined(B2400) && !defined(HOST_B2400)
 static const typeof(B2400) HOST_B2400 = B2400;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B2400
 #define B2400	2400
 #if defined(B4800) && !defined(HOST_B4800)
 static const typeof(B4800) HOST_B4800 = B4800;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B4800
 #define B4800	4800
 #if defined(B9600) && !defined(HOST_B9600)
 static const typeof(B9600) HOST_B9600 = B9600;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B9600
 #define B9600	9600
 #if defined(B19200) && !defined(HOST_B19200)
 static const typeof(B19200) HOST_B19200 = B19200;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B19200
 #define B19200	19200
 #if defined(B38400) && !defined(HOST_B38400)
 static const typeof(B38400) HOST_B38400 = B38400;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B38400
 #define B38400	38400
 #if defined(B57600) && !defined(HOST_B57600)
 static const typeof(B57600) HOST_B57600 = B57600;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B57600
 #define B57600	57600
 #if defined(B115200) && !defined(HOST_B115200)
 static const typeof(B115200) HOST_B115200 = B115200;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B115200
 #define B115200	115200
 #if defined(B230400) && !defined(HOST_B230400)
 static const typeof(B230400) HOST_B230400 = B230400;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B230400
 #define B230400	230400
 #if defined(B460800) && !defined(HOST_B460800)
 static const typeof(B460800) HOST_B460800 = B460800;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef B460800
 #define B460800	460800
 #if defined(CSIZE) && !defined(HOST_CSIZE)
 static const typeof(CSIZE) HOST_CSIZE = CSIZE;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CSIZE
 #define CSIZE		0x00000300	/* character size mask */
 #if defined(CS5) && !defined(HOST_CS5)
 static const typeof(CS5) HOST_CS5 = CS5;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CS5
 #define CS5		    0x00000000	    /* 5 bits (pseudo) */
 #if defined(CS6) && !defined(HOST_CS6)
 static const typeof(CS6) HOST_CS6 = CS6;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CS6
 #define CS6		    0x00000100	    /* 6 bits */
 #if defined(CS7) && !defined(HOST_CS7)
 static const typeof(CS7) HOST_CS7 = CS7;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CS7
 #define CS7		    0x00000200	    /* 7 bits */
 #if defined(CS8) && !defined(HOST_CS8)
 static const typeof(CS8) HOST_CS8 = CS8;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CS8
 #define CS8		    0x00000300	    /* 8 bits */
 #if defined(CSTOPB) && !defined(HOST_CSTOPB)
 static const typeof(CSTOPB) HOST_CSTOPB = CSTOPB;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CSTOPB
 #define CSTOPB		0x00000400	/* send 2 stop bits */
 #if defined(CREAD) && !defined(HOST_CREAD)
 static const typeof(CREAD) HOST_CREAD = CREAD;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CREAD
 #define CREAD		0x00000800	/* enable receiver */
 #if defined(PARENB) && !defined(HOST_PARENB)
 static const typeof(PARENB) HOST_PARENB = PARENB;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef PARENB
 #define PARENB		0x00001000	/* parity enable */
 #if defined(PARODD) && !defined(HOST_PARODD)
 static const typeof(PARODD) HOST_PARODD = PARODD;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef PARODD
 #define PARODD		0x00002000	/* odd parity, else even */
 #if defined(HUPCL) && !defined(HOST_HUPCL)
 static const typeof(HUPCL) HOST_HUPCL = HUPCL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef HUPCL
 #define HUPCL		0x00004000	/* hang up on last close */
 #if defined(CLOCAL) && !defined(HOST_CLOCAL)
 static const typeof(CLOCAL) HOST_CLOCAL = CLOCAL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CLOCAL
 #define CLOCAL		0x00008000	/* ignore modem status lines */
 #undef CRTSCTS /* found in: sys/_termios.h */
 #define CRTSCTS		(CCTS_OFLOW | CRTS_IFLOW)
 #if defined(ISIG) && !defined(HOST_ISIG)
 static const typeof(ISIG) HOST_ISIG = ISIG;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ISIG
 #define ISIG		0x00000080	/* enable signals INTR, QUIT, [D]SUSP */
 #if defined(ICANON) && !defined(HOST_ICANON)
 static const typeof(ICANON) HOST_ICANON = ICANON;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ICANON
 #define ICANON		0x00000100	/* canonicalize input lines */
 #if defined(ECHO) && !defined(HOST_ECHO)
 static const typeof(ECHO) HOST_ECHO = ECHO;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ECHO
 #define ECHO		0x00000008	/* enable echoing */
 #if defined(ECHOE) && !defined(HOST_ECHOE)
 static const typeof(ECHOE) HOST_ECHOE = ECHOE;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ECHOE
 #define ECHOE		0x00000002	/* visually erase chars */
 #if defined(ECHOK) && !defined(HOST_ECHOK)
 static const typeof(ECHOK) HOST_ECHOK = ECHOK;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ECHOK
 #define ECHOK		0x00000004	/* echo NL after line kill */
 #if defined(ECHONL) && !defined(HOST_ECHONL)
 static const typeof(ECHONL) HOST_ECHONL = ECHONL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ECHONL
 #define ECHONL		0x00000010	/* echo NL even if ECHO is off */
 #if defined(NOFLSH) && !defined(HOST_NOFLSH)
 static const typeof(NOFLSH) HOST_NOFLSH = NOFLSH;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef NOFLSH
 #define NOFLSH		0x80000000	/* don't flush after interrupt */
 #if defined(TOSTOP) && !defined(HOST_TOSTOP)
 static const typeof(TOSTOP) HOST_TOSTOP = TOSTOP;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef TOSTOP
 #define TOSTOP		0x00400000	/* stop background jobs from output */
 #if defined(ECHOCTL) && !defined(HOST_ECHOCTL)
 static const typeof(ECHOCTL) HOST_ECHOCTL = ECHOCTL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ECHOCTL
 #define ECHOCTL  	0x00000040	/* echo control chars as ^(Char) */
 #if defined(ECHOPRT) && !defined(HOST_ECHOPRT)
 static const typeof(ECHOPRT) HOST_ECHOPRT = ECHOPRT;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ECHOPRT
 #define ECHOPRT		0x00000020	/* visual erase mode for hardcopy */
 #if defined(ECHOKE) && !defined(HOST_ECHOKE)
 static const typeof(ECHOKE) HOST_ECHOKE = ECHOKE;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef ECHOKE
 #define ECHOKE		0x00000001	/* visual erase for line kill */
 #if defined(FLUSHO) && !defined(HOST_FLUSHO)
 static const typeof(FLUSHO) HOST_FLUSHO = FLUSHO;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef FLUSHO
 #define FLUSHO		0x00800000	/* output being flushed (state) */
 #if defined(PENDIN) && !defined(HOST_PENDIN)
 static const typeof(PENDIN) HOST_PENDIN = PENDIN;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef PENDIN
 #define PENDIN		0x20000000	/* XXX retype pending input (state) */
 #if defined(IEXTEN) && !defined(HOST_IEXTEN)
 static const typeof(IEXTEN) HOST_IEXTEN = IEXTEN;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef IEXTEN
 #define IEXTEN		0x00000400	/* enable DISCARD and LNEXT */
 #if defined(EXTPROC) && !defined(HOST_EXTPROC)
 static const typeof(EXTPROC) HOST_EXTPROC = EXTPROC;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef EXTPROC
 #define EXTPROC         0x00000800      /* external processing */
 #if defined(CCTS_OFLOW) && !defined(HOST_CCTS_OFLOW)
 static const typeof(CCTS_OFLOW) HOST_CCTS_OFLOW = CCTS_OFLOW;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CCTS_OFLOW
 #define CCTS_OFLOW	0x00010000	/* CTS flow control of output */
 #if defined(CRTS_IFLOW) && !defined(HOST_CRTS_IFLOW)
 static const typeof(CRTS_IFLOW) HOST_CRTS_IFLOW = CRTS_IFLOW;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef CRTS_IFLOW
 #define CRTS_IFLOW	0x00020000	/* RTS flow control of input */
 #if defined(VEOF) && !defined(HOST_VEOF)
 static const typeof(VEOF) HOST_VEOF = VEOF;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VEOF
 #define VEOF		0	/* ICANON */
 #if defined(VEOL) && !defined(HOST_VEOL)
 static const typeof(VEOL) HOST_VEOL = VEOL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VEOL
 #define VEOL		1	/* ICANON */
 #if defined(VEOL2) && !defined(HOST_VEOL2)
 static const typeof(VEOL2) HOST_VEOL2 = VEOL2;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VEOL2
 #define VEOL2		2	/* ICANON together with IEXTEN */
 #if defined(VERASE) && !defined(HOST_VERASE)
 static const typeof(VERASE) HOST_VERASE = VERASE;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VERASE
 #define VERASE		3	/* ICANON */
 #if defined(VWERASE) && !defined(HOST_VWERASE)
 static const typeof(VWERASE) HOST_VWERASE = VWERASE;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VWERASE
 #define VWERASE 	4	/* ICANON together with IEXTEN */
 #if defined(VKILL) && !defined(HOST_VKILL)
 static const typeof(VKILL) HOST_VKILL = VKILL;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VKILL
 #define VKILL		5	/* ICANON */
 #if defined(VREPRINT) && !defined(HOST_VREPRINT)
 static const typeof(VREPRINT) HOST_VREPRINT = VREPRINT;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VREPRINT
 #define VREPRINT 	6	/* ICANON together with IEXTEN */
 #if defined(VINTR) && !defined(HOST_VINTR)
 static const typeof(VINTR) HOST_VINTR = VINTR;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VINTR
 #define VINTR		8	/* ISIG */
 #if defined(VQUIT) && !defined(HOST_VQUIT)
 static const typeof(VQUIT) HOST_VQUIT = VQUIT;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VQUIT
 #define VQUIT		9	/* ISIG */
 #if defined(VSUSP) && !defined(HOST_VSUSP)
 static const typeof(VSUSP) HOST_VSUSP = VSUSP;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VSUSP
 #define VSUSP		10	/* ISIG */
 #if defined(VSTART) && !defined(HOST_VSTART)
 static const typeof(VSTART) HOST_VSTART = VSTART;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VSTART
 #define VSTART		12	/* IXON, IXOFF */
 #if defined(VSTOP) && !defined(HOST_VSTOP)
 static const typeof(VSTOP) HOST_VSTOP = VSTOP;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VSTOP
 #define VSTOP		13	/* IXON, IXOFF */
 #if defined(VLNEXT) && !defined(HOST_VLNEXT)
 static const typeof(VLNEXT) HOST_VLNEXT = VLNEXT;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VLNEXT
 #define VLNEXT		14	/* IEXTEN */
 #if defined(VDISCARD) && !defined(HOST_VDISCARD)
 static const typeof(VDISCARD) HOST_VDISCARD = VDISCARD;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VDISCARD
 #define VDISCARD	15	/* IEXTEN */
 #if defined(VMIN) && !defined(HOST_VMIN)
 static const typeof(VMIN) HOST_VMIN = VMIN;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VMIN
 #define VMIN		16	/* !ICANON */
 #if defined(VTIME) && !defined(HOST_VTIME)
 static const typeof(VTIME) HOST_VTIME = VTIME;
-#endif /* target found in: sys/_termios.h */
+#endif /* found in: sys/_termios.h */
 #undef VTIME
 #define VTIME		17	/* !ICANON */
-#if defined(EJUSTRETURN) && !defined(HOST_EJUSTRETURN)
-static const typeof(EJUSTRETURN) HOST_EJUSTRETURN = EJUSTRETURN;
-#endif /* target found in: sys/errno.h */
-#undef EJUSTRETURN
-#define EJUSTRETURN	(-2)		/* don't modify regs, just return */
+#if defined(TARGET_E2BIG)
+#undef TARGET_E2BIG
+#endif /* found in: sys/errno.h */
+#define TARGET_E2BIG		7		/* Argument list too long */
+#if defined(TARGET_EACCES)
+#undef TARGET_EACCES
+#endif /* found in: sys/errno.h */
+#define TARGET_EACCES		13		/* Permission denied */
+#if defined(TARGET_EADDRINUSE)
+#undef TARGET_EADDRINUSE
+#endif /* found in: sys/errno.h */
+#define TARGET_EADDRINUSE	48		/* Address already in use */
+#if defined(TARGET_EADDRNOTAVAIL)
+#undef TARGET_EADDRNOTAVAIL
+#endif /* found in: sys/errno.h */
+#define TARGET_EADDRNOTAVAIL	49		/* Can't assign requested address */
+#if defined(TARGET_EAFNOSUPPORT)
+#undef TARGET_EAFNOSUPPORT
+#endif /* found in: sys/errno.h */
+#define TARGET_EAFNOSUPPORT	47		/* Address family not supported by protocol family */
+#if defined(TARGET_EAGAIN)
+#undef TARGET_EAGAIN
+#endif /* found in: sys/errno.h */
+#define TARGET_EAGAIN		35		/* Resource temporarily unavailable */
+#if defined(TARGET_EALREADY)
+#undef TARGET_EALREADY
+#endif /* found in: sys/errno.h */
+#define TARGET_EALREADY	37		/* Operation already in progress */
+#if defined(TARGET_EAUTH)
+#undef TARGET_EAUTH
+#endif /* found in: sys/errno.h */
+#define TARGET_EAUTH		80		/* Authentication error */
+#if defined(TARGET_EBADF)
+#undef TARGET_EBADF
+#endif /* found in: sys/errno.h */
+#define TARGET_EBADF		9		/* Bad file descriptor */
+#if defined(TARGET_EBADMSG)
+#undef TARGET_EBADMSG
+#endif /* found in: sys/errno.h */
+#define TARGET_EBADMSG		89		/* Bad message */
+#if defined(TARGET_EBADRPC)
+#undef TARGET_EBADRPC
+#endif /* found in: sys/errno.h */
+#define TARGET_EBADRPC		72		/* RPC struct is bad */
+#if defined(TARGET_EBUSY)
+#undef TARGET_EBUSY
+#endif /* found in: sys/errno.h */
+#define TARGET_EBUSY		16		/* Device busy */
+#if defined(TARGET_ECANCELED)
+#undef TARGET_ECANCELED
+#endif /* found in: sys/errno.h */
+#define TARGET_ECANCELED	85		/* Operation canceled */
+#if defined(TARGET_ECAPMODE)
+#undef TARGET_ECAPMODE
+#endif /* found in: sys/errno.h */
+#define TARGET_ECAPMODE	94		/* Not permitted in capability mode */
+#if defined(TARGET_ECHILD)
+#undef TARGET_ECHILD
+#endif /* found in: sys/errno.h */
+#define TARGET_ECHILD		10		/* No child processes */
+#if defined(TARGET_ECONNABORTED)
+#undef TARGET_ECONNABORTED
+#endif /* found in: sys/errno.h */
+#define TARGET_ECONNABORTED	53		/* Software caused connection abort */
+#if defined(TARGET_ECONNREFUSED)
+#undef TARGET_ECONNREFUSED
+#endif /* found in: sys/errno.h */
+#define TARGET_ECONNREFUSED	61		/* Connection refused */
+#if defined(TARGET_ECONNRESET)
+#undef TARGET_ECONNRESET
+#endif /* found in: sys/errno.h */
+#define TARGET_ECONNRESET	54		/* Connection reset by peer */
+#if defined(TARGET_EDEADLK)
+#undef TARGET_EDEADLK
+#endif /* found in: sys/errno.h */
+#define TARGET_EDEADLK		11		/* Resource deadlock avoided */
+#if defined(TARGET_EDESTADDRREQ)
+#undef TARGET_EDESTADDRREQ
+#endif /* found in: sys/errno.h */
+#define TARGET_EDESTADDRREQ	39		/* Destination address required */
+#if defined(TARGET_EDIRIOCTL)
+#undef TARGET_EDIRIOCTL
+#endif /* found in: sys/errno.h */
+#define TARGET_EDIRIOCTL	(-4)		/* do direct ioctl in GEOM */
+#if defined(TARGET_EDOM)
+#undef TARGET_EDOM
+#endif /* found in: sys/errno.h */
+#define TARGET_EDOM		33		/* Numerical argument out of domain */
+#if defined(TARGET_EDOOFUS)
+#undef TARGET_EDOOFUS
+#endif /* found in: sys/errno.h */
+#define TARGET_EDOOFUS		88		/* Programming error */
+#if defined(TARGET_EDQUOT)
+#undef TARGET_EDQUOT
+#endif /* found in: sys/errno.h */
+#define TARGET_EDQUOT		69		/* Disc quota exceeded */
+#if defined(TARGET_EEXIST)
+#undef TARGET_EEXIST
+#endif /* found in: sys/errno.h */
+#define TARGET_EEXIST		17		/* File exists */
+#if defined(TARGET_EFAULT)
+#undef TARGET_EFAULT
+#endif /* found in: sys/errno.h */
+#define TARGET_EFAULT		14		/* Bad address */
+#if defined(TARGET_EFBIG)
+#undef TARGET_EFBIG
+#endif /* found in: sys/errno.h */
+#define TARGET_EFBIG		27		/* File too large */
+#if defined(TARGET_EFTYPE)
+#undef TARGET_EFTYPE
+#endif /* found in: sys/errno.h */
+#define TARGET_EFTYPE		79		/* Inappropriate file type or format */
+#if defined(TARGET_EHOSTDOWN)
+#undef TARGET_EHOSTDOWN
+#endif /* found in: sys/errno.h */
+#define TARGET_EHOSTDOWN	64		/* Host is down */
+#if defined(TARGET_EHOSTUNREACH)
+#undef TARGET_EHOSTUNREACH
+#endif /* found in: sys/errno.h */
+#define TARGET_EHOSTUNREACH	65		/* No route to host */
+#if defined(TARGET_EIDRM)
+#undef TARGET_EIDRM
+#endif /* found in: sys/errno.h */
+#define TARGET_EIDRM		82		/* Identifier removed */
+#if defined(TARGET_EILSEQ)
+#undef TARGET_EILSEQ
+#endif /* found in: sys/errno.h */
+#define TARGET_EILSEQ		86		/* Illegal byte sequence */
+#if defined(TARGET_EINPROGRESS)
+#undef TARGET_EINPROGRESS
+#endif /* found in: sys/errno.h */
+#define TARGET_EINPROGRESS	36		/* Operation now in progress */
+#if defined(TARGET_EINTEGRITY)
+#undef TARGET_EINTEGRITY
+#endif /* found in: sys/errno.h */
+#define TARGET_EINTEGRITY	97		/* Integrity check failed */
+#if defined(TARGET_EINTR)
+#undef TARGET_EINTR
+#endif /* found in: sys/errno.h */
+#define TARGET_EINTR		4		/* Interrupted system call */
+#if defined(TARGET_EINVAL)
+#undef TARGET_EINVAL
+#endif /* found in: sys/errno.h */
+#define TARGET_EINVAL		22		/* Invalid argument */
+#if defined(TARGET_EIO)
+#undef TARGET_EIO
+#endif /* found in: sys/errno.h */
+#define TARGET_EIO		5		/* Input/output error */
+#if defined(TARGET_EISCONN)
+#undef TARGET_EISCONN
+#endif /* found in: sys/errno.h */
+#define TARGET_EISCONN		56		/* Socket is already connected */
+#if defined(TARGET_EISDIR)
+#undef TARGET_EISDIR
+#endif /* found in: sys/errno.h */
+#define TARGET_EISDIR		21		/* Is a directory */
+#if defined(TARGET_EJUSTRETURN)
+#undef TARGET_EJUSTRETURN
+#endif /* found in: sys/errno.h */
+#define TARGET_EJUSTRETURN	(-2)		/* don't modify regs, just return */
+#if defined(TARGET_ELAST)
+#undef TARGET_ELAST
+#endif /* found in: sys/errno.h */
+#define TARGET_ELAST		97		/* Must be equal largest errno */
+#if defined(TARGET_ELOOP)
+#undef TARGET_ELOOP
+#endif /* found in: sys/errno.h */
+#define TARGET_ELOOP		62		/* Too many levels of symbolic links */
+#if defined(TARGET_EMFILE)
+#undef TARGET_EMFILE
+#endif /* found in: sys/errno.h */
+#define TARGET_EMFILE		24		/* Too many open files */
+#if defined(TARGET_EMLINK)
+#undef TARGET_EMLINK
+#endif /* found in: sys/errno.h */
+#define TARGET_EMLINK		31		/* Too many links */
+#if defined(TARGET_EMSGSIZE)
+#undef TARGET_EMSGSIZE
+#endif /* found in: sys/errno.h */
+#define TARGET_EMSGSIZE	40		/* Message too long */
+#if defined(TARGET_EMULTIHOP)
+#undef TARGET_EMULTIHOP
+#endif /* found in: sys/errno.h */
+#define TARGET_EMULTIHOP	90		/* Multihop attempted */
+#if defined(TARGET_ENAMETOOLONG)
+#undef TARGET_ENAMETOOLONG
+#endif /* found in: sys/errno.h */
+#define TARGET_ENAMETOOLONG	63		/* File name too long */
+#if defined(TARGET_ENEEDAUTH)
+#undef TARGET_ENEEDAUTH
+#endif /* found in: sys/errno.h */
+#define TARGET_ENEEDAUTH	81		/* Need authenticator */
+#if defined(TARGET_ENETDOWN)
+#undef TARGET_ENETDOWN
+#endif /* found in: sys/errno.h */
+#define TARGET_ENETDOWN	50		/* Network is down */
+#if defined(TARGET_ENETRESET)
+#undef TARGET_ENETRESET
+#endif /* found in: sys/errno.h */
+#define TARGET_ENETRESET	52		/* Network dropped connection on reset */
+#if defined(TARGET_ENETUNREACH)
+#undef TARGET_ENETUNREACH
+#endif /* found in: sys/errno.h */
+#define TARGET_ENETUNREACH	51		/* Network is unreachable */
+#if defined(TARGET_ENFILE)
+#undef TARGET_ENFILE
+#endif /* found in: sys/errno.h */
+#define TARGET_ENFILE		23		/* Too many open files in system */
+#if defined(TARGET_ENOATTR)
+#undef TARGET_ENOATTR
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOATTR		87		/* Attribute not found */
+#if defined(TARGET_ENOBUFS)
+#undef TARGET_ENOBUFS
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOBUFS		55		/* No buffer space available */
+#if defined(TARGET_ENODEV)
+#undef TARGET_ENODEV
+#endif /* found in: sys/errno.h */
+#define TARGET_ENODEV		19		/* Operation not supported by device */
+#if defined(TARGET_ENOENT)
+#undef TARGET_ENOENT
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOENT		2		/* No such file or directory */
+#if defined(TARGET_ENOEXEC)
+#undef TARGET_ENOEXEC
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOEXEC		8		/* Exec format error */
+#if defined(TARGET_ENOIOCTL)
+#undef TARGET_ENOIOCTL
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOIOCTL	(-3)		/* ioctl not handled by this layer */
+#if defined(TARGET_ENOLCK)
+#undef TARGET_ENOLCK
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOLCK		77		/* No locks available */
+#if defined(TARGET_ENOLINK)
+#undef TARGET_ENOLINK
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOLINK		91		/* Link has been severed */
+#if defined(TARGET_ENOMEM)
+#undef TARGET_ENOMEM
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOMEM		12		/* Cannot allocate memory */
+#if defined(TARGET_ENOMSG)
+#undef TARGET_ENOMSG
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOMSG		83		/* No message of desired type */
+#if defined(TARGET_ENOPROTOOPT)
+#undef TARGET_ENOPROTOOPT
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOPROTOOPT	42		/* Protocol not available */
+#if defined(TARGET_ENOSPC)
+#undef TARGET_ENOSPC
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOSPC		28		/* No space left on device */
+#if defined(TARGET_ENOSYS)
+#undef TARGET_ENOSYS
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOSYS		78		/* Function not implemented */
+#if defined(TARGET_ENOTBLK)
+#undef TARGET_ENOTBLK
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTBLK		15		/* Block device required */
+#if defined(TARGET_ENOTCAPABLE)
+#undef TARGET_ENOTCAPABLE
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTCAPABLE	93		/* Capabilities insufficient */
+#if defined(TARGET_ENOTCONN)
+#undef TARGET_ENOTCONN
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTCONN	57		/* Socket is not connected */
+#if defined(TARGET_ENOTDIR)
+#undef TARGET_ENOTDIR
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTDIR		20		/* Not a directory */
+#if defined(TARGET_ENOTEMPTY)
+#undef TARGET_ENOTEMPTY
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTEMPTY	66		/* Directory not empty */
+#if defined(TARGET_ENOTRECOVERABLE)
+#undef TARGET_ENOTRECOVERABLE
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTRECOVERABLE	95		/* State not recoverable */
+#if defined(TARGET_ENOTSOCK)
+#undef TARGET_ENOTSOCK
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTSOCK	38		/* Socket operation on non-socket */
+#if defined(TARGET_ENOTSUP)
+#undef TARGET_ENOTSUP
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTSUP		EOPNOTSUPP	/* Operation not supported */
+#if defined(TARGET_ENOTTY)
+#undef TARGET_ENOTTY
+#endif /* found in: sys/errno.h */
+#define TARGET_ENOTTY		25		/* Inappropriate ioctl for device */
+#if defined(TARGET_ENXIO)
+#undef TARGET_ENXIO
+#endif /* found in: sys/errno.h */
+#define TARGET_ENXIO		6		/* Device not configured */
+#if defined(TARGET_EOPNOTSUPP)
+#undef TARGET_EOPNOTSUPP
+#endif /* found in: sys/errno.h */
+#define TARGET_EOPNOTSUPP	45		/* Operation not supported */
+#if defined(TARGET_EOVERFLOW)
+#undef TARGET_EOVERFLOW
+#endif /* found in: sys/errno.h */
+#define TARGET_EOVERFLOW	84		/* Value too large to be stored in data type */
+#if defined(TARGET_EOWNERDEAD)
+#undef TARGET_EOWNERDEAD
+#endif /* found in: sys/errno.h */
+#define TARGET_EOWNERDEAD	96		/* Previous owner died */
+#if defined(TARGET_EPERM)
+#undef TARGET_EPERM
+#endif /* found in: sys/errno.h */
+#define TARGET_EPERM		1		/* Operation not permitted */
+#if defined(TARGET_EPFNOSUPPORT)
+#undef TARGET_EPFNOSUPPORT
+#endif /* found in: sys/errno.h */
+#define TARGET_EPFNOSUPPORT	46		/* Protocol family not supported */
+#if defined(TARGET_EPIPE)
+#undef TARGET_EPIPE
+#endif /* found in: sys/errno.h */
+#define TARGET_EPIPE		32		/* Broken pipe */
+#if defined(TARGET_EPROCLIM)
+#undef TARGET_EPROCLIM
+#endif /* found in: sys/errno.h */
+#define TARGET_EPROCLIM	67		/* Too many processes */
+#if defined(TARGET_EPROCUNAVAIL)
+#undef TARGET_EPROCUNAVAIL
+#endif /* found in: sys/errno.h */
+#define TARGET_EPROCUNAVAIL	76		/* Bad procedure for program */
+#if defined(TARGET_EPROGMISMATCH)
+#undef TARGET_EPROGMISMATCH
+#endif /* found in: sys/errno.h */
+#define TARGET_EPROGMISMATCH	75		/* Program version wrong */
+#if defined(TARGET_EPROGUNAVAIL)
+#undef TARGET_EPROGUNAVAIL
+#endif /* found in: sys/errno.h */
+#define TARGET_EPROGUNAVAIL	74		/* RPC prog. not avail */
+#if defined(TARGET_EPROTO)
+#undef TARGET_EPROTO
+#endif /* found in: sys/errno.h */
+#define TARGET_EPROTO		92		/* Protocol error */
+#if defined(TARGET_EPROTONOSUPPORT)
+#undef TARGET_EPROTONOSUPPORT
+#endif /* found in: sys/errno.h */
+#define TARGET_EPROTONOSUPPORT	43		/* Protocol not supported */
+#if defined(TARGET_EPROTOTYPE)
+#undef TARGET_EPROTOTYPE
+#endif /* found in: sys/errno.h */
+#define TARGET_EPROTOTYPE	41		/* Protocol wrong type for socket */
+#if defined(TARGET_ERANGE)
+#undef TARGET_ERANGE
+#endif /* found in: sys/errno.h */
+#define TARGET_ERANGE		34		/* Result too large */
+#if defined(TARGET_ERELOOKUP)
+#undef TARGET_ERELOOKUP
+#endif /* found in: sys/errno.h */
+#define TARGET_ERELOOKUP	(-5)		/* retry the directory lookup */
+#if defined(TARGET_EREMOTE)
+#undef TARGET_EREMOTE
+#endif /* found in: sys/errno.h */
+#define TARGET_EREMOTE		71		/* Too many levels of remote in path */
+#if defined(TARGET_ERESTART)
+#undef TARGET_ERESTART
+#endif /* found in: sys/errno.h */
+#define TARGET_ERESTART	(-1)		/* restart syscall */
+#if defined(TARGET_EROFS)
+#undef TARGET_EROFS
+#endif /* found in: sys/errno.h */
+#define TARGET_EROFS		30		/* Read-only filesystem */
+#if defined(TARGET_ERPCMISMATCH)
+#undef TARGET_ERPCMISMATCH
+#endif /* found in: sys/errno.h */
+#define TARGET_ERPCMISMATCH	73		/* RPC version wrong */
+#if defined(TARGET_ESHUTDOWN)
+#undef TARGET_ESHUTDOWN
+#endif /* found in: sys/errno.h */
+#define TARGET_ESHUTDOWN	58		/* Can't send after socket shutdown */
+#if defined(TARGET_ESOCKTNOSUPPORT)
+#undef TARGET_ESOCKTNOSUPPORT
+#endif /* found in: sys/errno.h */
+#define TARGET_ESOCKTNOSUPPORT	44		/* Socket type not supported */
+#if defined(TARGET_ESPIPE)
+#undef TARGET_ESPIPE
+#endif /* found in: sys/errno.h */
+#define TARGET_ESPIPE		29		/* Illegal seek */
+#if defined(TARGET_ESRCH)
+#undef TARGET_ESRCH
+#endif /* found in: sys/errno.h */
+#define TARGET_ESRCH		3		/* No such process */
+#if defined(TARGET_ESTALE)
+#undef TARGET_ESTALE
+#endif /* found in: sys/errno.h */
+#define TARGET_ESTALE		70		/* Stale NFS file handle */
+#if defined(TARGET_ETIMEDOUT)
+#undef TARGET_ETIMEDOUT
+#endif /* found in: sys/errno.h */
+#define TARGET_ETIMEDOUT	60		/* Operation timed out */
+#if defined(TARGET_ETOOMANYREFS)
+#undef TARGET_ETOOMANYREFS
+#endif /* found in: sys/errno.h */
+#define TARGET_ETOOMANYREFS	59		/* Too many references: can't splice */
+#if defined(TARGET_ETXTBSY)
+#undef TARGET_ETXTBSY
+#endif /* found in: sys/errno.h */
+#define TARGET_ETXTBSY		26		/* Text file busy */
+#if defined(TARGET_EUSERS)
+#undef TARGET_EUSERS
+#endif /* found in: sys/errno.h */
+#define TARGET_EUSERS		68		/* Too many users */
+#if defined(TARGET_EWOULDBLOCK)
+#undef TARGET_EWOULDBLOCK
+#endif /* found in: sys/errno.h */
+#define TARGET_EWOULDBLOCK	EAGAIN		/* Operation would block */
+#if defined(TARGET_EXDEV)
+#undef TARGET_EXDEV
+#endif /* found in: sys/errno.h */
+#define TARGET_EXDEV		18		/* Cross-device link */
 #if defined(DT_UNKNOWN) && !defined(HOST_DT_UNKNOWN)
 static const typeof(DT_UNKNOWN) HOST_DT_UNKNOWN = DT_UNKNOWN;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_UNKNOWN
 #define DT_UNKNOWN	 0
 #if defined(DT_FIFO) && !defined(HOST_DT_FIFO)
 static const typeof(DT_FIFO) HOST_DT_FIFO = DT_FIFO;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_FIFO
 #define DT_FIFO		 1
 #if defined(DT_CHR) && !defined(HOST_DT_CHR)
 static const typeof(DT_CHR) HOST_DT_CHR = DT_CHR;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_CHR
 #define DT_CHR		 2
 #if defined(DT_DIR) && !defined(HOST_DT_DIR)
 static const typeof(DT_DIR) HOST_DT_DIR = DT_DIR;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_DIR
 #define DT_DIR		 4
 #if defined(DT_BLK) && !defined(HOST_DT_BLK)
 static const typeof(DT_BLK) HOST_DT_BLK = DT_BLK;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_BLK
 #define DT_BLK		 6
 #if defined(DT_REG) && !defined(HOST_DT_REG)
 static const typeof(DT_REG) HOST_DT_REG = DT_REG;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_REG
 #define DT_REG		 8
 #if defined(DT_LNK) && !defined(HOST_DT_LNK)
 static const typeof(DT_LNK) HOST_DT_LNK = DT_LNK;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_LNK
 #define DT_LNK		10
 #if defined(DT_SOCK) && !defined(HOST_DT_SOCK)
 static const typeof(DT_SOCK) HOST_DT_SOCK = DT_SOCK;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_SOCK
 #define DT_SOCK		12
 #if defined(DT_WHT) && !defined(HOST_DT_WHT)
 static const typeof(DT_WHT) HOST_DT_WHT = DT_WHT;
-#endif /* target found in: sys/dirent.h */
+#endif /* found in: sys/dirent.h */
 #undef DT_WHT
 #define DT_WHT		14
 #undef IFTODT /* found in: sys/dirent.h */
@@ -503,182 +918,182 @@ static const typeof(DT_WHT) HOST_DT_WHT = DT_WHT;
 #define DIOCGMEDIASIZE	_IOR('d', 129, off_t)	/* Get media size in bytes */
 #if defined(O_ACCMODE) && !defined(HOST_O_ACCMODE)
 static const typeof(O_ACCMODE) HOST_O_ACCMODE = O_ACCMODE;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_ACCMODE
 #define O_ACCMODE	0x0003		/* mask for above modes */
 #if defined(O_WRONLY) && !defined(HOST_O_WRONLY)
 static const typeof(O_WRONLY) HOST_O_WRONLY = O_WRONLY;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_WRONLY
 #define O_WRONLY	0x0001		/* open for writing only */
 #if defined(O_RDWR) && !defined(HOST_O_RDWR)
 static const typeof(O_RDWR) HOST_O_RDWR = O_RDWR;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_RDWR
 #define O_RDWR		0x0002		/* open for reading and writing */
 #if defined(O_CREAT) && !defined(HOST_O_CREAT)
 static const typeof(O_CREAT) HOST_O_CREAT = O_CREAT;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_CREAT
 #define O_CREAT		0x0200		/* create if nonexistent */
 #if defined(O_EXCL) && !defined(HOST_O_EXCL)
 static const typeof(O_EXCL) HOST_O_EXCL = O_EXCL;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_EXCL
 #define O_EXCL		0x0800		/* error if already exists */
 #if defined(O_NOCTTY) && !defined(HOST_O_NOCTTY)
 static const typeof(O_NOCTTY) HOST_O_NOCTTY = O_NOCTTY;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_NOCTTY
 #define O_NOCTTY	0x8000		/* don't assign controlling terminal */
 #if defined(O_TRUNC) && !defined(HOST_O_TRUNC)
 static const typeof(O_TRUNC) HOST_O_TRUNC = O_TRUNC;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_TRUNC
 #define O_TRUNC		0x0400		/* truncate to zero length */
 #if defined(O_APPEND) && !defined(HOST_O_APPEND)
 static const typeof(O_APPEND) HOST_O_APPEND = O_APPEND;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_APPEND
 #define O_APPEND	0x0008		/* set append mode */
 #if defined(O_NONBLOCK) && !defined(HOST_O_NONBLOCK)
 static const typeof(O_NONBLOCK) HOST_O_NONBLOCK = O_NONBLOCK;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_NONBLOCK
 #define O_NONBLOCK	0x0004		/* no delay */
 #if defined(O_SYNC) && !defined(HOST_O_SYNC)
 static const typeof(O_SYNC) HOST_O_SYNC = O_SYNC;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_SYNC
 #define O_SYNC		0x0080		/* POSIX synonym for O_FSYNC */
 #if defined(O_DIRECTORY) && !defined(HOST_O_DIRECTORY)
 static const typeof(O_DIRECTORY) HOST_O_DIRECTORY = O_DIRECTORY;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_DIRECTORY
 #define O_DIRECTORY	0x00020000	/* Fail if not directory */
 #if defined(O_NOFOLLOW) && !defined(HOST_O_NOFOLLOW)
 static const typeof(O_NOFOLLOW) HOST_O_NOFOLLOW = O_NOFOLLOW;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_NOFOLLOW
 #define O_NOFOLLOW	0x0100		/* don't follow symlinks */
 #if defined(O_DIRECT) && !defined(HOST_O_DIRECT)
 static const typeof(O_DIRECT) HOST_O_DIRECT = O_DIRECT;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_DIRECT
 #define O_DIRECT	0x00010000
 #if defined(O_CLOEXEC) && !defined(HOST_O_CLOEXEC)
 static const typeof(O_CLOEXEC) HOST_O_CLOEXEC = O_CLOEXEC;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_CLOEXEC
 #define O_CLOEXEC	0x00100000
 #if defined(O_PATH) && !defined(HOST_O_PATH)
 static const typeof(O_PATH) HOST_O_PATH = O_PATH;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_PATH
 #define O_PATH		0x00400000	/* fd is only a path */
 #if defined(O_DSYNC) && !defined(HOST_O_DSYNC)
 static const typeof(O_DSYNC) HOST_O_DSYNC = O_DSYNC;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef O_DSYNC
 #define O_DSYNC		0x01000000	/* POSIX data sync */
 #if defined(AT_FDCWD) && !defined(HOST_AT_FDCWD)
 static const typeof(AT_FDCWD) HOST_AT_FDCWD = AT_FDCWD;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef AT_FDCWD
 #define AT_FDCWD		-100
 #if defined(AT_EACCESS) && !defined(HOST_AT_EACCESS)
 static const typeof(AT_EACCESS) HOST_AT_EACCESS = AT_EACCESS;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef AT_EACCESS
 #define AT_EACCESS		0x0100	/* Check access using effective user */
 #if defined(AT_SYMLINK_NOFOLLOW) && !defined(HOST_AT_SYMLINK_NOFOLLOW)
 static const typeof(AT_SYMLINK_NOFOLLOW) HOST_AT_SYMLINK_NOFOLLOW = AT_SYMLINK_NOFOLLOW;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef AT_SYMLINK_NOFOLLOW
 #define AT_SYMLINK_NOFOLLOW	0x0200	/* Do not follow symbolic links */
 #if defined(AT_SYMLINK_FOLLOW) && !defined(HOST_AT_SYMLINK_FOLLOW)
 static const typeof(AT_SYMLINK_FOLLOW) HOST_AT_SYMLINK_FOLLOW = AT_SYMLINK_FOLLOW;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef AT_SYMLINK_FOLLOW
 #define AT_SYMLINK_FOLLOW	0x0400	/* Follow symbolic link */
 #if defined(AT_REMOVEDIR) && !defined(HOST_AT_REMOVEDIR)
 static const typeof(AT_REMOVEDIR) HOST_AT_REMOVEDIR = AT_REMOVEDIR;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef AT_REMOVEDIR
 #define AT_REMOVEDIR		0x0800	/* Remove directory instead of file */
 #if defined(AT_RESOLVE_BENEATH) && !defined(HOST_AT_RESOLVE_BENEATH)
 static const typeof(AT_RESOLVE_BENEATH) HOST_AT_RESOLVE_BENEATH = AT_RESOLVE_BENEATH;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef AT_RESOLVE_BENEATH
 #define AT_RESOLVE_BENEATH	0x2000	/* Do not allow name resolution */
 #if defined(AT_EMPTY_PATH) && !defined(HOST_AT_EMPTY_PATH)
 static const typeof(AT_EMPTY_PATH) HOST_AT_EMPTY_PATH = AT_EMPTY_PATH;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef AT_EMPTY_PATH
 #define AT_EMPTY_PATH		0x4000	/* Operate on dirfd if path is empty */
 #if defined(F_DUPFD) && !defined(HOST_F_DUPFD)
 static const typeof(F_DUPFD) HOST_F_DUPFD = F_DUPFD;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_DUPFD
 #define F_DUPFD		0		/* duplicate file descriptor */
 #if defined(F_DUPFD_CLOEXEC) && !defined(HOST_F_DUPFD_CLOEXEC)
 static const typeof(F_DUPFD_CLOEXEC) HOST_F_DUPFD_CLOEXEC = F_DUPFD_CLOEXEC;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_DUPFD_CLOEXEC
 #define F_DUPFD_CLOEXEC	17		/* Like F_DUPFD, but FD_CLOEXEC is set */
 #if defined(F_DUP2FD) && !defined(HOST_F_DUP2FD)
 static const typeof(F_DUP2FD) HOST_F_DUP2FD = F_DUP2FD;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_DUP2FD
 #define F_DUP2FD	10		/* duplicate file descriptor to arg */
 #if defined(F_DUP2FD_CLOEXEC) && !defined(HOST_F_DUP2FD_CLOEXEC)
 static const typeof(F_DUP2FD_CLOEXEC) HOST_F_DUP2FD_CLOEXEC = F_DUP2FD_CLOEXEC;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_DUP2FD_CLOEXEC
 #define F_DUP2FD_CLOEXEC 18		/* Like F_DUP2FD, but FD_CLOEXEC is set */
 #if defined(F_GETFD) && !defined(HOST_F_GETFD)
 static const typeof(F_GETFD) HOST_F_GETFD = F_GETFD;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_GETFD
 #define F_GETFD		1		/* get file descriptor flags */
 #if defined(F_SETFD) && !defined(HOST_F_SETFD)
 static const typeof(F_SETFD) HOST_F_SETFD = F_SETFD;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_SETFD
 #define F_SETFD		2		/* set file descriptor flags */
 #if defined(F_GETFL) && !defined(HOST_F_GETFL)
 static const typeof(F_GETFL) HOST_F_GETFL = F_GETFL;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_GETFL
 #define F_GETFL		3		/* get file status flags */
 #if defined(F_SETFL) && !defined(HOST_F_SETFL)
 static const typeof(F_SETFL) HOST_F_SETFL = F_SETFL;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_SETFL
 #define F_SETFL		4		/* set file status flags */
 #if defined(F_GETOWN) && !defined(HOST_F_GETOWN)
 static const typeof(F_GETOWN) HOST_F_GETOWN = F_GETOWN;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_GETOWN
 #define F_GETOWN	5		/* get SIGIO/SIGURG proc/pgrp */
 #if defined(F_SETOWN) && !defined(HOST_F_SETOWN)
 static const typeof(F_SETOWN) HOST_F_SETOWN = F_SETOWN;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_SETOWN
 #define F_SETOWN	6		/* set SIGIO/SIGURG proc/pgrp */
 #if defined(F_GETLK) && !defined(HOST_F_GETLK)
 static const typeof(F_GETLK) HOST_F_GETLK = F_GETLK;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_GETLK
 #define F_GETLK		11		/* get record locking information */
 #if defined(F_SETLK) && !defined(HOST_F_SETLK)
 static const typeof(F_SETLK) HOST_F_SETLK = F_SETLK;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_SETLK
 #define F_SETLK		12		/* set record locking information */
 #if defined(F_SETLKW) && !defined(HOST_F_SETLKW)
 static const typeof(F_SETLKW) HOST_F_SETLKW = F_SETLKW;
-#endif /* target found in: sys/fcntl.h */
+#endif /* found in: sys/fcntl.h */
 #undef F_SETLKW
 #define F_SETLKW	13		/* F_SETLK; wait if blocked */
 #undef FIODGNAME /* found in: sys/filio.h */
@@ -697,42 +1112,42 @@ static const typeof(F_SETLKW) HOST_F_SETLKW = F_SETLKW;
 #define FIOSEEKHOLE	_IOWR('f', 98, off_t)	/* SEEK_HOLE */
 #if defined(FIOCLEX) && !defined(HOST_FIOCLEX)
 static const typeof(FIOCLEX) HOST_FIOCLEX = FIOCLEX;
-#endif /* target found in: sys/filio.h */
+#endif /* found in: sys/filio.h */
 #undef FIOCLEX
 #define FIOCLEX		 _IO('f', 1)		/* set close on exec on fd */
 #if defined(FIONCLEX) && !defined(HOST_FIONCLEX)
 static const typeof(FIONCLEX) HOST_FIONCLEX = FIONCLEX;
-#endif /* target found in: sys/filio.h */
+#endif /* found in: sys/filio.h */
 #undef FIONCLEX
 #define FIONCLEX	 _IO('f', 2)		/* remove close on exec */
 #if defined(FIONREAD) && !defined(HOST_FIONREAD)
 static const typeof(FIONREAD) HOST_FIONREAD = FIONREAD;
-#endif /* target found in: sys/filio.h */
+#endif /* found in: sys/filio.h */
 #undef FIONREAD
 #define FIONREAD	_IOR('f', 127, int)	/* get # bytes to read */
 #if defined(FIONBIO) && !defined(HOST_FIONBIO)
 static const typeof(FIONBIO) HOST_FIONBIO = FIONBIO;
-#endif /* target found in: sys/filio.h */
+#endif /* found in: sys/filio.h */
 #undef FIONBIO
 #define FIONBIO		_IOW('f', 126, int)	/* set/clear non-blocking i/o */
 #if defined(FIOASYNC) && !defined(HOST_FIOASYNC)
 static const typeof(FIOASYNC) HOST_FIOASYNC = FIOASYNC;
-#endif /* target found in: sys/filio.h */
+#endif /* found in: sys/filio.h */
 #undef FIOASYNC
 #define FIOASYNC	_IOW('f', 125, int)	/* set/clear async i/o */
 #if defined(FIOSETOWN) && !defined(HOST_FIOSETOWN)
 static const typeof(FIOSETOWN) HOST_FIOSETOWN = FIOSETOWN;
-#endif /* target found in: sys/filio.h */
+#endif /* found in: sys/filio.h */
 #undef FIOSETOWN
 #define FIOSETOWN	_IOW('f', 124, int)	/* set owner */
 #if defined(FIOGETOWN) && !defined(HOST_FIOGETOWN)
 static const typeof(FIOGETOWN) HOST_FIOGETOWN = FIOGETOWN;
-#endif /* target found in: sys/filio.h */
+#endif /* found in: sys/filio.h */
 #undef FIOGETOWN
 #define FIOGETOWN	_IOR('f', 123, int)	/* get owner */
 #if defined(IOCPARM_SHIFT) && !defined(HOST_IOCPARM_SHIFT)
 static const typeof(IOCPARM_SHIFT) HOST_IOCPARM_SHIFT = IOCPARM_SHIFT;
-#endif /* target found in: sys/ioccom.h */
+#endif /* found in: sys/ioccom.h */
 #undef IOCPARM_SHIFT
 #define IOCPARM_SHIFT	13		/* number of bits for ioctl size */
 #undef IOCPARM_MASK /* found in: sys/ioccom.h */
@@ -770,117 +1185,117 @@ static const typeof(IOCPARM_SHIFT) HOST_IOCPARM_SHIFT = IOCPARM_SHIFT;
 #define _IOWR(g,n,t)	_IOC(IOC_INOUT,	(g), (n), sizeof(t))
 #if defined(BS0) && !defined(HOST_BS0)
 static const typeof(BS0) HOST_BS0 = BS0;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef BS0
 #define BS0	0x00000000
 #if defined(BS1) && !defined(HOST_BS1)
 static const typeof(BS1) HOST_BS1 = BS1;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef BS1
 #define BS1	0x00008000
 #if defined(CR0) && !defined(HOST_CR0)
 static const typeof(CR0) HOST_CR0 = CR0;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef CR0
 #define CR0	0x00000000
 #if defined(CR1) && !defined(HOST_CR1)
 static const typeof(CR1) HOST_CR1 = CR1;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef CR1
 #define CR1	0x00001000	/* tn 300 */
 #if defined(CR2) && !defined(HOST_CR2)
 static const typeof(CR2) HOST_CR2 = CR2;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef CR2
 #define CR2	0x00002000	/* tty 37 */
 #if defined(CR3) && !defined(HOST_CR3)
 static const typeof(CR3) HOST_CR3 = CR3;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef CR3
 #define CR3	0x00003000	/* concept 100 */
 #if defined(FF0) && !defined(HOST_FF0)
 static const typeof(FF0) HOST_FF0 = FF0;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef FF0
 #define FF0	0x00000000
 #if defined(FF1) && !defined(HOST_FF1)
 static const typeof(FF1) HOST_FF1 = FF1;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef FF1
 #define FF1	0x00004000	/* tty 37 */
 #if defined(NL0) && !defined(HOST_NL0)
 static const typeof(NL0) HOST_NL0 = NL0;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef NL0
 #define NL0	0x00000000
 #if defined(NL1) && !defined(HOST_NL1)
 static const typeof(NL1) HOST_NL1 = NL1;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef NL1
 #define NL1	0x00000100	/* tty 37 */
 #if defined(TAB1) && !defined(HOST_TAB1)
 static const typeof(TAB1) HOST_TAB1 = TAB1;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef TAB1
 #define TAB1	0x00000400	/* tty 37 */
 #if defined(TAB2) && !defined(HOST_TAB2)
 static const typeof(TAB2) HOST_TAB2 = TAB2;
-#endif /* target found in: sys/ioctl_compat.h */
+#endif /* found in: sys/ioctl_compat.h */
 #undef TAB2
 #define TAB2	0x00000800
 #if defined(KENV_GET) && !defined(HOST_KENV_GET)
 static const typeof(KENV_GET) HOST_KENV_GET = KENV_GET;
-#endif /* target found in: sys/kenv.h */
+#endif /* found in: sys/kenv.h */
 #undef KENV_GET
 #define KENV_GET		0
 #if defined(MAP_GUARD) && !defined(HOST_MAP_GUARD)
 static const typeof(MAP_GUARD) HOST_MAP_GUARD = MAP_GUARD;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_GUARD
 #define MAP_GUARD	 0x00002000 /* reserve but don't map address range */
 #if defined(MAP_FIXED) && !defined(HOST_MAP_FIXED)
 static const typeof(MAP_FIXED) HOST_MAP_FIXED = MAP_FIXED;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_FIXED
 #define MAP_FIXED	 0x0010	/* map addr must be exactly as requested */
 #if defined(MAP_ANON) && !defined(HOST_MAP_ANON)
 static const typeof(MAP_ANON) HOST_MAP_ANON = MAP_ANON;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_ANON
 #define MAP_ANON	 0x1000	/* allocated from memory, swap space */
 #if defined(MAP_EXCL) && !defined(HOST_MAP_EXCL)
 static const typeof(MAP_EXCL) HOST_MAP_EXCL = MAP_EXCL;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_EXCL
 #define MAP_EXCL	 0x00004000 /* for MAP_FIXED, fail if address is used */
 #if defined(MAP_PRIVATE) && !defined(HOST_MAP_PRIVATE)
 static const typeof(MAP_PRIVATE) HOST_MAP_PRIVATE = MAP_PRIVATE;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_PRIVATE
 #define MAP_PRIVATE	0x0002		/* changes are private */
 #if defined(MAP_SHARED) && !defined(HOST_MAP_SHARED)
 static const typeof(MAP_SHARED) HOST_MAP_SHARED = MAP_SHARED;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_SHARED
 #define MAP_SHARED	0x0001		/* share changes */
 #if defined(MAP_NOCORE) && !defined(HOST_MAP_NOCORE)
 static const typeof(MAP_NOCORE) HOST_MAP_NOCORE = MAP_NOCORE;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_NOCORE
 #define MAP_NOCORE	 0x00020000 /* dont include these pages in a coredump */
 #if defined(MAP_STACK) && !defined(HOST_MAP_STACK)
 static const typeof(MAP_STACK) HOST_MAP_STACK = MAP_STACK;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_STACK
 #define MAP_STACK	 0x0400	/* region grows down, like a stack */
 #if defined(MAP_PREFAULT_READ) && !defined(HOST_MAP_PREFAULT_READ)
 static const typeof(MAP_PREFAULT_READ) HOST_MAP_PREFAULT_READ = MAP_PREFAULT_READ;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_PREFAULT_READ
 #define MAP_PREFAULT_READ 0x00040000 /* prefault mapping for reading */
 #if defined(MAP_ALIGNMENT_SHIFT) && !defined(HOST_MAP_ALIGNMENT_SHIFT)
 static const typeof(MAP_ALIGNMENT_SHIFT) HOST_MAP_ALIGNMENT_SHIFT = MAP_ALIGNMENT_SHIFT;
-#endif /* target found in: sys/mman.h */
+#endif /* found in: sys/mman.h */
 #undef MAP_ALIGNMENT_SHIFT
 #define MAP_ALIGNMENT_SHIFT	24
 #undef MAP_ALIGNED /* found in: sys/mman.h */
@@ -891,112 +1306,112 @@ static const typeof(MAP_ALIGNMENT_SHIFT) HOST_MAP_ALIGNMENT_SHIFT = MAP_ALIGNMEN
 #define SHM_ANON		((char *)1)
 #if defined(STATFS_VERSION) && !defined(HOST_STATFS_VERSION)
 static const typeof(STATFS_VERSION) HOST_STATFS_VERSION = STATFS_VERSION;
-#endif /* target found in: sys/mount.h */
+#endif /* found in: sys/mount.h */
 #undef STATFS_VERSION
 #define STATFS_VERSION	0x20140518	/* current version number */
 #if defined(MNAMELEN) && !defined(HOST_MNAMELEN)
 static const typeof(MNAMELEN) HOST_MNAMELEN = MNAMELEN;
-#endif /* target found in: sys/mount.h */
+#endif /* found in: sys/mount.h */
 #undef MNAMELEN
 #define MNAMELEN	1024		/* size of on/from name bufs */
 #if defined(__FreeBSD_version) && !defined(HOST___FreeBSD_version)
 static const typeof(__FreeBSD_version) HOST___FreeBSD_version = __FreeBSD_version;
-#endif /* target found in: sys/param.h */
+#endif /* found in: sys/param.h */
 #undef __FreeBSD_version
 #define __FreeBSD_version 1401000
 #if defined(P_OSREL_MAP_GUARD) && !defined(HOST_P_OSREL_MAP_GUARD)
 static const typeof(P_OSREL_MAP_GUARD) HOST_P_OSREL_MAP_GUARD = P_OSREL_MAP_GUARD;
-#endif /* target found in: sys/param.h */
+#endif /* found in: sys/param.h */
 #undef P_OSREL_MAP_GUARD
 #define P_OSREL_MAP_GUARD		1200035
 #if defined(INFTIM) && !defined(HOST_INFTIM)
 static const typeof(INFTIM) HOST_INFTIM = INFTIM;
-#endif /* target found in: sys/poll.h */
+#endif /* found in: sys/poll.h */
 #undef INFTIM
 #define INFTIM		(-1)
 #if defined(SIGBUS) && !defined(HOST_SIGBUS)
 static const typeof(SIGBUS) HOST_SIGBUS = SIGBUS;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGBUS
 #define SIGBUS		10	/* bus error */
 #if defined(SIGUSR1) && !defined(HOST_SIGUSR1)
 static const typeof(SIGUSR1) HOST_SIGUSR1 = SIGUSR1;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGUSR1
 #define SIGUSR1		30	/* user defined signal 1 */
 #if defined(SIGUSR2) && !defined(HOST_SIGUSR2)
 static const typeof(SIGUSR2) HOST_SIGUSR2 = SIGUSR2;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGUSR2
 #define SIGUSR2		31	/* user defined signal 2 */
 #if defined(SIGSYS) && !defined(HOST_SIGSYS)
 static const typeof(SIGSYS) HOST_SIGSYS = SIGSYS;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGSYS
 #define SIGSYS		12	/* non-existent system call invoked */
 #if defined(SIGURG) && !defined(HOST_SIGURG)
 static const typeof(SIGURG) HOST_SIGURG = SIGURG;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGURG
 #define SIGURG		16	/* urgent condition on IO channel */
 #if defined(SIGSTOP) && !defined(HOST_SIGSTOP)
 static const typeof(SIGSTOP) HOST_SIGSTOP = SIGSTOP;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGSTOP
 #define SIGSTOP		17	/* sendable stop signal not from tty */
 #if defined(SIGTSTP) && !defined(HOST_SIGTSTP)
 static const typeof(SIGTSTP) HOST_SIGTSTP = SIGTSTP;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGTSTP
 #define SIGTSTP		18	/* stop signal from tty */
 #if defined(SIGCONT) && !defined(HOST_SIGCONT)
 static const typeof(SIGCONT) HOST_SIGCONT = SIGCONT;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGCONT
 #define SIGCONT		19	/* continue a stopped process */
 #if defined(SIGCHLD) && !defined(HOST_SIGCHLD)
 static const typeof(SIGCHLD) HOST_SIGCHLD = SIGCHLD;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGCHLD
 #define SIGCHLD		20	/* to parent on child stop or exit */
 #if defined(SIGIO) && !defined(HOST_SIGIO)
 static const typeof(SIGIO) HOST_SIGIO = SIGIO;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGIO
 #define SIGIO		23	/* input/output possible signal */
 #if defined(SIGRTMIN) && !defined(HOST_SIGRTMIN)
 static const typeof(SIGRTMIN) HOST_SIGRTMIN = SIGRTMIN;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGRTMIN
 #define SIGRTMIN	65
 #if defined(SIGRTMAX) && !defined(HOST_SIGRTMAX)
 static const typeof(SIGRTMAX) HOST_SIGRTMAX = SIGRTMAX;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef SIGRTMAX
 #define SIGRTMAX	126
 #if defined(NSIG) && !defined(HOST_NSIG)
 static const typeof(NSIG) HOST_NSIG = NSIG;
-#endif /* target found in: sys/signal.h */
+#endif /* found in: sys/signal.h */
 #undef NSIG
 #define NSIG		32	/* number of old signals (counting 0) */
 #if defined(SO_NOSIGPIPE) && !defined(HOST_SO_NOSIGPIPE)
 static const typeof(SO_NOSIGPIPE) HOST_SO_NOSIGPIPE = SO_NOSIGPIPE;
-#endif /* target found in: sys/socket.h */
+#endif /* found in: sys/socket.h */
 #undef SO_NOSIGPIPE
 #define SO_NOSIGPIPE	0x00000800	/* no SIGPIPE from EPIPE */
 #if defined(SO_BINTIME) && !defined(HOST_SO_BINTIME)
 static const typeof(SO_BINTIME) HOST_SO_BINTIME = SO_BINTIME;
-#endif /* target found in: sys/socket.h */
+#endif /* found in: sys/socket.h */
 #undef SO_BINTIME
 #define SO_BINTIME	0x00002000	/* timestamp received dgram traffic */
 #if defined(SO_LISTENINCQLEN) && !defined(HOST_SO_LISTENINCQLEN)
 static const typeof(SO_LISTENINCQLEN) HOST_SO_LISTENINCQLEN = SO_LISTENINCQLEN;
-#endif /* target found in: sys/socket.h */
+#endif /* found in: sys/socket.h */
 #undef SO_LISTENINCQLEN
 #define SO_LISTENINCQLEN	0x1013	/* socket's incomplete queue length */
 #if defined(NET_RT_IFLISTL) && !defined(HOST_NET_RT_IFLISTL)
 static const typeof(NET_RT_IFLISTL) HOST_NET_RT_IFLISTL = NET_RT_IFLISTL;
-#endif /* target found in: sys/socket.h */
+#endif /* found in: sys/socket.h */
 #undef NET_RT_IFLISTL
 #define NET_RT_IFLISTL	5		/* Survey interface list, using 'l'en */
 #undef SIOCGIFMAC /* found in: sys/sockio.h */
@@ -1021,2732 +1436,2732 @@ static const typeof(NET_RT_IFLISTL) HOST_NET_RT_IFLISTL = NET_RT_IFLISTL;
 #define SIOCGIFSTATUS	_IOWR('i', 59, struct ifstat)	/* get IF status */
 #if defined(SIOCGIFCONF) && !defined(HOST_SIOCGIFCONF)
 static const typeof(SIOCGIFCONF) HOST_SIOCGIFCONF = SIOCGIFCONF;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFCONF
 #define SIOCGIFCONF	_IOWR('i', 36, struct ifconf)	/* get ifnet list */
 #if defined(SIOCGIFFLAGS) && !defined(HOST_SIOCGIFFLAGS)
 static const typeof(SIOCGIFFLAGS) HOST_SIOCGIFFLAGS = SIOCGIFFLAGS;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFFLAGS
 #define SIOCGIFFLAGS	_IOWR('i', 17, struct ifreq)	/* get ifnet flags */
 #if defined(SIOCSIFFLAGS) && !defined(HOST_SIOCSIFFLAGS)
 static const typeof(SIOCSIFFLAGS) HOST_SIOCSIFFLAGS = SIOCSIFFLAGS;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCSIFFLAGS
 #define SIOCSIFFLAGS	 _IOW('i', 16, struct ifreq)	/* set ifnet flags */
 #if defined(SIOCGIFMETRIC) && !defined(HOST_SIOCGIFMETRIC)
 static const typeof(SIOCGIFMETRIC) HOST_SIOCGIFMETRIC = SIOCGIFMETRIC;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFMETRIC
 #define SIOCGIFMETRIC	_IOWR('i', 23, struct ifreq)	/* get IF metric */
 #if defined(SIOCSIFMETRIC) && !defined(HOST_SIOCSIFMETRIC)
 static const typeof(SIOCSIFMETRIC) HOST_SIOCSIFMETRIC = SIOCSIFMETRIC;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCSIFMETRIC
 #define SIOCSIFMETRIC	 _IOW('i', 24, struct ifreq)	/* set IF metric */
 #if defined(SIOCGIFMTU) && !defined(HOST_SIOCGIFMTU)
 static const typeof(SIOCGIFMTU) HOST_SIOCGIFMTU = SIOCGIFMTU;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFMTU
 #define SIOCGIFMTU	_IOWR('i', 51, struct ifreq)	/* get IF mtu */
 #if defined(SIOCSIFMTU) && !defined(HOST_SIOCSIFMTU)
 static const typeof(SIOCSIFMTU) HOST_SIOCSIFMTU = SIOCSIFMTU;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCSIFMTU
 #define SIOCSIFMTU	 _IOW('i', 52, struct ifreq)	/* set IF mtu */
 #if defined(SIOCGIFINDEX) && !defined(HOST_SIOCGIFINDEX)
 static const typeof(SIOCGIFINDEX) HOST_SIOCGIFINDEX = SIOCGIFINDEX;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFINDEX
 #define SIOCGIFINDEX	_IOWR('i', 32, struct ifreq)	/* get IF index */
 #if defined(SIOCGIFADDR) && !defined(HOST_SIOCGIFADDR)
 static const typeof(SIOCGIFADDR) HOST_SIOCGIFADDR = SIOCGIFADDR;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFADDR
 #define SIOCGIFADDR	_IOWR('i', 33, struct ifreq)	/* get ifnet address */
 #if defined(SIOCSIFADDR) && !defined(HOST_SIOCSIFADDR)
 static const typeof(SIOCSIFADDR) HOST_SIOCSIFADDR = SIOCSIFADDR;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCSIFADDR
 #define SIOCSIFADDR	 _IOW('i', 12, struct ifreq)	/* set ifnet address */
 #if defined(SIOCGIFBRDADDR) && !defined(HOST_SIOCGIFBRDADDR)
 static const typeof(SIOCGIFBRDADDR) HOST_SIOCGIFBRDADDR = SIOCGIFBRDADDR;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFBRDADDR
 #define SIOCGIFBRDADDR	_IOWR('i', 35, struct ifreq)	/* get broadcast addr */
 #if defined(SIOCSIFBRDADDR) && !defined(HOST_SIOCSIFBRDADDR)
 static const typeof(SIOCSIFBRDADDR) HOST_SIOCSIFBRDADDR = SIOCSIFBRDADDR;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCSIFBRDADDR
 #define SIOCSIFBRDADDR	 _IOW('i', 19, struct ifreq)	/* set broadcast addr */
 #if defined(SIOCGIFDSTADDR) && !defined(HOST_SIOCGIFDSTADDR)
 static const typeof(SIOCGIFDSTADDR) HOST_SIOCGIFDSTADDR = SIOCGIFDSTADDR;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFDSTADDR
 #define SIOCGIFDSTADDR	_IOWR('i', 34, struct ifreq)	/* get p-p address */
 #if defined(SIOCSIFDSTADDR) && !defined(HOST_SIOCSIFDSTADDR)
 static const typeof(SIOCSIFDSTADDR) HOST_SIOCSIFDSTADDR = SIOCSIFDSTADDR;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCSIFDSTADDR
 #define SIOCSIFDSTADDR	 _IOW('i', 14, struct ifreq)	/* set p-p address */
 #if defined(SIOCGIFNETMASK) && !defined(HOST_SIOCGIFNETMASK)
 static const typeof(SIOCGIFNETMASK) HOST_SIOCGIFNETMASK = SIOCGIFNETMASK;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCGIFNETMASK
 #define SIOCGIFNETMASK	_IOWR('i', 37, struct ifreq)	/* get net addr mask */
 #if defined(SIOCSIFNETMASK) && !defined(HOST_SIOCSIFNETMASK)
 static const typeof(SIOCSIFNETMASK) HOST_SIOCSIFNETMASK = SIOCSIFNETMASK;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCSIFNETMASK
 #define SIOCSIFNETMASK	 _IOW('i', 22, struct ifreq)	/* set net addr mask */
 #if defined(SIOCADDMULTI) && !defined(HOST_SIOCADDMULTI)
 static const typeof(SIOCADDMULTI) HOST_SIOCADDMULTI = SIOCADDMULTI;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCADDMULTI
 #define SIOCADDMULTI	 _IOW('i', 49, struct ifreq)	/* add m'cast addr */
 #if defined(SIOCDELMULTI) && !defined(HOST_SIOCDELMULTI)
 static const typeof(SIOCDELMULTI) HOST_SIOCDELMULTI = SIOCDELMULTI;
-#endif /* target found in: sys/sockio.h */
+#endif /* found in: sys/sockio.h */
 #undef SIOCDELMULTI
 #define SIOCDELMULTI	 _IOW('i', 50, struct ifreq)	/* del m'cast addr */
 #if defined(SYS_syscall) && !defined(HOST_SYS_syscall)
 static const typeof(SYS_syscall) HOST_SYS_syscall = SYS_syscall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_syscall
 #define SYS_syscall	0
 #if defined(SYS___syscall) && !defined(HOST_SYS___syscall)
 static const typeof(SYS___syscall) HOST_SYS___syscall = SYS___syscall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___syscall
 #define SYS___syscall	198
 #if defined(SYS_exit) && !defined(HOST_SYS_exit)
 static const typeof(SYS_exit) HOST_SYS_exit = SYS_exit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_exit
 #define SYS_exit	1
 #if defined(SYS_fork) && !defined(HOST_SYS_fork)
 static const typeof(SYS_fork) HOST_SYS_fork = SYS_fork;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fork
 #define SYS_fork	2
 #if defined(SYS_read) && !defined(HOST_SYS_read)
 static const typeof(SYS_read) HOST_SYS_read = SYS_read;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_read
 #define SYS_read	3
 #if defined(SYS_write) && !defined(HOST_SYS_write)
 static const typeof(SYS_write) HOST_SYS_write = SYS_write;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_write
 #define SYS_write	4
 #if defined(SYS_open) && !defined(HOST_SYS_open)
 static const typeof(SYS_open) HOST_SYS_open = SYS_open;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_open
 #define SYS_open	5
 #if defined(SYS_close) && !defined(HOST_SYS_close)
 static const typeof(SYS_close) HOST_SYS_close = SYS_close;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_close
 #define SYS_close	6
 #if defined(SYS_wait4) && !defined(HOST_SYS_wait4)
 static const typeof(SYS_wait4) HOST_SYS_wait4 = SYS_wait4;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_wait4
 #define SYS_wait4	7
 #if defined(SYS_link) && !defined(HOST_SYS_link)
 static const typeof(SYS_link) HOST_SYS_link = SYS_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_link
 #define SYS_link	9
 #if defined(SYS_unlink) && !defined(HOST_SYS_unlink)
 static const typeof(SYS_unlink) HOST_SYS_unlink = SYS_unlink;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_unlink
 #define SYS_unlink	10
 #if defined(SYS_chdir) && !defined(HOST_SYS_chdir)
 static const typeof(SYS_chdir) HOST_SYS_chdir = SYS_chdir;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_chdir
 #define SYS_chdir	12
 #if defined(SYS_fchdir) && !defined(HOST_SYS_fchdir)
 static const typeof(SYS_fchdir) HOST_SYS_fchdir = SYS_fchdir;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fchdir
 #define SYS_fchdir	13
 #if defined(SYS_freebsd11_mknod) && !defined(HOST_SYS_freebsd11_mknod)
 static const typeof(SYS_freebsd11_mknod) HOST_SYS_freebsd11_mknod = SYS_freebsd11_mknod;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_mknod
 #define SYS_freebsd11_mknod	14
 #if defined(SYS_chmod) && !defined(HOST_SYS_chmod)
 static const typeof(SYS_chmod) HOST_SYS_chmod = SYS_chmod;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_chmod
 #define SYS_chmod	15
 #if defined(SYS_chown) && !defined(HOST_SYS_chown)
 static const typeof(SYS_chown) HOST_SYS_chown = SYS_chown;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_chown
 #define SYS_chown	16
 #if defined(SYS_break) && !defined(HOST_SYS_break)
 static const typeof(SYS_break) HOST_SYS_break = SYS_break;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_break
 #define SYS_break	17
 #if defined(SYS_getpid) && !defined(HOST_SYS_getpid)
 static const typeof(SYS_getpid) HOST_SYS_getpid = SYS_getpid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getpid
 #define SYS_getpid	20
 #if defined(SYS_mount) && !defined(HOST_SYS_mount)
 static const typeof(SYS_mount) HOST_SYS_mount = SYS_mount;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mount
 #define SYS_mount	21
 #if defined(SYS_unmount) && !defined(HOST_SYS_unmount)
 static const typeof(SYS_unmount) HOST_SYS_unmount = SYS_unmount;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_unmount
 #define SYS_unmount	22
 #if defined(SYS_setuid) && !defined(HOST_SYS_setuid)
 static const typeof(SYS_setuid) HOST_SYS_setuid = SYS_setuid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setuid
 #define SYS_setuid	23
 #if defined(SYS_getuid) && !defined(HOST_SYS_getuid)
 static const typeof(SYS_getuid) HOST_SYS_getuid = SYS_getuid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getuid
 #define SYS_getuid	24
 #if defined(SYS_geteuid) && !defined(HOST_SYS_geteuid)
 static const typeof(SYS_geteuid) HOST_SYS_geteuid = SYS_geteuid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_geteuid
 #define SYS_geteuid	25
 #if defined(SYS_ptrace) && !defined(HOST_SYS_ptrace)
 static const typeof(SYS_ptrace) HOST_SYS_ptrace = SYS_ptrace;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ptrace
 #define SYS_ptrace	26
 #if defined(SYS_recvmsg) && !defined(HOST_SYS_recvmsg)
 static const typeof(SYS_recvmsg) HOST_SYS_recvmsg = SYS_recvmsg;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_recvmsg
 #define SYS_recvmsg	27
 #if defined(SYS_sendmsg) && !defined(HOST_SYS_sendmsg)
 static const typeof(SYS_sendmsg) HOST_SYS_sendmsg = SYS_sendmsg;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sendmsg
 #define SYS_sendmsg	28
 #if defined(SYS_recvfrom) && !defined(HOST_SYS_recvfrom)
 static const typeof(SYS_recvfrom) HOST_SYS_recvfrom = SYS_recvfrom;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_recvfrom
 #define SYS_recvfrom	29
 #if defined(SYS_accept) && !defined(HOST_SYS_accept)
 static const typeof(SYS_accept) HOST_SYS_accept = SYS_accept;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_accept
 #define SYS_accept	30
 #if defined(SYS_getpeername) && !defined(HOST_SYS_getpeername)
 static const typeof(SYS_getpeername) HOST_SYS_getpeername = SYS_getpeername;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getpeername
 #define SYS_getpeername	31
 #if defined(SYS_getsockname) && !defined(HOST_SYS_getsockname)
 static const typeof(SYS_getsockname) HOST_SYS_getsockname = SYS_getsockname;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getsockname
 #define SYS_getsockname	32
 #if defined(SYS_access) && !defined(HOST_SYS_access)
 static const typeof(SYS_access) HOST_SYS_access = SYS_access;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_access
 #define SYS_access	33
 #if defined(SYS_chflags) && !defined(HOST_SYS_chflags)
 static const typeof(SYS_chflags) HOST_SYS_chflags = SYS_chflags;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_chflags
 #define SYS_chflags	34
 #if defined(SYS_fchflags) && !defined(HOST_SYS_fchflags)
 static const typeof(SYS_fchflags) HOST_SYS_fchflags = SYS_fchflags;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fchflags
 #define SYS_fchflags	35
 #if defined(SYS_sync) && !defined(HOST_SYS_sync)
 static const typeof(SYS_sync) HOST_SYS_sync = SYS_sync;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sync
 #define SYS_sync	36
 #if defined(SYS_kill) && !defined(HOST_SYS_kill)
 static const typeof(SYS_kill) HOST_SYS_kill = SYS_kill;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kill
 #define SYS_kill	37
 #if defined(SYS_getppid) && !defined(HOST_SYS_getppid)
 static const typeof(SYS_getppid) HOST_SYS_getppid = SYS_getppid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getppid
 #define SYS_getppid	39
 #if defined(SYS_dup) && !defined(HOST_SYS_dup)
 static const typeof(SYS_dup) HOST_SYS_dup = SYS_dup;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_dup
 #define SYS_dup	41
 #if defined(SYS_freebsd10_pipe) && !defined(HOST_SYS_freebsd10_pipe)
 static const typeof(SYS_freebsd10_pipe) HOST_SYS_freebsd10_pipe = SYS_freebsd10_pipe;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd10_pipe
 #define SYS_freebsd10_pipe	42
 #if defined(SYS_getegid) && !defined(HOST_SYS_getegid)
 static const typeof(SYS_getegid) HOST_SYS_getegid = SYS_getegid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getegid
 #define SYS_getegid	43
 #if defined(SYS_profil) && !defined(HOST_SYS_profil)
 static const typeof(SYS_profil) HOST_SYS_profil = SYS_profil;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_profil
 #define SYS_profil	44
 #if defined(SYS_ktrace) && !defined(HOST_SYS_ktrace)
 static const typeof(SYS_ktrace) HOST_SYS_ktrace = SYS_ktrace;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ktrace
 #define SYS_ktrace	45
 #if defined(SYS_getgid) && !defined(HOST_SYS_getgid)
 static const typeof(SYS_getgid) HOST_SYS_getgid = SYS_getgid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getgid
 #define SYS_getgid	47
 #if defined(SYS_getlogin) && !defined(HOST_SYS_getlogin)
 static const typeof(SYS_getlogin) HOST_SYS_getlogin = SYS_getlogin;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getlogin
 #define SYS_getlogin	49
 #if defined(SYS_setlogin) && !defined(HOST_SYS_setlogin)
 static const typeof(SYS_setlogin) HOST_SYS_setlogin = SYS_setlogin;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setlogin
 #define SYS_setlogin	50
 #if defined(SYS_acct) && !defined(HOST_SYS_acct)
 static const typeof(SYS_acct) HOST_SYS_acct = SYS_acct;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_acct
 #define SYS_acct	51
 #if defined(SYS_sigaltstack) && !defined(HOST_SYS_sigaltstack)
 static const typeof(SYS_sigaltstack) HOST_SYS_sigaltstack = SYS_sigaltstack;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigaltstack
 #define SYS_sigaltstack	53
 #if defined(SYS_ioctl) && !defined(HOST_SYS_ioctl)
 static const typeof(SYS_ioctl) HOST_SYS_ioctl = SYS_ioctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ioctl
 #define SYS_ioctl	54
 #if defined(SYS_reboot) && !defined(HOST_SYS_reboot)
 static const typeof(SYS_reboot) HOST_SYS_reboot = SYS_reboot;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_reboot
 #define SYS_reboot	55
 #if defined(SYS_revoke) && !defined(HOST_SYS_revoke)
 static const typeof(SYS_revoke) HOST_SYS_revoke = SYS_revoke;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_revoke
 #define SYS_revoke	56
 #if defined(SYS_symlink) && !defined(HOST_SYS_symlink)
 static const typeof(SYS_symlink) HOST_SYS_symlink = SYS_symlink;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_symlink
 #define SYS_symlink	57
 #if defined(SYS_readlink) && !defined(HOST_SYS_readlink)
 static const typeof(SYS_readlink) HOST_SYS_readlink = SYS_readlink;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_readlink
 #define SYS_readlink	58
 #if defined(SYS_execve) && !defined(HOST_SYS_execve)
 static const typeof(SYS_execve) HOST_SYS_execve = SYS_execve;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_execve
 #define SYS_execve	59
 #if defined(SYS_umask) && !defined(HOST_SYS_umask)
 static const typeof(SYS_umask) HOST_SYS_umask = SYS_umask;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_umask
 #define SYS_umask	60
 #if defined(SYS_chroot) && !defined(HOST_SYS_chroot)
 static const typeof(SYS_chroot) HOST_SYS_chroot = SYS_chroot;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_chroot
 #define SYS_chroot	61
 #if defined(SYS_msync) && !defined(HOST_SYS_msync)
 static const typeof(SYS_msync) HOST_SYS_msync = SYS_msync;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_msync
 #define SYS_msync	65
 #if defined(SYS_vfork) && !defined(HOST_SYS_vfork)
 static const typeof(SYS_vfork) HOST_SYS_vfork = SYS_vfork;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_vfork
 #define SYS_vfork	66
 #if defined(SYS_sbrk) && !defined(HOST_SYS_sbrk)
 static const typeof(SYS_sbrk) HOST_SYS_sbrk = SYS_sbrk;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sbrk
 #define SYS_sbrk	69
 #if defined(SYS_sstk) && !defined(HOST_SYS_sstk)
 static const typeof(SYS_sstk) HOST_SYS_sstk = SYS_sstk;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sstk
 #define SYS_sstk	70
 #if defined(SYS_freebsd11_vadvise) && !defined(HOST_SYS_freebsd11_vadvise)
 static const typeof(SYS_freebsd11_vadvise) HOST_SYS_freebsd11_vadvise = SYS_freebsd11_vadvise;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_vadvise
 #define SYS_freebsd11_vadvise	72
 #if defined(SYS_munmap) && !defined(HOST_SYS_munmap)
 static const typeof(SYS_munmap) HOST_SYS_munmap = SYS_munmap;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_munmap
 #define SYS_munmap	73
 #if defined(SYS_mprotect) && !defined(HOST_SYS_mprotect)
 static const typeof(SYS_mprotect) HOST_SYS_mprotect = SYS_mprotect;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mprotect
 #define SYS_mprotect	74
 #if defined(SYS_madvise) && !defined(HOST_SYS_madvise)
 static const typeof(SYS_madvise) HOST_SYS_madvise = SYS_madvise;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_madvise
 #define SYS_madvise	75
 #if defined(SYS_mincore) && !defined(HOST_SYS_mincore)
 static const typeof(SYS_mincore) HOST_SYS_mincore = SYS_mincore;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mincore
 #define SYS_mincore	78
 #if defined(SYS_getgroups) && !defined(HOST_SYS_getgroups)
 static const typeof(SYS_getgroups) HOST_SYS_getgroups = SYS_getgroups;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getgroups
 #define SYS_getgroups	79
 #if defined(SYS_setgroups) && !defined(HOST_SYS_setgroups)
 static const typeof(SYS_setgroups) HOST_SYS_setgroups = SYS_setgroups;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setgroups
 #define SYS_setgroups	80
 #if defined(SYS_getpgrp) && !defined(HOST_SYS_getpgrp)
 static const typeof(SYS_getpgrp) HOST_SYS_getpgrp = SYS_getpgrp;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getpgrp
 #define SYS_getpgrp	81
 #if defined(SYS_setpgid) && !defined(HOST_SYS_setpgid)
 static const typeof(SYS_setpgid) HOST_SYS_setpgid = SYS_setpgid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setpgid
 #define SYS_setpgid	82
 #if defined(SYS_setitimer) && !defined(HOST_SYS_setitimer)
 static const typeof(SYS_setitimer) HOST_SYS_setitimer = SYS_setitimer;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setitimer
 #define SYS_setitimer	83
 #if defined(SYS_swapon) && !defined(HOST_SYS_swapon)
 static const typeof(SYS_swapon) HOST_SYS_swapon = SYS_swapon;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_swapon
 #define SYS_swapon	85
 #if defined(SYS_getitimer) && !defined(HOST_SYS_getitimer)
 static const typeof(SYS_getitimer) HOST_SYS_getitimer = SYS_getitimer;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getitimer
 #define SYS_getitimer	86
 #if defined(SYS_getdtablesize) && !defined(HOST_SYS_getdtablesize)
 static const typeof(SYS_getdtablesize) HOST_SYS_getdtablesize = SYS_getdtablesize;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getdtablesize
 #define SYS_getdtablesize	89
 #if defined(SYS_dup2) && !defined(HOST_SYS_dup2)
 static const typeof(SYS_dup2) HOST_SYS_dup2 = SYS_dup2;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_dup2
 #define SYS_dup2	90
 #if defined(SYS_fcntl) && !defined(HOST_SYS_fcntl)
 static const typeof(SYS_fcntl) HOST_SYS_fcntl = SYS_fcntl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fcntl
 #define SYS_fcntl	92
 #if defined(SYS_select) && !defined(HOST_SYS_select)
 static const typeof(SYS_select) HOST_SYS_select = SYS_select;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_select
 #define SYS_select	93
 #if defined(SYS_fsync) && !defined(HOST_SYS_fsync)
 static const typeof(SYS_fsync) HOST_SYS_fsync = SYS_fsync;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fsync
 #define SYS_fsync	95
 #if defined(SYS_setpriority) && !defined(HOST_SYS_setpriority)
 static const typeof(SYS_setpriority) HOST_SYS_setpriority = SYS_setpriority;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setpriority
 #define SYS_setpriority	96
 #if defined(SYS_socket) && !defined(HOST_SYS_socket)
 static const typeof(SYS_socket) HOST_SYS_socket = SYS_socket;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_socket
 #define SYS_socket	97
 #if defined(SYS_connect) && !defined(HOST_SYS_connect)
 static const typeof(SYS_connect) HOST_SYS_connect = SYS_connect;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_connect
 #define SYS_connect	98
 #if defined(SYS_getpriority) && !defined(HOST_SYS_getpriority)
 static const typeof(SYS_getpriority) HOST_SYS_getpriority = SYS_getpriority;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getpriority
 #define SYS_getpriority	100
 #if defined(SYS_bind) && !defined(HOST_SYS_bind)
 static const typeof(SYS_bind) HOST_SYS_bind = SYS_bind;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_bind
 #define SYS_bind	104
 #if defined(SYS_setsockopt) && !defined(HOST_SYS_setsockopt)
 static const typeof(SYS_setsockopt) HOST_SYS_setsockopt = SYS_setsockopt;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setsockopt
 #define SYS_setsockopt	105
 #if defined(SYS_listen) && !defined(HOST_SYS_listen)
 static const typeof(SYS_listen) HOST_SYS_listen = SYS_listen;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_listen
 #define SYS_listen	106
 #if defined(SYS_gettimeofday) && !defined(HOST_SYS_gettimeofday)
 static const typeof(SYS_gettimeofday) HOST_SYS_gettimeofday = SYS_gettimeofday;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_gettimeofday
 #define SYS_gettimeofday	116
 #if defined(SYS_getrusage) && !defined(HOST_SYS_getrusage)
 static const typeof(SYS_getrusage) HOST_SYS_getrusage = SYS_getrusage;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getrusage
 #define SYS_getrusage	117
 #if defined(SYS_getsockopt) && !defined(HOST_SYS_getsockopt)
 static const typeof(SYS_getsockopt) HOST_SYS_getsockopt = SYS_getsockopt;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getsockopt
 #define SYS_getsockopt	118
 #if defined(SYS_readv) && !defined(HOST_SYS_readv)
 static const typeof(SYS_readv) HOST_SYS_readv = SYS_readv;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_readv
 #define SYS_readv	120
 #if defined(SYS_writev) && !defined(HOST_SYS_writev)
 static const typeof(SYS_writev) HOST_SYS_writev = SYS_writev;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_writev
 #define SYS_writev	121
 #if defined(SYS_settimeofday) && !defined(HOST_SYS_settimeofday)
 static const typeof(SYS_settimeofday) HOST_SYS_settimeofday = SYS_settimeofday;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_settimeofday
 #define SYS_settimeofday	122
 #if defined(SYS_fchown) && !defined(HOST_SYS_fchown)
 static const typeof(SYS_fchown) HOST_SYS_fchown = SYS_fchown;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fchown
 #define SYS_fchown	123
 #if defined(SYS_fchmod) && !defined(HOST_SYS_fchmod)
 static const typeof(SYS_fchmod) HOST_SYS_fchmod = SYS_fchmod;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fchmod
 #define SYS_fchmod	124
 #if defined(SYS_setreuid) && !defined(HOST_SYS_setreuid)
 static const typeof(SYS_setreuid) HOST_SYS_setreuid = SYS_setreuid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setreuid
 #define SYS_setreuid	126
 #if defined(SYS_setregid) && !defined(HOST_SYS_setregid)
 static const typeof(SYS_setregid) HOST_SYS_setregid = SYS_setregid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setregid
 #define SYS_setregid	127
 #if defined(SYS_rename) && !defined(HOST_SYS_rename)
 static const typeof(SYS_rename) HOST_SYS_rename = SYS_rename;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rename
 #define SYS_rename	128
 #if defined(SYS_flock) && !defined(HOST_SYS_flock)
 static const typeof(SYS_flock) HOST_SYS_flock = SYS_flock;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_flock
 #define SYS_flock	131
 #if defined(SYS_mkfifo) && !defined(HOST_SYS_mkfifo)
 static const typeof(SYS_mkfifo) HOST_SYS_mkfifo = SYS_mkfifo;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mkfifo
 #define SYS_mkfifo	132
 #if defined(SYS_sendto) && !defined(HOST_SYS_sendto)
 static const typeof(SYS_sendto) HOST_SYS_sendto = SYS_sendto;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sendto
 #define SYS_sendto	133
 #if defined(SYS_shutdown) && !defined(HOST_SYS_shutdown)
 static const typeof(SYS_shutdown) HOST_SYS_shutdown = SYS_shutdown;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shutdown
 #define SYS_shutdown	134
 #if defined(SYS_socketpair) && !defined(HOST_SYS_socketpair)
 static const typeof(SYS_socketpair) HOST_SYS_socketpair = SYS_socketpair;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_socketpair
 #define SYS_socketpair	135
 #if defined(SYS_mkdir) && !defined(HOST_SYS_mkdir)
 static const typeof(SYS_mkdir) HOST_SYS_mkdir = SYS_mkdir;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mkdir
 #define SYS_mkdir	136
 #if defined(SYS_rmdir) && !defined(HOST_SYS_rmdir)
 static const typeof(SYS_rmdir) HOST_SYS_rmdir = SYS_rmdir;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rmdir
 #define SYS_rmdir	137
 #if defined(SYS_utimes) && !defined(HOST_SYS_utimes)
 static const typeof(SYS_utimes) HOST_SYS_utimes = SYS_utimes;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_utimes
 #define SYS_utimes	138
 #if defined(SYS_adjtime) && !defined(HOST_SYS_adjtime)
 static const typeof(SYS_adjtime) HOST_SYS_adjtime = SYS_adjtime;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_adjtime
 #define SYS_adjtime	140
 #if defined(SYS_setsid) && !defined(HOST_SYS_setsid)
 static const typeof(SYS_setsid) HOST_SYS_setsid = SYS_setsid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setsid
 #define SYS_setsid	147
 #if defined(SYS_quotactl) && !defined(HOST_SYS_quotactl)
 static const typeof(SYS_quotactl) HOST_SYS_quotactl = SYS_quotactl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_quotactl
 #define SYS_quotactl	148
 #if defined(SYS_nlm_syscall) && !defined(HOST_SYS_nlm_syscall)
 static const typeof(SYS_nlm_syscall) HOST_SYS_nlm_syscall = SYS_nlm_syscall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_nlm_syscall
 #define SYS_nlm_syscall	154
 #if defined(SYS_nfssvc) && !defined(HOST_SYS_nfssvc)
 static const typeof(SYS_nfssvc) HOST_SYS_nfssvc = SYS_nfssvc;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_nfssvc
 #define SYS_nfssvc	155
 #if defined(SYS_lgetfh) && !defined(HOST_SYS_lgetfh)
 static const typeof(SYS_lgetfh) HOST_SYS_lgetfh = SYS_lgetfh;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_lgetfh
 #define SYS_lgetfh	160
 #if defined(SYS_getfh) && !defined(HOST_SYS_getfh)
 static const typeof(SYS_getfh) HOST_SYS_getfh = SYS_getfh;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getfh
 #define SYS_getfh	161
 #if defined(SYS_sysarch) && !defined(HOST_SYS_sysarch)
 static const typeof(SYS_sysarch) HOST_SYS_sysarch = SYS_sysarch;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sysarch
 #define SYS_sysarch	165
 #if defined(SYS_rtprio) && !defined(HOST_SYS_rtprio)
 static const typeof(SYS_rtprio) HOST_SYS_rtprio = SYS_rtprio;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rtprio
 #define SYS_rtprio	166
 #if defined(SYS_semsys) && !defined(HOST_SYS_semsys)
 static const typeof(SYS_semsys) HOST_SYS_semsys = SYS_semsys;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_semsys
 #define SYS_semsys	169
 #if defined(SYS_msgsys) && !defined(HOST_SYS_msgsys)
 static const typeof(SYS_msgsys) HOST_SYS_msgsys = SYS_msgsys;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_msgsys
 #define SYS_msgsys	170
 #if defined(SYS_shmsys) && !defined(HOST_SYS_shmsys)
 static const typeof(SYS_shmsys) HOST_SYS_shmsys = SYS_shmsys;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shmsys
 #define SYS_shmsys	171
 #if defined(SYS_setfib) && !defined(HOST_SYS_setfib)
 static const typeof(SYS_setfib) HOST_SYS_setfib = SYS_setfib;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setfib
 #define SYS_setfib	175
 #if defined(SYS_ntp_adjtime) && !defined(HOST_SYS_ntp_adjtime)
 static const typeof(SYS_ntp_adjtime) HOST_SYS_ntp_adjtime = SYS_ntp_adjtime;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ntp_adjtime
 #define SYS_ntp_adjtime	176
 #if defined(SYS_setgid) && !defined(HOST_SYS_setgid)
 static const typeof(SYS_setgid) HOST_SYS_setgid = SYS_setgid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setgid
 #define SYS_setgid	181
 #if defined(SYS_setegid) && !defined(HOST_SYS_setegid)
 static const typeof(SYS_setegid) HOST_SYS_setegid = SYS_setegid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setegid
 #define SYS_setegid	182
 #if defined(SYS_seteuid) && !defined(HOST_SYS_seteuid)
 static const typeof(SYS_seteuid) HOST_SYS_seteuid = SYS_seteuid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_seteuid
 #define SYS_seteuid	183
 #if defined(SYS_freebsd11_stat) && !defined(HOST_SYS_freebsd11_stat)
 static const typeof(SYS_freebsd11_stat) HOST_SYS_freebsd11_stat = SYS_freebsd11_stat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_stat
 #define SYS_freebsd11_stat	188
 #if defined(SYS_freebsd11_fstat) && !defined(HOST_SYS_freebsd11_fstat)
 static const typeof(SYS_freebsd11_fstat) HOST_SYS_freebsd11_fstat = SYS_freebsd11_fstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_fstat
 #define SYS_freebsd11_fstat	189
 #if defined(SYS_freebsd11_lstat) && !defined(HOST_SYS_freebsd11_lstat)
 static const typeof(SYS_freebsd11_lstat) HOST_SYS_freebsd11_lstat = SYS_freebsd11_lstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_lstat
 #define SYS_freebsd11_lstat	190
 #if defined(SYS_pathconf) && !defined(HOST_SYS_pathconf)
 static const typeof(SYS_pathconf) HOST_SYS_pathconf = SYS_pathconf;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pathconf
 #define SYS_pathconf	191
 #if defined(SYS_fpathconf) && !defined(HOST_SYS_fpathconf)
 static const typeof(SYS_fpathconf) HOST_SYS_fpathconf = SYS_fpathconf;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fpathconf
 #define SYS_fpathconf	192
 #if defined(SYS_getrlimit) && !defined(HOST_SYS_getrlimit)
 static const typeof(SYS_getrlimit) HOST_SYS_getrlimit = SYS_getrlimit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getrlimit
 #define SYS_getrlimit	194
 #if defined(SYS_setrlimit) && !defined(HOST_SYS_setrlimit)
 static const typeof(SYS_setrlimit) HOST_SYS_setrlimit = SYS_setrlimit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setrlimit
 #define SYS_setrlimit	195
 #if defined(SYS_freebsd11_getdirentries) && !defined(HOST_SYS_freebsd11_getdirentries)
 static const typeof(SYS_freebsd11_getdirentries) HOST_SYS_freebsd11_getdirentries = SYS_freebsd11_getdirentries;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_getdirentries
 #define SYS_freebsd11_getdirentries	196
 #if defined(SYS___sysctl) && !defined(HOST_SYS___sysctl)
 static const typeof(SYS___sysctl) HOST_SYS___sysctl = SYS___sysctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___sysctl
 #define SYS___sysctl	202
 #if defined(SYS_mlock) && !defined(HOST_SYS_mlock)
 static const typeof(SYS_mlock) HOST_SYS_mlock = SYS_mlock;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mlock
 #define SYS_mlock	203
 #if defined(SYS_munlock) && !defined(HOST_SYS_munlock)
 static const typeof(SYS_munlock) HOST_SYS_munlock = SYS_munlock;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_munlock
 #define SYS_munlock	204
 #if defined(SYS_undelete) && !defined(HOST_SYS_undelete)
 static const typeof(SYS_undelete) HOST_SYS_undelete = SYS_undelete;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_undelete
 #define SYS_undelete	205
 #if defined(SYS_futimes) && !defined(HOST_SYS_futimes)
 static const typeof(SYS_futimes) HOST_SYS_futimes = SYS_futimes;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_futimes
 #define SYS_futimes	206
 #if defined(SYS_getpgid) && !defined(HOST_SYS_getpgid)
 static const typeof(SYS_getpgid) HOST_SYS_getpgid = SYS_getpgid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getpgid
 #define SYS_getpgid	207
 #if defined(SYS_poll) && !defined(HOST_SYS_poll)
 static const typeof(SYS_poll) HOST_SYS_poll = SYS_poll;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_poll
 #define SYS_poll	209
 #if defined(SYS_freebsd7___semctl) && !defined(HOST_SYS_freebsd7___semctl)
 static const typeof(SYS_freebsd7___semctl) HOST_SYS_freebsd7___semctl = SYS_freebsd7___semctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd7___semctl
 #define SYS_freebsd7___semctl	220
 #if defined(SYS_semget) && !defined(HOST_SYS_semget)
 static const typeof(SYS_semget) HOST_SYS_semget = SYS_semget;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_semget
 #define SYS_semget	221
 #if defined(SYS_semop) && !defined(HOST_SYS_semop)
 static const typeof(SYS_semop) HOST_SYS_semop = SYS_semop;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_semop
 #define SYS_semop	222
 #if defined(SYS_freebsd7_msgctl) && !defined(HOST_SYS_freebsd7_msgctl)
 static const typeof(SYS_freebsd7_msgctl) HOST_SYS_freebsd7_msgctl = SYS_freebsd7_msgctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd7_msgctl
 #define SYS_freebsd7_msgctl	224
 #if defined(SYS_msgget) && !defined(HOST_SYS_msgget)
 static const typeof(SYS_msgget) HOST_SYS_msgget = SYS_msgget;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_msgget
 #define SYS_msgget	225
 #if defined(SYS_msgsnd) && !defined(HOST_SYS_msgsnd)
 static const typeof(SYS_msgsnd) HOST_SYS_msgsnd = SYS_msgsnd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_msgsnd
 #define SYS_msgsnd	226
 #if defined(SYS_msgrcv) && !defined(HOST_SYS_msgrcv)
 static const typeof(SYS_msgrcv) HOST_SYS_msgrcv = SYS_msgrcv;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_msgrcv
 #define SYS_msgrcv	227
 #if defined(SYS_shmat) && !defined(HOST_SYS_shmat)
 static const typeof(SYS_shmat) HOST_SYS_shmat = SYS_shmat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shmat
 #define SYS_shmat	228
 #if defined(SYS_freebsd7_shmctl) && !defined(HOST_SYS_freebsd7_shmctl)
 static const typeof(SYS_freebsd7_shmctl) HOST_SYS_freebsd7_shmctl = SYS_freebsd7_shmctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd7_shmctl
 #define SYS_freebsd7_shmctl	229
 #if defined(SYS_shmdt) && !defined(HOST_SYS_shmdt)
 static const typeof(SYS_shmdt) HOST_SYS_shmdt = SYS_shmdt;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shmdt
 #define SYS_shmdt	230
 #if defined(SYS_shmget) && !defined(HOST_SYS_shmget)
 static const typeof(SYS_shmget) HOST_SYS_shmget = SYS_shmget;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shmget
 #define SYS_shmget	231
 #if defined(SYS_clock_gettime) && !defined(HOST_SYS_clock_gettime)
 static const typeof(SYS_clock_gettime) HOST_SYS_clock_gettime = SYS_clock_gettime;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_clock_gettime
 #define SYS_clock_gettime	232
 #if defined(SYS_clock_settime) && !defined(HOST_SYS_clock_settime)
 static const typeof(SYS_clock_settime) HOST_SYS_clock_settime = SYS_clock_settime;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_clock_settime
 #define SYS_clock_settime	233
 #if defined(SYS_clock_getres) && !defined(HOST_SYS_clock_getres)
 static const typeof(SYS_clock_getres) HOST_SYS_clock_getres = SYS_clock_getres;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_clock_getres
 #define SYS_clock_getres	234
 #if defined(SYS_ktimer_create) && !defined(HOST_SYS_ktimer_create)
 static const typeof(SYS_ktimer_create) HOST_SYS_ktimer_create = SYS_ktimer_create;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ktimer_create
 #define SYS_ktimer_create	235
 #if defined(SYS_ktimer_delete) && !defined(HOST_SYS_ktimer_delete)
 static const typeof(SYS_ktimer_delete) HOST_SYS_ktimer_delete = SYS_ktimer_delete;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ktimer_delete
 #define SYS_ktimer_delete	236
 #if defined(SYS_ktimer_settime) && !defined(HOST_SYS_ktimer_settime)
 static const typeof(SYS_ktimer_settime) HOST_SYS_ktimer_settime = SYS_ktimer_settime;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ktimer_settime
 #define SYS_ktimer_settime	237
 #if defined(SYS_ktimer_gettime) && !defined(HOST_SYS_ktimer_gettime)
 static const typeof(SYS_ktimer_gettime) HOST_SYS_ktimer_gettime = SYS_ktimer_gettime;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ktimer_gettime
 #define SYS_ktimer_gettime	238
 #if defined(SYS_ktimer_getoverrun) && !defined(HOST_SYS_ktimer_getoverrun)
 static const typeof(SYS_ktimer_getoverrun) HOST_SYS_ktimer_getoverrun = SYS_ktimer_getoverrun;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ktimer_getoverrun
 #define SYS_ktimer_getoverrun	239
 #if defined(SYS_nanosleep) && !defined(HOST_SYS_nanosleep)
 static const typeof(SYS_nanosleep) HOST_SYS_nanosleep = SYS_nanosleep;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_nanosleep
 #define SYS_nanosleep	240
 #if defined(SYS_ffclock_getcounter) && !defined(HOST_SYS_ffclock_getcounter)
 static const typeof(SYS_ffclock_getcounter) HOST_SYS_ffclock_getcounter = SYS_ffclock_getcounter;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ffclock_getcounter
 #define SYS_ffclock_getcounter	241
 #if defined(SYS_ffclock_setestimate) && !defined(HOST_SYS_ffclock_setestimate)
 static const typeof(SYS_ffclock_setestimate) HOST_SYS_ffclock_setestimate = SYS_ffclock_setestimate;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ffclock_setestimate
 #define SYS_ffclock_setestimate	242
 #if defined(SYS_ffclock_getestimate) && !defined(HOST_SYS_ffclock_getestimate)
 static const typeof(SYS_ffclock_getestimate) HOST_SYS_ffclock_getestimate = SYS_ffclock_getestimate;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ffclock_getestimate
 #define SYS_ffclock_getestimate	243
 #if defined(SYS_clock_nanosleep) && !defined(HOST_SYS_clock_nanosleep)
 static const typeof(SYS_clock_nanosleep) HOST_SYS_clock_nanosleep = SYS_clock_nanosleep;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_clock_nanosleep
 #define SYS_clock_nanosleep	244
 #if defined(SYS_clock_getcpuclockid2) && !defined(HOST_SYS_clock_getcpuclockid2)
 static const typeof(SYS_clock_getcpuclockid2) HOST_SYS_clock_getcpuclockid2 = SYS_clock_getcpuclockid2;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_clock_getcpuclockid2
 #define SYS_clock_getcpuclockid2	247
 #if defined(SYS_ntp_gettime) && !defined(HOST_SYS_ntp_gettime)
 static const typeof(SYS_ntp_gettime) HOST_SYS_ntp_gettime = SYS_ntp_gettime;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ntp_gettime
 #define SYS_ntp_gettime	248
 #if defined(SYS_minherit) && !defined(HOST_SYS_minherit)
 static const typeof(SYS_minherit) HOST_SYS_minherit = SYS_minherit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_minherit
 #define SYS_minherit	250
 #if defined(SYS_rfork) && !defined(HOST_SYS_rfork)
 static const typeof(SYS_rfork) HOST_SYS_rfork = SYS_rfork;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rfork
 #define SYS_rfork	251
 #if defined(SYS_issetugid) && !defined(HOST_SYS_issetugid)
 static const typeof(SYS_issetugid) HOST_SYS_issetugid = SYS_issetugid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_issetugid
 #define SYS_issetugid	253
 #if defined(SYS_lchown) && !defined(HOST_SYS_lchown)
 static const typeof(SYS_lchown) HOST_SYS_lchown = SYS_lchown;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_lchown
 #define SYS_lchown	254
 #if defined(SYS_aio_read) && !defined(HOST_SYS_aio_read)
 static const typeof(SYS_aio_read) HOST_SYS_aio_read = SYS_aio_read;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_read
 #define SYS_aio_read	255
 #if defined(SYS_aio_write) && !defined(HOST_SYS_aio_write)
 static const typeof(SYS_aio_write) HOST_SYS_aio_write = SYS_aio_write;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_write
 #define SYS_aio_write	256
 #if defined(SYS_lio_listio) && !defined(HOST_SYS_lio_listio)
 static const typeof(SYS_lio_listio) HOST_SYS_lio_listio = SYS_lio_listio;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_lio_listio
 #define SYS_lio_listio	257
 #if defined(SYS_freebsd11_getdents) && !defined(HOST_SYS_freebsd11_getdents)
 static const typeof(SYS_freebsd11_getdents) HOST_SYS_freebsd11_getdents = SYS_freebsd11_getdents;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_getdents
 #define SYS_freebsd11_getdents	272
 #if defined(SYS_lchmod) && !defined(HOST_SYS_lchmod)
 static const typeof(SYS_lchmod) HOST_SYS_lchmod = SYS_lchmod;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_lchmod
 #define SYS_lchmod	274
 #if defined(SYS_lutimes) && !defined(HOST_SYS_lutimes)
 static const typeof(SYS_lutimes) HOST_SYS_lutimes = SYS_lutimes;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_lutimes
 #define SYS_lutimes	276
 #if defined(SYS_freebsd11_nstat) && !defined(HOST_SYS_freebsd11_nstat)
 static const typeof(SYS_freebsd11_nstat) HOST_SYS_freebsd11_nstat = SYS_freebsd11_nstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_nstat
 #define SYS_freebsd11_nstat	278
 #if defined(SYS_freebsd11_nfstat) && !defined(HOST_SYS_freebsd11_nfstat)
 static const typeof(SYS_freebsd11_nfstat) HOST_SYS_freebsd11_nfstat = SYS_freebsd11_nfstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_nfstat
 #define SYS_freebsd11_nfstat	279
 #if defined(SYS_freebsd11_nlstat) && !defined(HOST_SYS_freebsd11_nlstat)
 static const typeof(SYS_freebsd11_nlstat) HOST_SYS_freebsd11_nlstat = SYS_freebsd11_nlstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_nlstat
 #define SYS_freebsd11_nlstat	280
 #if defined(SYS_preadv) && !defined(HOST_SYS_preadv)
 static const typeof(SYS_preadv) HOST_SYS_preadv = SYS_preadv;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_preadv
 #define SYS_preadv	289
 #if defined(SYS_pwritev) && !defined(HOST_SYS_pwritev)
 static const typeof(SYS_pwritev) HOST_SYS_pwritev = SYS_pwritev;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pwritev
 #define SYS_pwritev	290
 #if defined(SYS_fhopen) && !defined(HOST_SYS_fhopen)
 static const typeof(SYS_fhopen) HOST_SYS_fhopen = SYS_fhopen;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fhopen
 #define SYS_fhopen	298
 #if defined(SYS_freebsd11_fhstat) && !defined(HOST_SYS_freebsd11_fhstat)
 static const typeof(SYS_freebsd11_fhstat) HOST_SYS_freebsd11_fhstat = SYS_freebsd11_fhstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_fhstat
 #define SYS_freebsd11_fhstat	299
 #if defined(SYS_modnext) && !defined(HOST_SYS_modnext)
 static const typeof(SYS_modnext) HOST_SYS_modnext = SYS_modnext;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_modnext
 #define SYS_modnext	300
 #if defined(SYS_modstat) && !defined(HOST_SYS_modstat)
 static const typeof(SYS_modstat) HOST_SYS_modstat = SYS_modstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_modstat
 #define SYS_modstat	301
 #if defined(SYS_modfnext) && !defined(HOST_SYS_modfnext)
 static const typeof(SYS_modfnext) HOST_SYS_modfnext = SYS_modfnext;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_modfnext
 #define SYS_modfnext	302
 #if defined(SYS_modfind) && !defined(HOST_SYS_modfind)
 static const typeof(SYS_modfind) HOST_SYS_modfind = SYS_modfind;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_modfind
 #define SYS_modfind	303
 #if defined(SYS_kldload) && !defined(HOST_SYS_kldload)
 static const typeof(SYS_kldload) HOST_SYS_kldload = SYS_kldload;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kldload
 #define SYS_kldload	304
 #if defined(SYS_kldunload) && !defined(HOST_SYS_kldunload)
 static const typeof(SYS_kldunload) HOST_SYS_kldunload = SYS_kldunload;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kldunload
 #define SYS_kldunload	305
 #if defined(SYS_kldfind) && !defined(HOST_SYS_kldfind)
 static const typeof(SYS_kldfind) HOST_SYS_kldfind = SYS_kldfind;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kldfind
 #define SYS_kldfind	306
 #if defined(SYS_kldnext) && !defined(HOST_SYS_kldnext)
 static const typeof(SYS_kldnext) HOST_SYS_kldnext = SYS_kldnext;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kldnext
 #define SYS_kldnext	307
 #if defined(SYS_kldstat) && !defined(HOST_SYS_kldstat)
 static const typeof(SYS_kldstat) HOST_SYS_kldstat = SYS_kldstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kldstat
 #define SYS_kldstat	308
 #if defined(SYS_kldfirstmod) && !defined(HOST_SYS_kldfirstmod)
 static const typeof(SYS_kldfirstmod) HOST_SYS_kldfirstmod = SYS_kldfirstmod;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kldfirstmod
 #define SYS_kldfirstmod	309
 #if defined(SYS_getsid) && !defined(HOST_SYS_getsid)
 static const typeof(SYS_getsid) HOST_SYS_getsid = SYS_getsid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getsid
 #define SYS_getsid	310
 #if defined(SYS_setresuid) && !defined(HOST_SYS_setresuid)
 static const typeof(SYS_setresuid) HOST_SYS_setresuid = SYS_setresuid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setresuid
 #define SYS_setresuid	311
 #if defined(SYS_setresgid) && !defined(HOST_SYS_setresgid)
 static const typeof(SYS_setresgid) HOST_SYS_setresgid = SYS_setresgid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setresgid
 #define SYS_setresgid	312
 #if defined(SYS_aio_return) && !defined(HOST_SYS_aio_return)
 static const typeof(SYS_aio_return) HOST_SYS_aio_return = SYS_aio_return;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_return
 #define SYS_aio_return	314
 #if defined(SYS_aio_suspend) && !defined(HOST_SYS_aio_suspend)
 static const typeof(SYS_aio_suspend) HOST_SYS_aio_suspend = SYS_aio_suspend;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_suspend
 #define SYS_aio_suspend	315
 #if defined(SYS_aio_cancel) && !defined(HOST_SYS_aio_cancel)
 static const typeof(SYS_aio_cancel) HOST_SYS_aio_cancel = SYS_aio_cancel;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_cancel
 #define SYS_aio_cancel	316
 #if defined(SYS_aio_error) && !defined(HOST_SYS_aio_error)
 static const typeof(SYS_aio_error) HOST_SYS_aio_error = SYS_aio_error;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_error
 #define SYS_aio_error	317
 #if defined(SYS_yield) && !defined(HOST_SYS_yield)
 static const typeof(SYS_yield) HOST_SYS_yield = SYS_yield;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_yield
 #define SYS_yield	321
 #if defined(SYS_mlockall) && !defined(HOST_SYS_mlockall)
 static const typeof(SYS_mlockall) HOST_SYS_mlockall = SYS_mlockall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mlockall
 #define SYS_mlockall	324
 #if defined(SYS_munlockall) && !defined(HOST_SYS_munlockall)
 static const typeof(SYS_munlockall) HOST_SYS_munlockall = SYS_munlockall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_munlockall
 #define SYS_munlockall	325
 #if defined(SYS___getcwd) && !defined(HOST_SYS___getcwd)
 static const typeof(SYS___getcwd) HOST_SYS___getcwd = SYS___getcwd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___getcwd
 #define SYS___getcwd	326
 #if defined(SYS_sched_setparam) && !defined(HOST_SYS_sched_setparam)
 static const typeof(SYS_sched_setparam) HOST_SYS_sched_setparam = SYS_sched_setparam;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_setparam
 #define SYS_sched_setparam	327
 #if defined(SYS_sched_getparam) && !defined(HOST_SYS_sched_getparam)
 static const typeof(SYS_sched_getparam) HOST_SYS_sched_getparam = SYS_sched_getparam;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_getparam
 #define SYS_sched_getparam	328
 #if defined(SYS_sched_setscheduler) && !defined(HOST_SYS_sched_setscheduler)
 static const typeof(SYS_sched_setscheduler) HOST_SYS_sched_setscheduler = SYS_sched_setscheduler;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_setscheduler
 #define SYS_sched_setscheduler	329
 #if defined(SYS_sched_getscheduler) && !defined(HOST_SYS_sched_getscheduler)
 static const typeof(SYS_sched_getscheduler) HOST_SYS_sched_getscheduler = SYS_sched_getscheduler;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_getscheduler
 #define SYS_sched_getscheduler	330
 #if defined(SYS_sched_yield) && !defined(HOST_SYS_sched_yield)
 static const typeof(SYS_sched_yield) HOST_SYS_sched_yield = SYS_sched_yield;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_yield
 #define SYS_sched_yield	331
 #if defined(SYS_sched_get_priority_max) && !defined(HOST_SYS_sched_get_priority_max)
 static const typeof(SYS_sched_get_priority_max) HOST_SYS_sched_get_priority_max = SYS_sched_get_priority_max;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_get_priority_max
 #define SYS_sched_get_priority_max	332
 #if defined(SYS_sched_get_priority_min) && !defined(HOST_SYS_sched_get_priority_min)
 static const typeof(SYS_sched_get_priority_min) HOST_SYS_sched_get_priority_min = SYS_sched_get_priority_min;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_get_priority_min
 #define SYS_sched_get_priority_min	333
 #if defined(SYS_sched_rr_get_interval) && !defined(HOST_SYS_sched_rr_get_interval)
 static const typeof(SYS_sched_rr_get_interval) HOST_SYS_sched_rr_get_interval = SYS_sched_rr_get_interval;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_rr_get_interval
 #define SYS_sched_rr_get_interval	334
 #if defined(SYS_utrace) && !defined(HOST_SYS_utrace)
 static const typeof(SYS_utrace) HOST_SYS_utrace = SYS_utrace;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_utrace
 #define SYS_utrace	335
 #if defined(SYS_kldsym) && !defined(HOST_SYS_kldsym)
 static const typeof(SYS_kldsym) HOST_SYS_kldsym = SYS_kldsym;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kldsym
 #define SYS_kldsym	337
 #if defined(SYS_jail) && !defined(HOST_SYS_jail)
 static const typeof(SYS_jail) HOST_SYS_jail = SYS_jail;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_jail
 #define SYS_jail	338
 #if defined(SYS_nnpfs_syscall) && !defined(HOST_SYS_nnpfs_syscall)
 static const typeof(SYS_nnpfs_syscall) HOST_SYS_nnpfs_syscall = SYS_nnpfs_syscall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_nnpfs_syscall
 #define SYS_nnpfs_syscall	339
 #if defined(SYS_sigprocmask) && !defined(HOST_SYS_sigprocmask)
 static const typeof(SYS_sigprocmask) HOST_SYS_sigprocmask = SYS_sigprocmask;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigprocmask
 #define SYS_sigprocmask	340
 #if defined(SYS_sigsuspend) && !defined(HOST_SYS_sigsuspend)
 static const typeof(SYS_sigsuspend) HOST_SYS_sigsuspend = SYS_sigsuspend;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigsuspend
 #define SYS_sigsuspend	341
 #if defined(SYS_sigpending) && !defined(HOST_SYS_sigpending)
 static const typeof(SYS_sigpending) HOST_SYS_sigpending = SYS_sigpending;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigpending
 #define SYS_sigpending	343
 #if defined(SYS_sigtimedwait) && !defined(HOST_SYS_sigtimedwait)
 static const typeof(SYS_sigtimedwait) HOST_SYS_sigtimedwait = SYS_sigtimedwait;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigtimedwait
 #define SYS_sigtimedwait	345
 #if defined(SYS_sigwaitinfo) && !defined(HOST_SYS_sigwaitinfo)
 static const typeof(SYS_sigwaitinfo) HOST_SYS_sigwaitinfo = SYS_sigwaitinfo;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigwaitinfo
 #define SYS_sigwaitinfo	346
 #if defined(SYS___acl_get_file) && !defined(HOST_SYS___acl_get_file)
 static const typeof(SYS___acl_get_file) HOST_SYS___acl_get_file = SYS___acl_get_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_get_file
 #define SYS___acl_get_file	347
 #if defined(SYS___acl_set_file) && !defined(HOST_SYS___acl_set_file)
 static const typeof(SYS___acl_set_file) HOST_SYS___acl_set_file = SYS___acl_set_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_set_file
 #define SYS___acl_set_file	348
 #if defined(SYS___acl_get_fd) && !defined(HOST_SYS___acl_get_fd)
 static const typeof(SYS___acl_get_fd) HOST_SYS___acl_get_fd = SYS___acl_get_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_get_fd
 #define SYS___acl_get_fd	349
 #if defined(SYS___acl_set_fd) && !defined(HOST_SYS___acl_set_fd)
 static const typeof(SYS___acl_set_fd) HOST_SYS___acl_set_fd = SYS___acl_set_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_set_fd
 #define SYS___acl_set_fd	350
 #if defined(SYS___acl_delete_file) && !defined(HOST_SYS___acl_delete_file)
 static const typeof(SYS___acl_delete_file) HOST_SYS___acl_delete_file = SYS___acl_delete_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_delete_file
 #define SYS___acl_delete_file	351
 #if defined(SYS___acl_delete_fd) && !defined(HOST_SYS___acl_delete_fd)
 static const typeof(SYS___acl_delete_fd) HOST_SYS___acl_delete_fd = SYS___acl_delete_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_delete_fd
 #define SYS___acl_delete_fd	352
 #if defined(SYS___acl_aclcheck_file) && !defined(HOST_SYS___acl_aclcheck_file)
 static const typeof(SYS___acl_aclcheck_file) HOST_SYS___acl_aclcheck_file = SYS___acl_aclcheck_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_aclcheck_file
 #define SYS___acl_aclcheck_file	353
 #if defined(SYS___acl_aclcheck_fd) && !defined(HOST_SYS___acl_aclcheck_fd)
 static const typeof(SYS___acl_aclcheck_fd) HOST_SYS___acl_aclcheck_fd = SYS___acl_aclcheck_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_aclcheck_fd
 #define SYS___acl_aclcheck_fd	354
 #if defined(SYS_extattrctl) && !defined(HOST_SYS_extattrctl)
 static const typeof(SYS_extattrctl) HOST_SYS_extattrctl = SYS_extattrctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattrctl
 #define SYS_extattrctl	355
 #if defined(SYS_extattr_set_file) && !defined(HOST_SYS_extattr_set_file)
 static const typeof(SYS_extattr_set_file) HOST_SYS_extattr_set_file = SYS_extattr_set_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_set_file
 #define SYS_extattr_set_file	356
 #if defined(SYS_extattr_get_file) && !defined(HOST_SYS_extattr_get_file)
 static const typeof(SYS_extattr_get_file) HOST_SYS_extattr_get_file = SYS_extattr_get_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_get_file
 #define SYS_extattr_get_file	357
 #if defined(SYS_extattr_delete_file) && !defined(HOST_SYS_extattr_delete_file)
 static const typeof(SYS_extattr_delete_file) HOST_SYS_extattr_delete_file = SYS_extattr_delete_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_delete_file
 #define SYS_extattr_delete_file	358
 #if defined(SYS_aio_waitcomplete) && !defined(HOST_SYS_aio_waitcomplete)
 static const typeof(SYS_aio_waitcomplete) HOST_SYS_aio_waitcomplete = SYS_aio_waitcomplete;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_waitcomplete
 #define SYS_aio_waitcomplete	359
 #if defined(SYS_getresuid) && !defined(HOST_SYS_getresuid)
 static const typeof(SYS_getresuid) HOST_SYS_getresuid = SYS_getresuid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getresuid
 #define SYS_getresuid	360
 #if defined(SYS_getresgid) && !defined(HOST_SYS_getresgid)
 static const typeof(SYS_getresgid) HOST_SYS_getresgid = SYS_getresgid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getresgid
 #define SYS_getresgid	361
 #if defined(SYS_kqueue) && !defined(HOST_SYS_kqueue)
 static const typeof(SYS_kqueue) HOST_SYS_kqueue = SYS_kqueue;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kqueue
 #define SYS_kqueue	362
 #if defined(SYS_freebsd11_kevent) && !defined(HOST_SYS_freebsd11_kevent)
 static const typeof(SYS_freebsd11_kevent) HOST_SYS_freebsd11_kevent = SYS_freebsd11_kevent;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_kevent
 #define SYS_freebsd11_kevent	363
 #if defined(SYS_extattr_set_fd) && !defined(HOST_SYS_extattr_set_fd)
 static const typeof(SYS_extattr_set_fd) HOST_SYS_extattr_set_fd = SYS_extattr_set_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_set_fd
 #define SYS_extattr_set_fd	371
 #if defined(SYS_extattr_get_fd) && !defined(HOST_SYS_extattr_get_fd)
 static const typeof(SYS_extattr_get_fd) HOST_SYS_extattr_get_fd = SYS_extattr_get_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_get_fd
 #define SYS_extattr_get_fd	372
 #if defined(SYS_extattr_delete_fd) && !defined(HOST_SYS_extattr_delete_fd)
 static const typeof(SYS_extattr_delete_fd) HOST_SYS_extattr_delete_fd = SYS_extattr_delete_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_delete_fd
 #define SYS_extattr_delete_fd	373
 #if defined(SYS___setugid) && !defined(HOST_SYS___setugid)
 static const typeof(SYS___setugid) HOST_SYS___setugid = SYS___setugid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___setugid
 #define SYS___setugid	374
 #if defined(SYS_eaccess) && !defined(HOST_SYS_eaccess)
 static const typeof(SYS_eaccess) HOST_SYS_eaccess = SYS_eaccess;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_eaccess
 #define SYS_eaccess	376
 #if defined(SYS_afs3_syscall) && !defined(HOST_SYS_afs3_syscall)
 static const typeof(SYS_afs3_syscall) HOST_SYS_afs3_syscall = SYS_afs3_syscall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_afs3_syscall
 #define SYS_afs3_syscall	377
 #if defined(SYS_nmount) && !defined(HOST_SYS_nmount)
 static const typeof(SYS_nmount) HOST_SYS_nmount = SYS_nmount;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_nmount
 #define SYS_nmount	378
 #if defined(SYS___mac_get_proc) && !defined(HOST_SYS___mac_get_proc)
 static const typeof(SYS___mac_get_proc) HOST_SYS___mac_get_proc = SYS___mac_get_proc;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_get_proc
 #define SYS___mac_get_proc	384
 #if defined(SYS___mac_set_proc) && !defined(HOST_SYS___mac_set_proc)
 static const typeof(SYS___mac_set_proc) HOST_SYS___mac_set_proc = SYS___mac_set_proc;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_set_proc
 #define SYS___mac_set_proc	385
 #if defined(SYS___mac_get_fd) && !defined(HOST_SYS___mac_get_fd)
 static const typeof(SYS___mac_get_fd) HOST_SYS___mac_get_fd = SYS___mac_get_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_get_fd
 #define SYS___mac_get_fd	386
 #if defined(SYS___mac_get_file) && !defined(HOST_SYS___mac_get_file)
 static const typeof(SYS___mac_get_file) HOST_SYS___mac_get_file = SYS___mac_get_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_get_file
 #define SYS___mac_get_file	387
 #if defined(SYS___mac_set_fd) && !defined(HOST_SYS___mac_set_fd)
 static const typeof(SYS___mac_set_fd) HOST_SYS___mac_set_fd = SYS___mac_set_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_set_fd
 #define SYS___mac_set_fd	388
 #if defined(SYS___mac_set_file) && !defined(HOST_SYS___mac_set_file)
 static const typeof(SYS___mac_set_file) HOST_SYS___mac_set_file = SYS___mac_set_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_set_file
 #define SYS___mac_set_file	389
 #if defined(SYS_kenv) && !defined(HOST_SYS_kenv)
 static const typeof(SYS_kenv) HOST_SYS_kenv = SYS_kenv;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kenv
 #define SYS_kenv	390
 #if defined(SYS_lchflags) && !defined(HOST_SYS_lchflags)
 static const typeof(SYS_lchflags) HOST_SYS_lchflags = SYS_lchflags;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_lchflags
 #define SYS_lchflags	391
 #if defined(SYS_uuidgen) && !defined(HOST_SYS_uuidgen)
 static const typeof(SYS_uuidgen) HOST_SYS_uuidgen = SYS_uuidgen;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_uuidgen
 #define SYS_uuidgen	392
 #if defined(SYS_sendfile) && !defined(HOST_SYS_sendfile)
 static const typeof(SYS_sendfile) HOST_SYS_sendfile = SYS_sendfile;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sendfile
 #define SYS_sendfile	393
 #if defined(SYS_mac_syscall) && !defined(HOST_SYS_mac_syscall)
 static const typeof(SYS_mac_syscall) HOST_SYS_mac_syscall = SYS_mac_syscall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mac_syscall
 #define SYS_mac_syscall	394
 #if defined(SYS_freebsd11_getfsstat) && !defined(HOST_SYS_freebsd11_getfsstat)
 static const typeof(SYS_freebsd11_getfsstat) HOST_SYS_freebsd11_getfsstat = SYS_freebsd11_getfsstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_getfsstat
 #define SYS_freebsd11_getfsstat	395
 #if defined(SYS_freebsd11_statfs) && !defined(HOST_SYS_freebsd11_statfs)
 static const typeof(SYS_freebsd11_statfs) HOST_SYS_freebsd11_statfs = SYS_freebsd11_statfs;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_statfs
 #define SYS_freebsd11_statfs	396
 #if defined(SYS_freebsd11_fstatfs) && !defined(HOST_SYS_freebsd11_fstatfs)
 static const typeof(SYS_freebsd11_fstatfs) HOST_SYS_freebsd11_fstatfs = SYS_freebsd11_fstatfs;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_fstatfs
 #define SYS_freebsd11_fstatfs	397
 #if defined(SYS_freebsd11_fhstatfs) && !defined(HOST_SYS_freebsd11_fhstatfs)
 static const typeof(SYS_freebsd11_fhstatfs) HOST_SYS_freebsd11_fhstatfs = SYS_freebsd11_fhstatfs;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_fhstatfs
 #define SYS_freebsd11_fhstatfs	398
 #if defined(SYS_ksem_close) && !defined(HOST_SYS_ksem_close)
 static const typeof(SYS_ksem_close) HOST_SYS_ksem_close = SYS_ksem_close;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_close
 #define SYS_ksem_close	400
 #if defined(SYS_ksem_post) && !defined(HOST_SYS_ksem_post)
 static const typeof(SYS_ksem_post) HOST_SYS_ksem_post = SYS_ksem_post;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_post
 #define SYS_ksem_post	401
 #if defined(SYS_ksem_wait) && !defined(HOST_SYS_ksem_wait)
 static const typeof(SYS_ksem_wait) HOST_SYS_ksem_wait = SYS_ksem_wait;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_wait
 #define SYS_ksem_wait	402
 #if defined(SYS_ksem_trywait) && !defined(HOST_SYS_ksem_trywait)
 static const typeof(SYS_ksem_trywait) HOST_SYS_ksem_trywait = SYS_ksem_trywait;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_trywait
 #define SYS_ksem_trywait	403
 #if defined(SYS_ksem_init) && !defined(HOST_SYS_ksem_init)
 static const typeof(SYS_ksem_init) HOST_SYS_ksem_init = SYS_ksem_init;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_init
 #define SYS_ksem_init	404
 #if defined(SYS_ksem_open) && !defined(HOST_SYS_ksem_open)
 static const typeof(SYS_ksem_open) HOST_SYS_ksem_open = SYS_ksem_open;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_open
 #define SYS_ksem_open	405
 #if defined(SYS_ksem_unlink) && !defined(HOST_SYS_ksem_unlink)
 static const typeof(SYS_ksem_unlink) HOST_SYS_ksem_unlink = SYS_ksem_unlink;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_unlink
 #define SYS_ksem_unlink	406
 #if defined(SYS_ksem_getvalue) && !defined(HOST_SYS_ksem_getvalue)
 static const typeof(SYS_ksem_getvalue) HOST_SYS_ksem_getvalue = SYS_ksem_getvalue;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_getvalue
 #define SYS_ksem_getvalue	407
 #if defined(SYS_ksem_destroy) && !defined(HOST_SYS_ksem_destroy)
 static const typeof(SYS_ksem_destroy) HOST_SYS_ksem_destroy = SYS_ksem_destroy;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_destroy
 #define SYS_ksem_destroy	408
 #if defined(SYS___mac_get_pid) && !defined(HOST_SYS___mac_get_pid)
 static const typeof(SYS___mac_get_pid) HOST_SYS___mac_get_pid = SYS___mac_get_pid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_get_pid
 #define SYS___mac_get_pid	409
 #if defined(SYS___mac_get_link) && !defined(HOST_SYS___mac_get_link)
 static const typeof(SYS___mac_get_link) HOST_SYS___mac_get_link = SYS___mac_get_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_get_link
 #define SYS___mac_get_link	410
 #if defined(SYS___mac_set_link) && !defined(HOST_SYS___mac_set_link)
 static const typeof(SYS___mac_set_link) HOST_SYS___mac_set_link = SYS___mac_set_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_set_link
 #define SYS___mac_set_link	411
 #if defined(SYS_extattr_set_link) && !defined(HOST_SYS_extattr_set_link)
 static const typeof(SYS_extattr_set_link) HOST_SYS_extattr_set_link = SYS_extattr_set_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_set_link
 #define SYS_extattr_set_link	412
 #if defined(SYS_extattr_get_link) && !defined(HOST_SYS_extattr_get_link)
 static const typeof(SYS_extattr_get_link) HOST_SYS_extattr_get_link = SYS_extattr_get_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_get_link
 #define SYS_extattr_get_link	413
 #if defined(SYS_extattr_delete_link) && !defined(HOST_SYS_extattr_delete_link)
 static const typeof(SYS_extattr_delete_link) HOST_SYS_extattr_delete_link = SYS_extattr_delete_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_delete_link
 #define SYS_extattr_delete_link	414
 #if defined(SYS___mac_execve) && !defined(HOST_SYS___mac_execve)
 static const typeof(SYS___mac_execve) HOST_SYS___mac_execve = SYS___mac_execve;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___mac_execve
 #define SYS___mac_execve	415
 #if defined(SYS_sigaction) && !defined(HOST_SYS_sigaction)
 static const typeof(SYS_sigaction) HOST_SYS_sigaction = SYS_sigaction;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigaction
 #define SYS_sigaction	416
 #if defined(SYS_sigreturn) && !defined(HOST_SYS_sigreturn)
 static const typeof(SYS_sigreturn) HOST_SYS_sigreturn = SYS_sigreturn;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigreturn
 #define SYS_sigreturn	417
 #if defined(SYS_getcontext) && !defined(HOST_SYS_getcontext)
 static const typeof(SYS_getcontext) HOST_SYS_getcontext = SYS_getcontext;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getcontext
 #define SYS_getcontext	421
 #if defined(SYS_setcontext) && !defined(HOST_SYS_setcontext)
 static const typeof(SYS_setcontext) HOST_SYS_setcontext = SYS_setcontext;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setcontext
 #define SYS_setcontext	422
 #if defined(SYS_swapcontext) && !defined(HOST_SYS_swapcontext)
 static const typeof(SYS_swapcontext) HOST_SYS_swapcontext = SYS_swapcontext;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_swapcontext
 #define SYS_swapcontext	423
 #if defined(SYS_freebsd13_swapoff) && !defined(HOST_SYS_freebsd13_swapoff)
 static const typeof(SYS_freebsd13_swapoff) HOST_SYS_freebsd13_swapoff = SYS_freebsd13_swapoff;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd13_swapoff
 #define SYS_freebsd13_swapoff	424
 #if defined(SYS___acl_get_link) && !defined(HOST_SYS___acl_get_link)
 static const typeof(SYS___acl_get_link) HOST_SYS___acl_get_link = SYS___acl_get_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_get_link
 #define SYS___acl_get_link	425
 #if defined(SYS___acl_set_link) && !defined(HOST_SYS___acl_set_link)
 static const typeof(SYS___acl_set_link) HOST_SYS___acl_set_link = SYS___acl_set_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_set_link
 #define SYS___acl_set_link	426
 #if defined(SYS___acl_delete_link) && !defined(HOST_SYS___acl_delete_link)
 static const typeof(SYS___acl_delete_link) HOST_SYS___acl_delete_link = SYS___acl_delete_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_delete_link
 #define SYS___acl_delete_link	427
 #if defined(SYS___acl_aclcheck_link) && !defined(HOST_SYS___acl_aclcheck_link)
 static const typeof(SYS___acl_aclcheck_link) HOST_SYS___acl_aclcheck_link = SYS___acl_aclcheck_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___acl_aclcheck_link
 #define SYS___acl_aclcheck_link	428
 #if defined(SYS_sigwait) && !defined(HOST_SYS_sigwait)
 static const typeof(SYS_sigwait) HOST_SYS_sigwait = SYS_sigwait;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigwait
 #define SYS_sigwait	429
 #if defined(SYS_thr_create) && !defined(HOST_SYS_thr_create)
 static const typeof(SYS_thr_create) HOST_SYS_thr_create = SYS_thr_create;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_create
 #define SYS_thr_create	430
 #if defined(SYS_thr_exit) && !defined(HOST_SYS_thr_exit)
 static const typeof(SYS_thr_exit) HOST_SYS_thr_exit = SYS_thr_exit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_exit
 #define SYS_thr_exit	431
 #if defined(SYS_thr_self) && !defined(HOST_SYS_thr_self)
 static const typeof(SYS_thr_self) HOST_SYS_thr_self = SYS_thr_self;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_self
 #define SYS_thr_self	432
 #if defined(SYS_thr_kill) && !defined(HOST_SYS_thr_kill)
 static const typeof(SYS_thr_kill) HOST_SYS_thr_kill = SYS_thr_kill;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_kill
 #define SYS_thr_kill	433
 #if defined(SYS_freebsd10__umtx_lock) && !defined(HOST_SYS_freebsd10__umtx_lock)
 static const typeof(SYS_freebsd10__umtx_lock) HOST_SYS_freebsd10__umtx_lock = SYS_freebsd10__umtx_lock;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd10__umtx_lock
 #define SYS_freebsd10__umtx_lock	434
 #if defined(SYS_freebsd10__umtx_unlock) && !defined(HOST_SYS_freebsd10__umtx_unlock)
 static const typeof(SYS_freebsd10__umtx_unlock) HOST_SYS_freebsd10__umtx_unlock = SYS_freebsd10__umtx_unlock;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd10__umtx_unlock
 #define SYS_freebsd10__umtx_unlock	435
 #if defined(SYS_jail_attach) && !defined(HOST_SYS_jail_attach)
 static const typeof(SYS_jail_attach) HOST_SYS_jail_attach = SYS_jail_attach;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_jail_attach
 #define SYS_jail_attach	436
 #if defined(SYS_extattr_list_fd) && !defined(HOST_SYS_extattr_list_fd)
 static const typeof(SYS_extattr_list_fd) HOST_SYS_extattr_list_fd = SYS_extattr_list_fd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_list_fd
 #define SYS_extattr_list_fd	437
 #if defined(SYS_extattr_list_file) && !defined(HOST_SYS_extattr_list_file)
 static const typeof(SYS_extattr_list_file) HOST_SYS_extattr_list_file = SYS_extattr_list_file;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_list_file
 #define SYS_extattr_list_file	438
 #if defined(SYS_extattr_list_link) && !defined(HOST_SYS_extattr_list_link)
 static const typeof(SYS_extattr_list_link) HOST_SYS_extattr_list_link = SYS_extattr_list_link;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_extattr_list_link
 #define SYS_extattr_list_link	439
 #if defined(SYS_ksem_timedwait) && !defined(HOST_SYS_ksem_timedwait)
 static const typeof(SYS_ksem_timedwait) HOST_SYS_ksem_timedwait = SYS_ksem_timedwait;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ksem_timedwait
 #define SYS_ksem_timedwait	441
 #if defined(SYS_thr_suspend) && !defined(HOST_SYS_thr_suspend)
 static const typeof(SYS_thr_suspend) HOST_SYS_thr_suspend = SYS_thr_suspend;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_suspend
 #define SYS_thr_suspend	442
 #if defined(SYS_thr_wake) && !defined(HOST_SYS_thr_wake)
 static const typeof(SYS_thr_wake) HOST_SYS_thr_wake = SYS_thr_wake;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_wake
 #define SYS_thr_wake	443
 #if defined(SYS_kldunloadf) && !defined(HOST_SYS_kldunloadf)
 static const typeof(SYS_kldunloadf) HOST_SYS_kldunloadf = SYS_kldunloadf;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kldunloadf
 #define SYS_kldunloadf	444
 #if defined(SYS_audit) && !defined(HOST_SYS_audit)
 static const typeof(SYS_audit) HOST_SYS_audit = SYS_audit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_audit
 #define SYS_audit	445
 #if defined(SYS_auditon) && !defined(HOST_SYS_auditon)
 static const typeof(SYS_auditon) HOST_SYS_auditon = SYS_auditon;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_auditon
 #define SYS_auditon	446
 #if defined(SYS_getauid) && !defined(HOST_SYS_getauid)
 static const typeof(SYS_getauid) HOST_SYS_getauid = SYS_getauid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getauid
 #define SYS_getauid	447
 #if defined(SYS_setauid) && !defined(HOST_SYS_setauid)
 static const typeof(SYS_setauid) HOST_SYS_setauid = SYS_setauid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setauid
 #define SYS_setauid	448
 #if defined(SYS_getaudit) && !defined(HOST_SYS_getaudit)
 static const typeof(SYS_getaudit) HOST_SYS_getaudit = SYS_getaudit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getaudit
 #define SYS_getaudit	449
 #if defined(SYS_setaudit) && !defined(HOST_SYS_setaudit)
 static const typeof(SYS_setaudit) HOST_SYS_setaudit = SYS_setaudit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setaudit
 #define SYS_setaudit	450
 #if defined(SYS_getaudit_addr) && !defined(HOST_SYS_getaudit_addr)
 static const typeof(SYS_getaudit_addr) HOST_SYS_getaudit_addr = SYS_getaudit_addr;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getaudit_addr
 #define SYS_getaudit_addr	451
 #if defined(SYS_setaudit_addr) && !defined(HOST_SYS_setaudit_addr)
 static const typeof(SYS_setaudit_addr) HOST_SYS_setaudit_addr = SYS_setaudit_addr;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setaudit_addr
 #define SYS_setaudit_addr	452
 #if defined(SYS_auditctl) && !defined(HOST_SYS_auditctl)
 static const typeof(SYS_auditctl) HOST_SYS_auditctl = SYS_auditctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_auditctl
 #define SYS_auditctl	453
 #if defined(SYS__umtx_op) && !defined(HOST_SYS__umtx_op)
 static const typeof(SYS__umtx_op) HOST_SYS__umtx_op = SYS__umtx_op;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS__umtx_op
 #define SYS__umtx_op	454
 #if defined(SYS_thr_new) && !defined(HOST_SYS_thr_new)
 static const typeof(SYS_thr_new) HOST_SYS_thr_new = SYS_thr_new;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_new
 #define SYS_thr_new	455
 #if defined(SYS_sigqueue) && !defined(HOST_SYS_sigqueue)
 static const typeof(SYS_sigqueue) HOST_SYS_sigqueue = SYS_sigqueue;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigqueue
 #define SYS_sigqueue	456
 #if defined(SYS_kmq_open) && !defined(HOST_SYS_kmq_open)
 static const typeof(SYS_kmq_open) HOST_SYS_kmq_open = SYS_kmq_open;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kmq_open
 #define SYS_kmq_open	457
 #if defined(SYS_kmq_setattr) && !defined(HOST_SYS_kmq_setattr)
 static const typeof(SYS_kmq_setattr) HOST_SYS_kmq_setattr = SYS_kmq_setattr;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kmq_setattr
 #define SYS_kmq_setattr	458
 #if defined(SYS_kmq_timedreceive) && !defined(HOST_SYS_kmq_timedreceive)
 static const typeof(SYS_kmq_timedreceive) HOST_SYS_kmq_timedreceive = SYS_kmq_timedreceive;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kmq_timedreceive
 #define SYS_kmq_timedreceive	459
 #if defined(SYS_kmq_timedsend) && !defined(HOST_SYS_kmq_timedsend)
 static const typeof(SYS_kmq_timedsend) HOST_SYS_kmq_timedsend = SYS_kmq_timedsend;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kmq_timedsend
 #define SYS_kmq_timedsend	460
 #if defined(SYS_kmq_notify) && !defined(HOST_SYS_kmq_notify)
 static const typeof(SYS_kmq_notify) HOST_SYS_kmq_notify = SYS_kmq_notify;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kmq_notify
 #define SYS_kmq_notify	461
 #if defined(SYS_kmq_unlink) && !defined(HOST_SYS_kmq_unlink)
 static const typeof(SYS_kmq_unlink) HOST_SYS_kmq_unlink = SYS_kmq_unlink;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kmq_unlink
 #define SYS_kmq_unlink	462
 #if defined(SYS_abort2) && !defined(HOST_SYS_abort2)
 static const typeof(SYS_abort2) HOST_SYS_abort2 = SYS_abort2;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_abort2
 #define SYS_abort2	463
 #if defined(SYS_thr_set_name) && !defined(HOST_SYS_thr_set_name)
 static const typeof(SYS_thr_set_name) HOST_SYS_thr_set_name = SYS_thr_set_name;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_set_name
 #define SYS_thr_set_name	464
 #if defined(SYS_aio_fsync) && !defined(HOST_SYS_aio_fsync)
 static const typeof(SYS_aio_fsync) HOST_SYS_aio_fsync = SYS_aio_fsync;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_fsync
 #define SYS_aio_fsync	465
 #if defined(SYS_rtprio_thread) && !defined(HOST_SYS_rtprio_thread)
 static const typeof(SYS_rtprio_thread) HOST_SYS_rtprio_thread = SYS_rtprio_thread;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rtprio_thread
 #define SYS_rtprio_thread	466
 #if defined(SYS_sctp_peeloff) && !defined(HOST_SYS_sctp_peeloff)
 static const typeof(SYS_sctp_peeloff) HOST_SYS_sctp_peeloff = SYS_sctp_peeloff;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sctp_peeloff
 #define SYS_sctp_peeloff	471
 #if defined(SYS_sctp_generic_sendmsg) && !defined(HOST_SYS_sctp_generic_sendmsg)
 static const typeof(SYS_sctp_generic_sendmsg) HOST_SYS_sctp_generic_sendmsg = SYS_sctp_generic_sendmsg;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sctp_generic_sendmsg
 #define SYS_sctp_generic_sendmsg	472
 #if defined(SYS_sctp_generic_sendmsg_iov) && !defined(HOST_SYS_sctp_generic_sendmsg_iov)
 static const typeof(SYS_sctp_generic_sendmsg_iov) HOST_SYS_sctp_generic_sendmsg_iov = SYS_sctp_generic_sendmsg_iov;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sctp_generic_sendmsg_iov
 #define SYS_sctp_generic_sendmsg_iov	473
 #if defined(SYS_sctp_generic_recvmsg) && !defined(HOST_SYS_sctp_generic_recvmsg)
 static const typeof(SYS_sctp_generic_recvmsg) HOST_SYS_sctp_generic_recvmsg = SYS_sctp_generic_recvmsg;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sctp_generic_recvmsg
 #define SYS_sctp_generic_recvmsg	474
 #if defined(SYS_pread) && !defined(HOST_SYS_pread)
 static const typeof(SYS_pread) HOST_SYS_pread = SYS_pread;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pread
 #define SYS_pread	475
 #if defined(SYS_pwrite) && !defined(HOST_SYS_pwrite)
 static const typeof(SYS_pwrite) HOST_SYS_pwrite = SYS_pwrite;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pwrite
 #define SYS_pwrite	476
 #if defined(SYS_mmap) && !defined(HOST_SYS_mmap)
 static const typeof(SYS_mmap) HOST_SYS_mmap = SYS_mmap;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mmap
 #define SYS_mmap	477
 #if defined(SYS_lseek) && !defined(HOST_SYS_lseek)
 static const typeof(SYS_lseek) HOST_SYS_lseek = SYS_lseek;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_lseek
 #define SYS_lseek	478
 #if defined(SYS_truncate) && !defined(HOST_SYS_truncate)
 static const typeof(SYS_truncate) HOST_SYS_truncate = SYS_truncate;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_truncate
 #define SYS_truncate	479
 #if defined(SYS_ftruncate) && !defined(HOST_SYS_ftruncate)
 static const typeof(SYS_ftruncate) HOST_SYS_ftruncate = SYS_ftruncate;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ftruncate
 #define SYS_ftruncate	480
 #if defined(SYS_thr_kill2) && !defined(HOST_SYS_thr_kill2)
 static const typeof(SYS_thr_kill2) HOST_SYS_thr_kill2 = SYS_thr_kill2;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_thr_kill2
 #define SYS_thr_kill2	481
 #if defined(SYS_freebsd12_shm_open) && !defined(HOST_SYS_freebsd12_shm_open)
 static const typeof(SYS_freebsd12_shm_open) HOST_SYS_freebsd12_shm_open = SYS_freebsd12_shm_open;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd12_shm_open
 #define SYS_freebsd12_shm_open	482
 #if defined(SYS_shm_unlink) && !defined(HOST_SYS_shm_unlink)
 static const typeof(SYS_shm_unlink) HOST_SYS_shm_unlink = SYS_shm_unlink;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shm_unlink
 #define SYS_shm_unlink	483
 #if defined(SYS_cpuset) && !defined(HOST_SYS_cpuset)
 static const typeof(SYS_cpuset) HOST_SYS_cpuset = SYS_cpuset;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cpuset
 #define SYS_cpuset	484
 #if defined(SYS_cpuset_setid) && !defined(HOST_SYS_cpuset_setid)
 static const typeof(SYS_cpuset_setid) HOST_SYS_cpuset_setid = SYS_cpuset_setid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cpuset_setid
 #define SYS_cpuset_setid	485
 #if defined(SYS_cpuset_getid) && !defined(HOST_SYS_cpuset_getid)
 static const typeof(SYS_cpuset_getid) HOST_SYS_cpuset_getid = SYS_cpuset_getid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cpuset_getid
 #define SYS_cpuset_getid	486
 #if defined(SYS_cpuset_getaffinity) && !defined(HOST_SYS_cpuset_getaffinity)
 static const typeof(SYS_cpuset_getaffinity) HOST_SYS_cpuset_getaffinity = SYS_cpuset_getaffinity;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cpuset_getaffinity
 #define SYS_cpuset_getaffinity	487
 #if defined(SYS_cpuset_setaffinity) && !defined(HOST_SYS_cpuset_setaffinity)
 static const typeof(SYS_cpuset_setaffinity) HOST_SYS_cpuset_setaffinity = SYS_cpuset_setaffinity;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cpuset_setaffinity
 #define SYS_cpuset_setaffinity	488
 #if defined(SYS_faccessat) && !defined(HOST_SYS_faccessat)
 static const typeof(SYS_faccessat) HOST_SYS_faccessat = SYS_faccessat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_faccessat
 #define SYS_faccessat	489
 #if defined(SYS_fchmodat) && !defined(HOST_SYS_fchmodat)
 static const typeof(SYS_fchmodat) HOST_SYS_fchmodat = SYS_fchmodat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fchmodat
 #define SYS_fchmodat	490
 #if defined(SYS_fchownat) && !defined(HOST_SYS_fchownat)
 static const typeof(SYS_fchownat) HOST_SYS_fchownat = SYS_fchownat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fchownat
 #define SYS_fchownat	491
 #if defined(SYS_fexecve) && !defined(HOST_SYS_fexecve)
 static const typeof(SYS_fexecve) HOST_SYS_fexecve = SYS_fexecve;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fexecve
 #define SYS_fexecve	492
 #if defined(SYS_freebsd11_fstatat) && !defined(HOST_SYS_freebsd11_fstatat)
 static const typeof(SYS_freebsd11_fstatat) HOST_SYS_freebsd11_fstatat = SYS_freebsd11_fstatat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_fstatat
 #define SYS_freebsd11_fstatat	493
 #if defined(SYS_futimesat) && !defined(HOST_SYS_futimesat)
 static const typeof(SYS_futimesat) HOST_SYS_futimesat = SYS_futimesat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_futimesat
 #define SYS_futimesat	494
 #if defined(SYS_linkat) && !defined(HOST_SYS_linkat)
 static const typeof(SYS_linkat) HOST_SYS_linkat = SYS_linkat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_linkat
 #define SYS_linkat	495
 #if defined(SYS_mkdirat) && !defined(HOST_SYS_mkdirat)
 static const typeof(SYS_mkdirat) HOST_SYS_mkdirat = SYS_mkdirat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mkdirat
 #define SYS_mkdirat	496
 #if defined(SYS_mkfifoat) && !defined(HOST_SYS_mkfifoat)
 static const typeof(SYS_mkfifoat) HOST_SYS_mkfifoat = SYS_mkfifoat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mkfifoat
 #define SYS_mkfifoat	497
 #if defined(SYS_freebsd11_mknodat) && !defined(HOST_SYS_freebsd11_mknodat)
 static const typeof(SYS_freebsd11_mknodat) HOST_SYS_freebsd11_mknodat = SYS_freebsd11_mknodat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd11_mknodat
 #define SYS_freebsd11_mknodat	498
 #if defined(SYS_openat) && !defined(HOST_SYS_openat)
 static const typeof(SYS_openat) HOST_SYS_openat = SYS_openat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_openat
 #define SYS_openat	499
 #if defined(SYS_readlinkat) && !defined(HOST_SYS_readlinkat)
 static const typeof(SYS_readlinkat) HOST_SYS_readlinkat = SYS_readlinkat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_readlinkat
 #define SYS_readlinkat	500
 #if defined(SYS_renameat) && !defined(HOST_SYS_renameat)
 static const typeof(SYS_renameat) HOST_SYS_renameat = SYS_renameat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_renameat
 #define SYS_renameat	501
 #if defined(SYS_symlinkat) && !defined(HOST_SYS_symlinkat)
 static const typeof(SYS_symlinkat) HOST_SYS_symlinkat = SYS_symlinkat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_symlinkat
 #define SYS_symlinkat	502
 #if defined(SYS_unlinkat) && !defined(HOST_SYS_unlinkat)
 static const typeof(SYS_unlinkat) HOST_SYS_unlinkat = SYS_unlinkat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_unlinkat
 #define SYS_unlinkat	503
 #if defined(SYS_posix_openpt) && !defined(HOST_SYS_posix_openpt)
 static const typeof(SYS_posix_openpt) HOST_SYS_posix_openpt = SYS_posix_openpt;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_posix_openpt
 #define SYS_posix_openpt	504
 #if defined(SYS_gssd_syscall) && !defined(HOST_SYS_gssd_syscall)
 static const typeof(SYS_gssd_syscall) HOST_SYS_gssd_syscall = SYS_gssd_syscall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_gssd_syscall
 #define SYS_gssd_syscall	505
 #if defined(SYS_jail_get) && !defined(HOST_SYS_jail_get)
 static const typeof(SYS_jail_get) HOST_SYS_jail_get = SYS_jail_get;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_jail_get
 #define SYS_jail_get	506
 #if defined(SYS_jail_set) && !defined(HOST_SYS_jail_set)
 static const typeof(SYS_jail_set) HOST_SYS_jail_set = SYS_jail_set;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_jail_set
 #define SYS_jail_set	507
 #if defined(SYS_jail_remove) && !defined(HOST_SYS_jail_remove)
 static const typeof(SYS_jail_remove) HOST_SYS_jail_remove = SYS_jail_remove;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_jail_remove
 #define SYS_jail_remove	508
 #if defined(SYS_freebsd12_closefrom) && !defined(HOST_SYS_freebsd12_closefrom)
 static const typeof(SYS_freebsd12_closefrom) HOST_SYS_freebsd12_closefrom = SYS_freebsd12_closefrom;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_freebsd12_closefrom
 #define SYS_freebsd12_closefrom	509
 #if defined(SYS___semctl) && !defined(HOST_SYS___semctl)
 static const typeof(SYS___semctl) HOST_SYS___semctl = SYS___semctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___semctl
 #define SYS___semctl	510
 #if defined(SYS_msgctl) && !defined(HOST_SYS_msgctl)
 static const typeof(SYS_msgctl) HOST_SYS_msgctl = SYS_msgctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_msgctl
 #define SYS_msgctl	511
 #if defined(SYS_shmctl) && !defined(HOST_SYS_shmctl)
 static const typeof(SYS_shmctl) HOST_SYS_shmctl = SYS_shmctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shmctl
 #define SYS_shmctl	512
 #if defined(SYS_lpathconf) && !defined(HOST_SYS_lpathconf)
 static const typeof(SYS_lpathconf) HOST_SYS_lpathconf = SYS_lpathconf;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_lpathconf
 #define SYS_lpathconf	513
 #if defined(SYS___cap_rights_get) && !defined(HOST_SYS___cap_rights_get)
 static const typeof(SYS___cap_rights_get) HOST_SYS___cap_rights_get = SYS___cap_rights_get;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___cap_rights_get
 #define SYS___cap_rights_get	515
 #if defined(SYS_cap_enter) && !defined(HOST_SYS_cap_enter)
 static const typeof(SYS_cap_enter) HOST_SYS_cap_enter = SYS_cap_enter;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cap_enter
 #define SYS_cap_enter	516
 #if defined(SYS_cap_getmode) && !defined(HOST_SYS_cap_getmode)
 static const typeof(SYS_cap_getmode) HOST_SYS_cap_getmode = SYS_cap_getmode;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cap_getmode
 #define SYS_cap_getmode	517
 #if defined(SYS_pdfork) && !defined(HOST_SYS_pdfork)
 static const typeof(SYS_pdfork) HOST_SYS_pdfork = SYS_pdfork;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pdfork
 #define SYS_pdfork	518
 #if defined(SYS_pdkill) && !defined(HOST_SYS_pdkill)
 static const typeof(SYS_pdkill) HOST_SYS_pdkill = SYS_pdkill;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pdkill
 #define SYS_pdkill	519
 #if defined(SYS_pdgetpid) && !defined(HOST_SYS_pdgetpid)
 static const typeof(SYS_pdgetpid) HOST_SYS_pdgetpid = SYS_pdgetpid;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pdgetpid
 #define SYS_pdgetpid	520
 #if defined(SYS_pselect) && !defined(HOST_SYS_pselect)
 static const typeof(SYS_pselect) HOST_SYS_pselect = SYS_pselect;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pselect
 #define SYS_pselect	522
 #if defined(SYS_getloginclass) && !defined(HOST_SYS_getloginclass)
 static const typeof(SYS_getloginclass) HOST_SYS_getloginclass = SYS_getloginclass;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getloginclass
 #define SYS_getloginclass	523
 #if defined(SYS_setloginclass) && !defined(HOST_SYS_setloginclass)
 static const typeof(SYS_setloginclass) HOST_SYS_setloginclass = SYS_setloginclass;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_setloginclass
 #define SYS_setloginclass	524
 #if defined(SYS_rctl_get_racct) && !defined(HOST_SYS_rctl_get_racct)
 static const typeof(SYS_rctl_get_racct) HOST_SYS_rctl_get_racct = SYS_rctl_get_racct;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rctl_get_racct
 #define SYS_rctl_get_racct	525
 #if defined(SYS_rctl_get_rules) && !defined(HOST_SYS_rctl_get_rules)
 static const typeof(SYS_rctl_get_rules) HOST_SYS_rctl_get_rules = SYS_rctl_get_rules;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rctl_get_rules
 #define SYS_rctl_get_rules	526
 #if defined(SYS_rctl_get_limits) && !defined(HOST_SYS_rctl_get_limits)
 static const typeof(SYS_rctl_get_limits) HOST_SYS_rctl_get_limits = SYS_rctl_get_limits;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rctl_get_limits
 #define SYS_rctl_get_limits	527
 #if defined(SYS_rctl_add_rule) && !defined(HOST_SYS_rctl_add_rule)
 static const typeof(SYS_rctl_add_rule) HOST_SYS_rctl_add_rule = SYS_rctl_add_rule;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rctl_add_rule
 #define SYS_rctl_add_rule	528
 #if defined(SYS_rctl_remove_rule) && !defined(HOST_SYS_rctl_remove_rule)
 static const typeof(SYS_rctl_remove_rule) HOST_SYS_rctl_remove_rule = SYS_rctl_remove_rule;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rctl_remove_rule
 #define SYS_rctl_remove_rule	529
 #if defined(SYS_posix_fallocate) && !defined(HOST_SYS_posix_fallocate)
 static const typeof(SYS_posix_fallocate) HOST_SYS_posix_fallocate = SYS_posix_fallocate;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_posix_fallocate
 #define SYS_posix_fallocate	530
 #if defined(SYS_posix_fadvise) && !defined(HOST_SYS_posix_fadvise)
 static const typeof(SYS_posix_fadvise) HOST_SYS_posix_fadvise = SYS_posix_fadvise;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_posix_fadvise
 #define SYS_posix_fadvise	531
 #if defined(SYS_wait6) && !defined(HOST_SYS_wait6)
 static const typeof(SYS_wait6) HOST_SYS_wait6 = SYS_wait6;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_wait6
 #define SYS_wait6	532
 #if defined(SYS_cap_rights_limit) && !defined(HOST_SYS_cap_rights_limit)
 static const typeof(SYS_cap_rights_limit) HOST_SYS_cap_rights_limit = SYS_cap_rights_limit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cap_rights_limit
 #define SYS_cap_rights_limit	533
 #if defined(SYS_cap_ioctls_limit) && !defined(HOST_SYS_cap_ioctls_limit)
 static const typeof(SYS_cap_ioctls_limit) HOST_SYS_cap_ioctls_limit = SYS_cap_ioctls_limit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cap_ioctls_limit
 #define SYS_cap_ioctls_limit	534
 #if defined(SYS_cap_ioctls_get) && !defined(HOST_SYS_cap_ioctls_get)
 static const typeof(SYS_cap_ioctls_get) HOST_SYS_cap_ioctls_get = SYS_cap_ioctls_get;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cap_ioctls_get
 #define SYS_cap_ioctls_get	535
 #if defined(SYS_cap_fcntls_limit) && !defined(HOST_SYS_cap_fcntls_limit)
 static const typeof(SYS_cap_fcntls_limit) HOST_SYS_cap_fcntls_limit = SYS_cap_fcntls_limit;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cap_fcntls_limit
 #define SYS_cap_fcntls_limit	536
 #if defined(SYS_cap_fcntls_get) && !defined(HOST_SYS_cap_fcntls_get)
 static const typeof(SYS_cap_fcntls_get) HOST_SYS_cap_fcntls_get = SYS_cap_fcntls_get;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cap_fcntls_get
 #define SYS_cap_fcntls_get	537
 #if defined(SYS_bindat) && !defined(HOST_SYS_bindat)
 static const typeof(SYS_bindat) HOST_SYS_bindat = SYS_bindat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_bindat
 #define SYS_bindat	538
 #if defined(SYS_connectat) && !defined(HOST_SYS_connectat)
 static const typeof(SYS_connectat) HOST_SYS_connectat = SYS_connectat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_connectat
 #define SYS_connectat	539
 #if defined(SYS_chflagsat) && !defined(HOST_SYS_chflagsat)
 static const typeof(SYS_chflagsat) HOST_SYS_chflagsat = SYS_chflagsat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_chflagsat
 #define SYS_chflagsat	540
 #if defined(SYS_accept4) && !defined(HOST_SYS_accept4)
 static const typeof(SYS_accept4) HOST_SYS_accept4 = SYS_accept4;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_accept4
 #define SYS_accept4	541
 #if defined(SYS_pipe2) && !defined(HOST_SYS_pipe2)
 static const typeof(SYS_pipe2) HOST_SYS_pipe2 = SYS_pipe2;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_pipe2
 #define SYS_pipe2	542
 #if defined(SYS_aio_mlock) && !defined(HOST_SYS_aio_mlock)
 static const typeof(SYS_aio_mlock) HOST_SYS_aio_mlock = SYS_aio_mlock;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_mlock
 #define SYS_aio_mlock	543
 #if defined(SYS_procctl) && !defined(HOST_SYS_procctl)
 static const typeof(SYS_procctl) HOST_SYS_procctl = SYS_procctl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_procctl
 #define SYS_procctl	544
 #if defined(SYS_ppoll) && !defined(HOST_SYS_ppoll)
 static const typeof(SYS_ppoll) HOST_SYS_ppoll = SYS_ppoll;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_ppoll
 #define SYS_ppoll	545
 #if defined(SYS_futimens) && !defined(HOST_SYS_futimens)
 static const typeof(SYS_futimens) HOST_SYS_futimens = SYS_futimens;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_futimens
 #define SYS_futimens	546
 #if defined(SYS_utimensat) && !defined(HOST_SYS_utimensat)
 static const typeof(SYS_utimensat) HOST_SYS_utimensat = SYS_utimensat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_utimensat
 #define SYS_utimensat	547
 #if defined(SYS_fdatasync) && !defined(HOST_SYS_fdatasync)
 static const typeof(SYS_fdatasync) HOST_SYS_fdatasync = SYS_fdatasync;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fdatasync
 #define SYS_fdatasync	550
 #if defined(SYS_fstat) && !defined(HOST_SYS_fstat)
 static const typeof(SYS_fstat) HOST_SYS_fstat = SYS_fstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fstat
 #define SYS_fstat	551
 #if defined(SYS_fstatat) && !defined(HOST_SYS_fstatat)
 static const typeof(SYS_fstatat) HOST_SYS_fstatat = SYS_fstatat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fstatat
 #define SYS_fstatat	552
 #if defined(SYS_fhstat) && !defined(HOST_SYS_fhstat)
 static const typeof(SYS_fhstat) HOST_SYS_fhstat = SYS_fhstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fhstat
 #define SYS_fhstat	553
 #if defined(SYS_getdirentries) && !defined(HOST_SYS_getdirentries)
 static const typeof(SYS_getdirentries) HOST_SYS_getdirentries = SYS_getdirentries;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getdirentries
 #define SYS_getdirentries	554
 #if defined(SYS_statfs) && !defined(HOST_SYS_statfs)
 static const typeof(SYS_statfs) HOST_SYS_statfs = SYS_statfs;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_statfs
 #define SYS_statfs	555
 #if defined(SYS_fstatfs) && !defined(HOST_SYS_fstatfs)
 static const typeof(SYS_fstatfs) HOST_SYS_fstatfs = SYS_fstatfs;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fstatfs
 #define SYS_fstatfs	556
 #if defined(SYS_getfsstat) && !defined(HOST_SYS_getfsstat)
 static const typeof(SYS_getfsstat) HOST_SYS_getfsstat = SYS_getfsstat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getfsstat
 #define SYS_getfsstat	557
 #if defined(SYS_fhstatfs) && !defined(HOST_SYS_fhstatfs)
 static const typeof(SYS_fhstatfs) HOST_SYS_fhstatfs = SYS_fhstatfs;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fhstatfs
 #define SYS_fhstatfs	558
 #if defined(SYS_mknodat) && !defined(HOST_SYS_mknodat)
 static const typeof(SYS_mknodat) HOST_SYS_mknodat = SYS_mknodat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_mknodat
 #define SYS_mknodat	559
 #if defined(SYS_kevent) && !defined(HOST_SYS_kevent)
 static const typeof(SYS_kevent) HOST_SYS_kevent = SYS_kevent;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_kevent
 #define SYS_kevent	560
 #if defined(SYS_cpuset_getdomain) && !defined(HOST_SYS_cpuset_getdomain)
 static const typeof(SYS_cpuset_getdomain) HOST_SYS_cpuset_getdomain = SYS_cpuset_getdomain;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cpuset_getdomain
 #define SYS_cpuset_getdomain	561
 #if defined(SYS_cpuset_setdomain) && !defined(HOST_SYS_cpuset_setdomain)
 static const typeof(SYS_cpuset_setdomain) HOST_SYS_cpuset_setdomain = SYS_cpuset_setdomain;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_cpuset_setdomain
 #define SYS_cpuset_setdomain	562
 #if defined(SYS_getrandom) && !defined(HOST_SYS_getrandom)
 static const typeof(SYS_getrandom) HOST_SYS_getrandom = SYS_getrandom;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getrandom
 #define SYS_getrandom	563
 #if defined(SYS_getfhat) && !defined(HOST_SYS_getfhat)
 static const typeof(SYS_getfhat) HOST_SYS_getfhat = SYS_getfhat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_getfhat
 #define SYS_getfhat	564
 #if defined(SYS_fhlink) && !defined(HOST_SYS_fhlink)
 static const typeof(SYS_fhlink) HOST_SYS_fhlink = SYS_fhlink;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fhlink
 #define SYS_fhlink	565
 #if defined(SYS_fhlinkat) && !defined(HOST_SYS_fhlinkat)
 static const typeof(SYS_fhlinkat) HOST_SYS_fhlinkat = SYS_fhlinkat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fhlinkat
 #define SYS_fhlinkat	566
 #if defined(SYS_fhreadlink) && !defined(HOST_SYS_fhreadlink)
 static const typeof(SYS_fhreadlink) HOST_SYS_fhreadlink = SYS_fhreadlink;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fhreadlink
 #define SYS_fhreadlink	567
 #if defined(SYS_funlinkat) && !defined(HOST_SYS_funlinkat)
 static const typeof(SYS_funlinkat) HOST_SYS_funlinkat = SYS_funlinkat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_funlinkat
 #define SYS_funlinkat	568
 #if defined(SYS_copy_file_range) && !defined(HOST_SYS_copy_file_range)
 static const typeof(SYS_copy_file_range) HOST_SYS_copy_file_range = SYS_copy_file_range;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_copy_file_range
 #define SYS_copy_file_range	569
 #if defined(SYS___sysctlbyname) && !defined(HOST_SYS___sysctlbyname)
 static const typeof(SYS___sysctlbyname) HOST_SYS___sysctlbyname = SYS___sysctlbyname;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___sysctlbyname
 #define SYS___sysctlbyname	570
 #if defined(SYS_shm_open2) && !defined(HOST_SYS_shm_open2)
 static const typeof(SYS_shm_open2) HOST_SYS_shm_open2 = SYS_shm_open2;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shm_open2
 #define SYS_shm_open2	571
 #if defined(SYS_shm_rename) && !defined(HOST_SYS_shm_rename)
 static const typeof(SYS_shm_rename) HOST_SYS_shm_rename = SYS_shm_rename;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_shm_rename
 #define SYS_shm_rename	572
 #if defined(SYS_sigfastblock) && !defined(HOST_SYS_sigfastblock)
 static const typeof(SYS_sigfastblock) HOST_SYS_sigfastblock = SYS_sigfastblock;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sigfastblock
 #define SYS_sigfastblock	573
 #if defined(SYS___realpathat) && !defined(HOST_SYS___realpathat)
 static const typeof(SYS___realpathat) HOST_SYS___realpathat = SYS___realpathat;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___realpathat
 #define SYS___realpathat	574
 #if defined(SYS_close_range) && !defined(HOST_SYS_close_range)
 static const typeof(SYS_close_range) HOST_SYS_close_range = SYS_close_range;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_close_range
 #define SYS_close_range	575
 #if defined(SYS_rpctls_syscall) && !defined(HOST_SYS_rpctls_syscall)
 static const typeof(SYS_rpctls_syscall) HOST_SYS_rpctls_syscall = SYS_rpctls_syscall;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_rpctls_syscall
 #define SYS_rpctls_syscall	576
 #if defined(SYS___specialfd) && !defined(HOST_SYS___specialfd)
 static const typeof(SYS___specialfd) HOST_SYS___specialfd = SYS___specialfd;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS___specialfd
 #define SYS___specialfd	577
 #if defined(SYS_aio_writev) && !defined(HOST_SYS_aio_writev)
 static const typeof(SYS_aio_writev) HOST_SYS_aio_writev = SYS_aio_writev;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_writev
 #define SYS_aio_writev	578
 #if defined(SYS_aio_readv) && !defined(HOST_SYS_aio_readv)
 static const typeof(SYS_aio_readv) HOST_SYS_aio_readv = SYS_aio_readv;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_aio_readv
 #define SYS_aio_readv	579
 #if defined(SYS_fspacectl) && !defined(HOST_SYS_fspacectl)
 static const typeof(SYS_fspacectl) HOST_SYS_fspacectl = SYS_fspacectl;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_fspacectl
 #define SYS_fspacectl	580
 #if defined(SYS_sched_getcpu) && !defined(HOST_SYS_sched_getcpu)
 static const typeof(SYS_sched_getcpu) HOST_SYS_sched_getcpu = SYS_sched_getcpu;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_sched_getcpu
 #define SYS_sched_getcpu	581
 #if defined(SYS_swapoff) && !defined(HOST_SYS_swapoff)
 static const typeof(SYS_swapoff) HOST_SYS_swapoff = SYS_swapoff;
-#endif /* target found in: sys/syscall.h */
+#endif /* found in: sys/syscall.h */
 #undef SYS_swapoff
 #define SYS_swapoff	582
 #if defined(CTLTYPE) && !defined(HOST_CTLTYPE)
 static const typeof(CTLTYPE) HOST_CTLTYPE = CTLTYPE;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE
 #define CTLTYPE		0xf	/* mask for the type */
 #if defined(CTLTYPE_INT) && !defined(HOST_CTLTYPE_INT)
 static const typeof(CTLTYPE_INT) HOST_CTLTYPE_INT = CTLTYPE_INT;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_INT
 #define CTLTYPE_INT	2	/* name describes an integer */
 #if defined(CTLTYPE_UINT) && !defined(HOST_CTLTYPE_UINT)
 static const typeof(CTLTYPE_UINT) HOST_CTLTYPE_UINT = CTLTYPE_UINT;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_UINT
 #define CTLTYPE_UINT	6	/* name describes an unsigned integer */
 #if defined(CTLTYPE_LONG) && !defined(HOST_CTLTYPE_LONG)
 static const typeof(CTLTYPE_LONG) HOST_CTLTYPE_LONG = CTLTYPE_LONG;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_LONG
 #define CTLTYPE_LONG	7	/* name describes a long */
 #if defined(CTLTYPE_ULONG) && !defined(HOST_CTLTYPE_ULONG)
 static const typeof(CTLTYPE_ULONG) HOST_CTLTYPE_ULONG = CTLTYPE_ULONG;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_ULONG
 #define CTLTYPE_ULONG	8	/* name describes an unsigned long */
 #if defined(CTLTYPE_S8) && !defined(HOST_CTLTYPE_S8)
 static const typeof(CTLTYPE_S8) HOST_CTLTYPE_S8 = CTLTYPE_S8;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_S8
 #define CTLTYPE_S8	0xc	/* name describes a signed 8-bit number */
 #if defined(CTLTYPE_S16) && !defined(HOST_CTLTYPE_S16)
 static const typeof(CTLTYPE_S16) HOST_CTLTYPE_S16 = CTLTYPE_S16;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_S16
 #define CTLTYPE_S16	0xd	/* name describes a signed 16-bit number */
 #if defined(CTLTYPE_S32) && !defined(HOST_CTLTYPE_S32)
 static const typeof(CTLTYPE_S32) HOST_CTLTYPE_S32 = CTLTYPE_S32;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_S32
 #define CTLTYPE_S32	0xe	/* name describes a signed 32-bit number */
 #if defined(CTLTYPE_S64) && !defined(HOST_CTLTYPE_S64)
 static const typeof(CTLTYPE_S64) HOST_CTLTYPE_S64 = CTLTYPE_S64;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_S64
 #define CTLTYPE_S64	4	/* name describes a signed 64-bit number */
 #if defined(CTLTYPE_U8) && !defined(HOST_CTLTYPE_U8)
 static const typeof(CTLTYPE_U8) HOST_CTLTYPE_U8 = CTLTYPE_U8;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_U8
 #define CTLTYPE_U8	0xa	/* name describes an unsigned 8-bit number */
 #if defined(CTLTYPE_U16) && !defined(HOST_CTLTYPE_U16)
 static const typeof(CTLTYPE_U16) HOST_CTLTYPE_U16 = CTLTYPE_U16;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_U16
 #define CTLTYPE_U16	0xb	/* name describes an unsigned 16-bit number */
 #if defined(CTLTYPE_U32) && !defined(HOST_CTLTYPE_U32)
 static const typeof(CTLTYPE_U32) HOST_CTLTYPE_U32 = CTLTYPE_U32;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_U32
 #define CTLTYPE_U32	0xf	/* name describes an unsigned 32-bit number */
 #if defined(CTLTYPE_U64) && !defined(HOST_CTLTYPE_U64)
 static const typeof(CTLTYPE_U64) HOST_CTLTYPE_U64 = CTLTYPE_U64;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTLTYPE_U64
 #define CTLTYPE_U64	9	/* name describes an unsigned 64-bit number */
 #if defined(CTL_MAXNAME) && !defined(HOST_CTL_MAXNAME)
 static const typeof(CTL_MAXNAME) HOST_CTL_MAXNAME = CTL_MAXNAME;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_MAXNAME
 #define CTL_MAXNAME	24	/* largest number of components supported */
 #if defined(CTL_KERN) && !defined(HOST_CTL_KERN)
 static const typeof(CTL_KERN) HOST_CTL_KERN = CTL_KERN;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_KERN
 #define CTL_KERN	1		/* "high kernel": proc, limits */
 #if defined(CTL_NET) && !defined(HOST_CTL_NET)
 static const typeof(CTL_NET) HOST_CTL_NET = CTL_NET;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_NET
 #define CTL_NET		4		/* network, see socket.h */
 #if defined(CTL_HW) && !defined(HOST_CTL_HW)
 static const typeof(CTL_HW) HOST_CTL_HW = CTL_HW;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_HW
 #define CTL_HW		6		/* generic cpu/io */
 #if defined(CTL_VFS) && !defined(HOST_CTL_VFS)
 static const typeof(CTL_VFS) HOST_CTL_VFS = CTL_VFS;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_VFS
 #define CTL_VFS		3		/* filesystem, mount type is next */
 #if defined(HW_NCPU) && !defined(HOST_HW_NCPU)
 static const typeof(HW_NCPU) HOST_HW_NCPU = HW_NCPU;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef HW_NCPU
 #define HW_NCPU		 3		/* int: number of cpus */
 #if defined(HW_MACHINE) && !defined(HOST_HW_MACHINE)
 static const typeof(HW_MACHINE) HOST_HW_MACHINE = HW_MACHINE;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef HW_MACHINE
 #define HW_MACHINE	 1		/* string: machine class */
 #if defined(HW_MACHINE_ARCH) && !defined(HOST_HW_MACHINE_ARCH)
 static const typeof(HW_MACHINE_ARCH) HOST_HW_MACHINE_ARCH = HW_MACHINE_ARCH;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef HW_MACHINE_ARCH
 #define HW_MACHINE_ARCH	11		/* string: machine architecture */
 #if defined(KERN_PROC) && !defined(HOST_KERN_PROC)
 static const typeof(KERN_PROC) HOST_KERN_PROC = KERN_PROC;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC
 #define KERN_PROC		14	/* struct: process entries */
 #if defined(KERN_PROC_ALL) && !defined(HOST_KERN_PROC_ALL)
 static const typeof(KERN_PROC_ALL) HOST_KERN_PROC_ALL = KERN_PROC_ALL;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_ALL
 #define KERN_PROC_ALL		0	/* everything */
 #if defined(KERN_PROC_PROC) && !defined(HOST_KERN_PROC_PROC)
 static const typeof(KERN_PROC_PROC) HOST_KERN_PROC_PROC = KERN_PROC_PROC;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_PROC
 #define KERN_PROC_PROC		8	/* only return procs */
 #if defined(KERN_PROC_PID) && !defined(HOST_KERN_PROC_PID)
 static const typeof(KERN_PROC_PID) HOST_KERN_PROC_PID = KERN_PROC_PID;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_PID
 #define KERN_PROC_PID		1	/* by process id */
 #if defined(KERN_PROC_PGRP) && !defined(HOST_KERN_PROC_PGRP)
 static const typeof(KERN_PROC_PGRP) HOST_KERN_PROC_PGRP = KERN_PROC_PGRP;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_PGRP
 #define KERN_PROC_PGRP		2	/* by process group id */
 #if defined(KERN_PROC_INC_THREAD) && !defined(HOST_KERN_PROC_INC_THREAD)
 static const typeof(KERN_PROC_INC_THREAD) HOST_KERN_PROC_INC_THREAD = KERN_PROC_INC_THREAD;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_INC_THREAD
 #define KERN_PROC_INC_THREAD	0x10	/* */
 #if defined(KERN_PROC_PATHNAME) && !defined(HOST_KERN_PROC_PATHNAME)
 static const typeof(KERN_PROC_PATHNAME) HOST_KERN_PROC_PATHNAME = KERN_PROC_PATHNAME;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_PATHNAME
 #define KERN_PROC_PATHNAME	12	/* path to executable */
 #if defined(KERN_PROC_ARGS) && !defined(HOST_KERN_PROC_ARGS)
 static const typeof(KERN_PROC_ARGS) HOST_KERN_PROC_ARGS = KERN_PROC_ARGS;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_ARGS
 #define KERN_PROC_ARGS		7	/* get/set arguments/proctitle */
 #if defined(KERN_PROC_SESSION) && !defined(HOST_KERN_PROC_SESSION)
 static const typeof(KERN_PROC_SESSION) HOST_KERN_PROC_SESSION = KERN_PROC_SESSION;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_SESSION
 #define KERN_PROC_SESSION	3	/* by session of pid */
 #if defined(KERN_PROC_TTY) && !defined(HOST_KERN_PROC_TTY)
 static const typeof(KERN_PROC_TTY) HOST_KERN_PROC_TTY = KERN_PROC_TTY;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_TTY
 #define KERN_PROC_TTY		4	/* by controlling tty */
 #if defined(KERN_PROC_RUID) && !defined(HOST_KERN_PROC_RUID)
 static const typeof(KERN_PROC_RUID) HOST_KERN_PROC_RUID = KERN_PROC_RUID;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_RUID
 #define KERN_PROC_RUID		6	/* by real uid */
 #if defined(KERN_PROC_FILEDESC) && !defined(HOST_KERN_PROC_FILEDESC)
 static const typeof(KERN_PROC_FILEDESC) HOST_KERN_PROC_FILEDESC = KERN_PROC_FILEDESC;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_FILEDESC
 #define KERN_PROC_FILEDESC	33	/* File descriptors for process */
 #if defined(KERN_PROC_UID) && !defined(HOST_KERN_PROC_UID)
 static const typeof(KERN_PROC_UID) HOST_KERN_PROC_UID = KERN_PROC_UID;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_UID
 #define KERN_PROC_UID		5	/* by effective uid */
 #if defined(KERN_PROC_VMMAP) && !defined(HOST_KERN_PROC_VMMAP)
 static const typeof(KERN_PROC_VMMAP) HOST_KERN_PROC_VMMAP = KERN_PROC_VMMAP;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PROC_VMMAP
 #define KERN_PROC_VMMAP		32	/* VM map entries for process */
 #if defined(KERN_USRSTACK) && !defined(HOST_KERN_USRSTACK)
 static const typeof(KERN_USRSTACK) HOST_KERN_USRSTACK = KERN_USRSTACK;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_USRSTACK
 #define KERN_USRSTACK		33	/* int: address of USRSTACK */
 #if defined(KERN_PS_STRINGS) && !defined(HOST_KERN_PS_STRINGS)
 static const typeof(KERN_PS_STRINGS) HOST_KERN_PS_STRINGS = KERN_PS_STRINGS;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_PS_STRINGS
 #define KERN_PS_STRINGS		32	/* int: address of PS_STRINGS */
 #if defined(CTL_SYSCTL) && !defined(HOST_CTL_SYSCTL)
 static const typeof(CTL_SYSCTL) HOST_CTL_SYSCTL = CTL_SYSCTL;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_SYSCTL
 #define CTL_SYSCTL	0		/* "magic" numbers */
 #if defined(CTL_SYSCTL_NEXT) && !defined(HOST_CTL_SYSCTL_NEXT)
 static const typeof(CTL_SYSCTL_NEXT) HOST_CTL_SYSCTL_NEXT = CTL_SYSCTL_NEXT;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_SYSCTL_NEXT
 #define CTL_SYSCTL_NEXT		2	/* next OID, honoring CTLFLAG_SKIP */
 #if defined(CTL_SYSCTL_NAME2OID) && !defined(HOST_CTL_SYSCTL_NAME2OID)
 static const typeof(CTL_SYSCTL_NAME2OID) HOST_CTL_SYSCTL_NAME2OID = CTL_SYSCTL_NAME2OID;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_SYSCTL_NAME2OID
 #define CTL_SYSCTL_NAME2OID	3	/* int array of name */
 #if defined(CTL_SYSCTL_OIDFMT) && !defined(HOST_CTL_SYSCTL_OIDFMT)
 static const typeof(CTL_SYSCTL_OIDFMT) HOST_CTL_SYSCTL_OIDFMT = CTL_SYSCTL_OIDFMT;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_SYSCTL_OIDFMT
 #define CTL_SYSCTL_OIDFMT	4	/* OID's kind and format */
 #if defined(CTL_SYSCTL_OIDDESCR) && !defined(HOST_CTL_SYSCTL_OIDDESCR)
 static const typeof(CTL_SYSCTL_OIDDESCR) HOST_CTL_SYSCTL_OIDDESCR = CTL_SYSCTL_OIDDESCR;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_SYSCTL_OIDDESCR
 #define CTL_SYSCTL_OIDDESCR	5	/* OID's description */
 #if defined(CTL_SYSCTL_OIDLABEL) && !defined(HOST_CTL_SYSCTL_OIDLABEL)
 static const typeof(CTL_SYSCTL_OIDLABEL) HOST_CTL_SYSCTL_OIDLABEL = CTL_SYSCTL_OIDLABEL;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_SYSCTL_OIDLABEL
 #define CTL_SYSCTL_OIDLABEL	6	/* aggregation label */
 #if defined(CTL_SYSCTL_NEXTNOSKIP) && !defined(HOST_CTL_SYSCTL_NEXTNOSKIP)
 static const typeof(CTL_SYSCTL_NEXTNOSKIP) HOST_CTL_SYSCTL_NEXTNOSKIP = CTL_SYSCTL_NEXTNOSKIP;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef CTL_SYSCTL_NEXTNOSKIP
 #define CTL_SYSCTL_NEXTNOSKIP	7	/* next OID, ignoring CTLFLAG_SKIP */
 #if defined(KERN_OSRELDATE) && !defined(HOST_KERN_OSRELDATE)
 static const typeof(KERN_OSRELDATE) HOST_KERN_OSRELDATE = KERN_OSRELDATE;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_OSRELDATE
 #define KERN_OSRELDATE		24	/* int: kernel release date */
 #if defined(KERN_ARND) && !defined(HOST_KERN_ARND)
 static const typeof(KERN_ARND) HOST_KERN_ARND = KERN_ARND;
-#endif /* target found in: sys/sysctl.h */
+#endif /* found in: sys/sysctl.h */
 #undef KERN_ARND
 #define KERN_ARND		37	/* int: from arc4rand() */
 #if defined(TIOCSETD) && !defined(HOST_TIOCSETD)
 static const typeof(TIOCSETD) HOST_TIOCSETD = TIOCSETD;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSETD
 #define TIOCSETD	_IOW('t', 27, int)	/* set line discipline */
 #if defined(TIOCGETD) && !defined(HOST_TIOCGETD)
 static const typeof(TIOCGETD) HOST_TIOCGETD = TIOCGETD;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCGETD
 #define TIOCGETD	_IOR('t', 26, int)	/* get line discipline */
 #if defined(TIOCSBRK) && !defined(HOST_TIOCSBRK)
 static const typeof(TIOCSBRK) HOST_TIOCSBRK = TIOCSBRK;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSBRK
 #define TIOCSBRK	 _IO('t', 123)		/* set break bit */
 #if defined(TIOCCBRK) && !defined(HOST_TIOCCBRK)
 static const typeof(TIOCCBRK) HOST_TIOCCBRK = TIOCCBRK;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCCBRK
 #define TIOCCBRK	 _IO('t', 122)		/* clear break bit */
 #if defined(TIOCSDTR) && !defined(HOST_TIOCSDTR)
 static const typeof(TIOCSDTR) HOST_TIOCSDTR = TIOCSDTR;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSDTR
 #define TIOCSDTR	 _IO('t', 121)		/* set data terminal ready */
 #if defined(TIOCCDTR) && !defined(HOST_TIOCCDTR)
 static const typeof(TIOCCDTR) HOST_TIOCCDTR = TIOCCDTR;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCCDTR
 #define TIOCCDTR	 _IO('t', 120)		/* clear data terminal ready */
 #if defined(TIOCGPGRP) && !defined(HOST_TIOCGPGRP)
 static const typeof(TIOCGPGRP) HOST_TIOCGPGRP = TIOCGPGRP;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCGPGRP
 #define TIOCGPGRP	_IOR('t', 119, int)	/* get pgrp of tty */
 #if defined(TIOCSPGRP) && !defined(HOST_TIOCSPGRP)
 static const typeof(TIOCSPGRP) HOST_TIOCSPGRP = TIOCSPGRP;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSPGRP
 #define TIOCSPGRP	_IOW('t', 118, int)	/* set pgrp of tty */
 #if defined(TIOCGETA) && !defined(HOST_TIOCGETA)
 static const typeof(TIOCGETA) HOST_TIOCGETA = TIOCGETA;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCGETA
 #define TIOCGETA	_IOR('t', 19, struct termios) /* get termios struct */
 #if defined(TIOCSETA) && !defined(HOST_TIOCSETA)
 static const typeof(TIOCSETA) HOST_TIOCSETA = TIOCSETA;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSETA
 #define TIOCSETA	_IOW('t', 20, struct termios) /* set termios struct */
 #if defined(TIOCSETAW) && !defined(HOST_TIOCSETAW)
 static const typeof(TIOCSETAW) HOST_TIOCSETAW = TIOCSETAW;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSETAW
 #define TIOCSETAW	_IOW('t', 21, struct termios) /* drain output, set */
 #if defined(TIOCSETAF) && !defined(HOST_TIOCSETAF)
 static const typeof(TIOCSETAF) HOST_TIOCSETAF = TIOCSETAF;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSETAF
 #define TIOCSETAF	_IOW('t', 22, struct termios) /* drn out, fls in, set */
 #if defined(TIOCPTMASTER) && !defined(HOST_TIOCPTMASTER)
 static const typeof(TIOCPTMASTER) HOST_TIOCPTMASTER = TIOCPTMASTER;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCPTMASTER
 #define TIOCPTMASTER	 _IO('t', 28)		/* pts master validation */
 #if defined(TIOCOUTQ) && !defined(HOST_TIOCOUTQ)
 static const typeof(TIOCOUTQ) HOST_TIOCOUTQ = TIOCOUTQ;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCOUTQ
 #define TIOCOUTQ	_IOR('t', 115, int)	/* output queue size */
 #if defined(TIOCSTI) && !defined(HOST_TIOCSTI)
 static const typeof(TIOCSTI) HOST_TIOCSTI = TIOCSTI;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSTI
 #define TIOCSTI		_IOW('t', 114, char)	/* simulate terminal input */
 #if defined(TIOCNOTTY) && !defined(HOST_TIOCNOTTY)
 static const typeof(TIOCNOTTY) HOST_TIOCNOTTY = TIOCNOTTY;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCNOTTY
 #define TIOCNOTTY	 _IO('t', 113)		/* void tty association */
 #if defined(TIOCSTOP) && !defined(HOST_TIOCSTOP)
 static const typeof(TIOCSTOP) HOST_TIOCSTOP = TIOCSTOP;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSTOP
 #define TIOCSTOP	 _IO('t', 111)		/* stop output, like ^S */
 #if defined(TIOCSTART) && !defined(HOST_TIOCSTART)
 static const typeof(TIOCSTART) HOST_TIOCSTART = TIOCSTART;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSTART
 #define TIOCSTART	 _IO('t', 110)		/* start output, like ^Q */
 #if defined(TIOCPKT) && !defined(HOST_TIOCPKT)
 static const typeof(TIOCPKT) HOST_TIOCPKT = TIOCPKT;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCPKT
 #define TIOCPKT		_IOW('t', 112, int)	/* pty: set/clear packet mode */
 #if defined(TIOCSCTTY) && !defined(HOST_TIOCSCTTY)
 static const typeof(TIOCSCTTY) HOST_TIOCSCTTY = TIOCSCTTY;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSCTTY
 #define TIOCSCTTY	 _IO('t', 97)		/* become controlling tty */
 #if defined(TIOCDRAIN) && !defined(HOST_TIOCDRAIN)
 static const typeof(TIOCDRAIN) HOST_TIOCDRAIN = TIOCDRAIN;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCDRAIN
 #define TIOCDRAIN	 _IO('t', 94)		/* wait till output drained */
 #if defined(TIOCEXCL) && !defined(HOST_TIOCEXCL)
 static const typeof(TIOCEXCL) HOST_TIOCEXCL = TIOCEXCL;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCEXCL
 #define TIOCEXCL	 _IO('t', 13)		/* set exclusive use of tty */
 #if defined(TIOCNXCL) && !defined(HOST_TIOCNXCL)
 static const typeof(TIOCNXCL) HOST_TIOCNXCL = TIOCNXCL;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCNXCL
 #define TIOCNXCL	 _IO('t', 14)		/* reset exclusive use of tty */
 #if defined(TIOCGWINSZ) && !defined(HOST_TIOCGWINSZ)
 static const typeof(TIOCGWINSZ) HOST_TIOCGWINSZ = TIOCGWINSZ;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCGWINSZ
 #define TIOCGWINSZ	_IOR('t', 104, struct winsize)	/* get window size */
 #if defined(TIOCSWINSZ) && !defined(HOST_TIOCSWINSZ)
 static const typeof(TIOCSWINSZ) HOST_TIOCSWINSZ = TIOCSWINSZ;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCSWINSZ
 #define TIOCSWINSZ	_IOW('t', 103, struct winsize)	/* set window size */
 #if defined(TIOCCONS) && !defined(HOST_TIOCCONS)
 static const typeof(TIOCCONS) HOST_TIOCCONS = TIOCCONS;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCCONS
 #define TIOCCONS	_IOW('t', 98, int)	/* become virtual console */
 #if defined(TIOCMSET) && !defined(HOST_TIOCMSET)
 static const typeof(TIOCMSET) HOST_TIOCMSET = TIOCMSET;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCMSET
 #define TIOCMSET	_IOW('t', 109, int)	/* set all modem bits */
 #if defined(TIOCMGET) && !defined(HOST_TIOCMGET)
 static const typeof(TIOCMGET) HOST_TIOCMGET = TIOCMGET;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCMGET
 #define TIOCMGET	_IOR('t', 106, int)	/* get all modem bits */
 #if defined(TIOCMBIS) && !defined(HOST_TIOCMBIS)
 static const typeof(TIOCMBIS) HOST_TIOCMBIS = TIOCMBIS;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCMBIS
 #define TIOCMBIS	_IOW('t', 108, int)	/* bis modem bits */
 #if defined(TIOCMBIC) && !defined(HOST_TIOCMBIC)
 static const typeof(TIOCMBIC) HOST_TIOCMBIC = TIOCMBIC;
-#endif /* target found in: sys/ttycom.h */
+#endif /* found in: sys/ttycom.h */
 #undef TIOCMBIC
 #define TIOCMBIC	_IOW('t', 107, int)	/* bic modem bits */
 #if defined(UMTX_OP_SHM) && !defined(HOST_UMTX_OP_SHM)
 static const typeof(UMTX_OP_SHM) HOST_UMTX_OP_SHM = UMTX_OP_SHM;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_SHM
 #define UMTX_OP_SHM		25
 #if defined(UMTX_OP_WAIT_UINT) && !defined(HOST_UMTX_OP_WAIT_UINT)
 static const typeof(UMTX_OP_WAIT_UINT) HOST_UMTX_OP_WAIT_UINT = UMTX_OP_WAIT_UINT;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_WAIT_UINT
 #define UMTX_OP_WAIT_UINT	11
 #if defined(UMTX_OP_WAIT_UINT_PRIVATE) && !defined(HOST_UMTX_OP_WAIT_UINT_PRIVATE)
 static const typeof(UMTX_OP_WAIT_UINT_PRIVATE) HOST_UMTX_OP_WAIT_UINT_PRIVATE = UMTX_OP_WAIT_UINT_PRIVATE;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_WAIT_UINT_PRIVATE
 #define UMTX_OP_WAIT_UINT_PRIVATE	15
 #if defined(UMTX_OP_WAIT) && !defined(HOST_UMTX_OP_WAIT)
 static const typeof(UMTX_OP_WAIT) HOST_UMTX_OP_WAIT = UMTX_OP_WAIT;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_WAIT
 #define UMTX_OP_WAIT		2
 #if defined(UMTX_OP_WAKE) && !defined(HOST_UMTX_OP_WAKE)
 static const typeof(UMTX_OP_WAKE) HOST_UMTX_OP_WAKE = UMTX_OP_WAKE;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_WAKE
 #define UMTX_OP_WAKE		3
 #if defined(UMTX_OP_MUTEX_TRYLOCK) && !defined(HOST_UMTX_OP_MUTEX_TRYLOCK)
 static const typeof(UMTX_OP_MUTEX_TRYLOCK) HOST_UMTX_OP_MUTEX_TRYLOCK = UMTX_OP_MUTEX_TRYLOCK;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_MUTEX_TRYLOCK
 #define UMTX_OP_MUTEX_TRYLOCK	4
 #if defined(UMTX_OP_MUTEX_LOCK) && !defined(HOST_UMTX_OP_MUTEX_LOCK)
 static const typeof(UMTX_OP_MUTEX_LOCK) HOST_UMTX_OP_MUTEX_LOCK = UMTX_OP_MUTEX_LOCK;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_MUTEX_LOCK
 #define UMTX_OP_MUTEX_LOCK	5
 #if defined(UMTX_OP_MUTEX_UNLOCK) && !defined(HOST_UMTX_OP_MUTEX_UNLOCK)
 static const typeof(UMTX_OP_MUTEX_UNLOCK) HOST_UMTX_OP_MUTEX_UNLOCK = UMTX_OP_MUTEX_UNLOCK;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_MUTEX_UNLOCK
 #define UMTX_OP_MUTEX_UNLOCK	6
 #if defined(UMTX_OP_CV_WAIT) && !defined(HOST_UMTX_OP_CV_WAIT)
 static const typeof(UMTX_OP_CV_WAIT) HOST_UMTX_OP_CV_WAIT = UMTX_OP_CV_WAIT;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_CV_WAIT
 #define UMTX_OP_CV_WAIT		8
 #if defined(UMTX_OP_CV_SIGNAL) && !defined(HOST_UMTX_OP_CV_SIGNAL)
 static const typeof(UMTX_OP_CV_SIGNAL) HOST_UMTX_OP_CV_SIGNAL = UMTX_OP_CV_SIGNAL;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_CV_SIGNAL
 #define UMTX_OP_CV_SIGNAL	9
 #if defined(UMTX_OP_CV_BROADCAST) && !defined(HOST_UMTX_OP_CV_BROADCAST)
 static const typeof(UMTX_OP_CV_BROADCAST) HOST_UMTX_OP_CV_BROADCAST = UMTX_OP_CV_BROADCAST;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_CV_BROADCAST
 #define UMTX_OP_CV_BROADCAST	10
 #if defined(UMTX_OP_RW_RDLOCK) && !defined(HOST_UMTX_OP_RW_RDLOCK)
 static const typeof(UMTX_OP_RW_RDLOCK) HOST_UMTX_OP_RW_RDLOCK = UMTX_OP_RW_RDLOCK;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_RW_RDLOCK
 #define UMTX_OP_RW_RDLOCK	12
 #if defined(UMTX_OP_RW_WRLOCK) && !defined(HOST_UMTX_OP_RW_WRLOCK)
 static const typeof(UMTX_OP_RW_WRLOCK) HOST_UMTX_OP_RW_WRLOCK = UMTX_OP_RW_WRLOCK;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_RW_WRLOCK
 #define UMTX_OP_RW_WRLOCK	13
 #if defined(UMTX_OP_RW_UNLOCK) && !defined(HOST_UMTX_OP_RW_UNLOCK)
 static const typeof(UMTX_OP_RW_UNLOCK) HOST_UMTX_OP_RW_UNLOCK = UMTX_OP_RW_UNLOCK;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_RW_UNLOCK
 #define UMTX_OP_RW_UNLOCK	14
 #if defined(UMTX_OP_WAKE_PRIVATE) && !defined(HOST_UMTX_OP_WAKE_PRIVATE)
 static const typeof(UMTX_OP_WAKE_PRIVATE) HOST_UMTX_OP_WAKE_PRIVATE = UMTX_OP_WAKE_PRIVATE;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_WAKE_PRIVATE
 #define UMTX_OP_WAKE_PRIVATE	16
 #if defined(UMTX_OP_SEM2_WAIT) && !defined(HOST_UMTX_OP_SEM2_WAIT)
 static const typeof(UMTX_OP_SEM2_WAIT) HOST_UMTX_OP_SEM2_WAIT = UMTX_OP_SEM2_WAIT;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_SEM2_WAIT
 #define UMTX_OP_SEM2_WAIT	23
 #if defined(UMTX_OP_SEM2_WAKE) && !defined(HOST_UMTX_OP_SEM2_WAKE)
 static const typeof(UMTX_OP_SEM2_WAKE) HOST_UMTX_OP_SEM2_WAKE = UMTX_OP_SEM2_WAKE;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_SEM2_WAKE
 #define UMTX_OP_SEM2_WAKE	24
 #if defined(UMTX_OP_ROBUST_LISTS) && !defined(HOST_UMTX_OP_ROBUST_LISTS)
 static const typeof(UMTX_OP_ROBUST_LISTS) HOST_UMTX_OP_ROBUST_LISTS = UMTX_OP_ROBUST_LISTS;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_ROBUST_LISTS
 #define UMTX_OP_ROBUST_LISTS	26
 #if defined(UMTX_OP_MUTEX_WAIT) && !defined(HOST_UMTX_OP_MUTEX_WAIT)
 static const typeof(UMTX_OP_MUTEX_WAIT) HOST_UMTX_OP_MUTEX_WAIT = UMTX_OP_MUTEX_WAIT;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_MUTEX_WAIT
 #define UMTX_OP_MUTEX_WAIT	17
 #if defined(UMTX_OP_MUTEX_WAKE) && !defined(HOST_UMTX_OP_MUTEX_WAKE)
 static const typeof(UMTX_OP_MUTEX_WAKE) HOST_UMTX_OP_MUTEX_WAKE = UMTX_OP_MUTEX_WAKE;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_MUTEX_WAKE
 #define UMTX_OP_MUTEX_WAKE	18	/* deprecated */
 #if defined(UMTX_OP_SEM_WAIT) && !defined(HOST_UMTX_OP_SEM_WAIT)
 static const typeof(UMTX_OP_SEM_WAIT) HOST_UMTX_OP_SEM_WAIT = UMTX_OP_SEM_WAIT;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_SEM_WAIT
 #define UMTX_OP_SEM_WAIT	19	/* deprecated */
 #if defined(UMTX_OP_SEM_WAKE) && !defined(HOST_UMTX_OP_SEM_WAKE)
 static const typeof(UMTX_OP_SEM_WAKE) HOST_UMTX_OP_SEM_WAKE = UMTX_OP_SEM_WAKE;
-#endif /* target found in: sys/umtx.h */
+#endif /* found in: sys/umtx.h */
 #undef UMTX_OP_SEM_WAKE
 #define UMTX_OP_SEM_WAKE	20	/* deprecated */
 #if defined(WNOHANG) && !defined(HOST_WNOHANG)
 static const typeof(WNOHANG) HOST_WNOHANG = WNOHANG;
-#endif /* target found in: sys/wait.h */
+#endif /* found in: sys/wait.h */
 #undef WNOHANG
 #define WNOHANG		1	/* Don't hang in wait. */
 #if defined(WUNTRACED) && !defined(HOST_WUNTRACED)
 static const typeof(WUNTRACED) HOST_WUNTRACED = WUNTRACED;
-#endif /* target found in: sys/wait.h */
+#endif /* found in: sys/wait.h */
 #undef WUNTRACED
 #define WUNTRACED	2	/* Tell about stopped, untraced children. */
 #if defined(WCONTINUED) && !defined(HOST_WCONTINUED)
 static const typeof(WCONTINUED) HOST_WCONTINUED = WCONTINUED;
-#endif /* target found in: sys/wait.h */
+#endif /* found in: sys/wait.h */
 #undef WCONTINUED
 #define WCONTINUED	4	/* Report a job control continued process. */
 #if defined(WNOWAIT) && !defined(HOST_WNOWAIT)
 static const typeof(WNOWAIT) HOST_WNOWAIT = WNOWAIT;
-#endif /* target found in: sys/wait.h */
+#endif /* found in: sys/wait.h */
 #undef WNOWAIT
 #define WNOWAIT		8	/* Poll only. Don't delete the proc entry. */
 #if defined(WEXITED) && !defined(HOST_WEXITED)
 static const typeof(WEXITED) HOST_WEXITED = WEXITED;
-#endif /* target found in: sys/wait.h */
+#endif /* found in: sys/wait.h */
 #undef WEXITED
 #define WEXITED		16	/* Wait for exited processes. */
 #if defined(WTRAPPED) && !defined(HOST_WTRAPPED)
 static const typeof(WTRAPPED) HOST_WTRAPPED = WTRAPPED;
-#endif /* target found in: sys/wait.h */
+#endif /* found in: sys/wait.h */
 #undef WTRAPPED
 #define WTRAPPED	32	/* Wait for a process to hit a trap or */
 
@@ -3781,17 +4196,17 @@ struct lagg_reqall;
 /* Defines: */
 #if defined(ETHER_ADDR_LEN) && !defined(HOST_ETHER_ADDR_LEN)
 static const typeof(ETHER_ADDR_LEN) HOST_ETHER_ADDR_LEN = ETHER_ADDR_LEN;
-#endif /* target found in: net/ethernet.h */
+#endif /* found in: net/ethernet.h */
 #undef ETHER_ADDR_LEN
 #define ETHER_ADDR_LEN		6	/* length of an Ethernet address */
 #if defined(IFSTATMAX) && !defined(HOST_IFSTATMAX)
 static const typeof(IFSTATMAX) HOST_IFSTATMAX = IFSTATMAX;
-#endif /* target found in: net/if.h */
+#endif /* found in: net/if.h */
 #undef IFSTATMAX
 #define IFSTATMAX	800		/* 10 lines of text */
 #if defined(IF_NAMESIZE) && !defined(HOST_IF_NAMESIZE)
 static const typeof(IF_NAMESIZE) HOST_IF_NAMESIZE = IF_NAMESIZE;
-#endif /* target found in: net/if.h */
+#endif /* found in: net/if.h */
 #undef IF_NAMESIZE
 #define IF_NAMESIZE	16
 #undef IFNAMSIZ /* found in: net/if.h */
@@ -3907,42 +4322,42 @@ struct lagg_reqall {
 /* Defines: */
 #if defined(IP_RECVOPTS) && !defined(HOST_IP_RECVOPTS)
 static const typeof(IP_RECVOPTS) HOST_IP_RECVOPTS = IP_RECVOPTS;
-#endif /* target found in: netinet/in.h */
+#endif /* found in: netinet/in.h */
 #undef IP_RECVOPTS
 #define IP_RECVOPTS		5    /* bool; receive all IP opts w/dgram */
 #if defined(IP_RECVDSTADDR) && !defined(HOST_IP_RECVDSTADDR)
 static const typeof(IP_RECVDSTADDR) HOST_IP_RECVDSTADDR = IP_RECVDSTADDR;
-#endif /* target found in: netinet/in.h */
+#endif /* found in: netinet/in.h */
 #undef IP_RECVDSTADDR
 #define IP_RECVDSTADDR		7    /* bool; receive IP dst addr w/dgram */
 #if defined(IP_RECVRETOPTS) && !defined(HOST_IP_RECVRETOPTS)
 static const typeof(IP_RECVRETOPTS) HOST_IP_RECVRETOPTS = IP_RECVRETOPTS;
-#endif /* target found in: netinet/in.h */
+#endif /* found in: netinet/in.h */
 #undef IP_RECVRETOPTS
 #define IP_RECVRETOPTS		6    /* bool; receive IP opts for response */
 #if defined(IP_PORTRANGE) && !defined(HOST_IP_PORTRANGE)
 static const typeof(IP_PORTRANGE) HOST_IP_PORTRANGE = IP_PORTRANGE;
-#endif /* target found in: netinet/in.h */
+#endif /* found in: netinet/in.h */
 #undef IP_PORTRANGE
 #define IP_PORTRANGE		19   /* int; range to choose for unspec port */
 #if defined(IP_RECVIF) && !defined(HOST_IP_RECVIF)
 static const typeof(IP_RECVIF) HOST_IP_RECVIF = IP_RECVIF;
-#endif /* target found in: netinet/in.h */
+#endif /* found in: netinet/in.h */
 #undef IP_RECVIF
 #define IP_RECVIF		20   /* bool; receive reception if w/dgram */
 #if defined(IP_RETOPTS) && !defined(HOST_IP_RETOPTS)
 static const typeof(IP_RETOPTS) HOST_IP_RETOPTS = IP_RETOPTS;
-#endif /* target found in: netinet/in.h */
+#endif /* found in: netinet/in.h */
 #undef IP_RETOPTS
 #define IP_RETOPTS		8    /* ip_opts; set/get IP options */
 #if defined(IP_BINDANY) && !defined(HOST_IP_BINDANY)
 static const typeof(IP_BINDANY) HOST_IP_BINDANY = IP_BINDANY;
-#endif /* target found in: netinet/in.h */
+#endif /* found in: netinet/in.h */
 #undef IP_BINDANY
 #define IP_BINDANY		24   /* bool: allow bind to any address */
 #if defined(IP_ONESBCAST) && !defined(HOST_IP_ONESBCAST)
 static const typeof(IP_ONESBCAST) HOST_IP_ONESBCAST = IP_ONESBCAST;
-#endif /* target found in: netinet/in.h */
+#endif /* found in: netinet/in.h */
 #undef IP_ONESBCAST
 #define IP_ONESBCAST		23   /* bool: send all-ones broadcast */
 #undef SIOCGVH /* found in: netinet/ip_carp.h */
@@ -3960,67 +4375,67 @@ struct in6_ndifreq;
 /* Defines: */
 #if defined(IPV6_MULTICAST_HOPS) && !defined(HOST_IPV6_MULTICAST_HOPS)
 static const typeof(IPV6_MULTICAST_HOPS) HOST_IPV6_MULTICAST_HOPS = IPV6_MULTICAST_HOPS;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_MULTICAST_HOPS
 #define IPV6_MULTICAST_HOPS	10 /* int; set/get IP6 multicast hops */
 #if defined(IPV6_IPSEC_POLICY) && !defined(HOST_IPV6_IPSEC_POLICY)
 static const typeof(IPV6_IPSEC_POLICY) HOST_IPV6_IPSEC_POLICY = IPV6_IPSEC_POLICY;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_IPSEC_POLICY
 #define IPV6_IPSEC_POLICY	28 /* struct; get/set security policy */
 #if defined(IPV6_PORTRANGE) && !defined(HOST_IPV6_PORTRANGE)
 static const typeof(IPV6_PORTRANGE) HOST_IPV6_PORTRANGE = IPV6_PORTRANGE;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_PORTRANGE
 #define IPV6_PORTRANGE		14 /* int; range to choose for unspec port */
 #if defined(IPV6_USE_MIN_MTU) && !defined(HOST_IPV6_USE_MIN_MTU)
 static const typeof(IPV6_USE_MIN_MTU) HOST_IPV6_USE_MIN_MTU = IPV6_USE_MIN_MTU;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_USE_MIN_MTU
 #define IPV6_USE_MIN_MTU	42 /* bool; send packets at the minimum MTU */
 #if defined(IPV6_PREFER_TEMPADDR) && !defined(HOST_IPV6_PREFER_TEMPADDR)
 static const typeof(IPV6_PREFER_TEMPADDR) HOST_IPV6_PREFER_TEMPADDR = IPV6_PREFER_TEMPADDR;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_PREFER_TEMPADDR
 #define IPV6_PREFER_TEMPADDR	63 /* int; prefer temporary addresses as */
 #if defined(IPV6_BINDANY) && !defined(HOST_IPV6_BINDANY)
 static const typeof(IPV6_BINDANY) HOST_IPV6_BINDANY = IPV6_BINDANY;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_BINDANY
 #define IPV6_BINDANY		64 /* bool: allow bind to any address */
 #if defined(ICMP6_FILTER) && !defined(HOST_ICMP6_FILTER)
 static const typeof(ICMP6_FILTER) HOST_ICMP6_FILTER = ICMP6_FILTER;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef ICMP6_FILTER
 #define ICMP6_FILTER		18 /* icmp6_filter; icmp6 filter */
 #if defined(IPV6_FW_ADD) && !defined(HOST_IPV6_FW_ADD)
 static const typeof(IPV6_FW_ADD) HOST_IPV6_FW_ADD = IPV6_FW_ADD;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_FW_ADD
 #define IPV6_FW_ADD		30 /* add a firewall rule to chain */
 #if defined(IPV6_FW_DEL) && !defined(HOST_IPV6_FW_DEL)
 static const typeof(IPV6_FW_DEL) HOST_IPV6_FW_DEL = IPV6_FW_DEL;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_FW_DEL
 #define IPV6_FW_DEL		31 /* delete a firewall rule from chain */
 #if defined(IPV6_FW_FLUSH) && !defined(HOST_IPV6_FW_FLUSH)
 static const typeof(IPV6_FW_FLUSH) HOST_IPV6_FW_FLUSH = IPV6_FW_FLUSH;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_FW_FLUSH
 #define IPV6_FW_FLUSH		32 /* flush firewall rule chain */
 #if defined(IPV6_FW_ZERO) && !defined(HOST_IPV6_FW_ZERO)
 static const typeof(IPV6_FW_ZERO) HOST_IPV6_FW_ZERO = IPV6_FW_ZERO;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_FW_ZERO
 #define IPV6_FW_ZERO		33 /* clear single/all firewall counter(s) */
 #if defined(IPV6_FW_GET) && !defined(HOST_IPV6_FW_GET)
 static const typeof(IPV6_FW_GET) HOST_IPV6_FW_GET = IPV6_FW_GET;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_FW_GET
 #define IPV6_FW_GET		34 /* get entire firewall rule chain */
 #if defined(IPV6_MSFILTER) && !defined(HOST_IPV6_MSFILTER)
 static const typeof(IPV6_MSFILTER) HOST_IPV6_MSFILTER = IPV6_MSFILTER;
-#endif /* target found in: netinet6/in6.h */
+#endif /* found in: netinet6/in6.h */
 #undef IPV6_MSFILTER
 #define IPV6_MSFILTER		74 /* struct __msfilterreq; */
 #undef SIOCGIFAFLAG_IN6 /* found in: netinet6/in6_var.h */

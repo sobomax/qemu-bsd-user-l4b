@@ -23,7 +23,9 @@
 #include <sys/syscall.h>
 #include <sys/resource.h>
 
+#if !defined(__linux__)
 #include "errno_defs.h"
+#endif
 
 #include "os-syscall.h"
 
