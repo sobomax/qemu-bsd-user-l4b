@@ -1237,6 +1237,7 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
 #endif
     CPUState *cpu = env_cpu(env);
     TaskState *ts = (TaskState *)cpu->opaque;
+    const char *ret_str;
 
     holdlen = oldlen = *holdlenp;
     oidfmt(snamep, namelen, NULL, &kind);
@@ -1257,6 +1258,30 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
     case CTL_KERN:
         switch (snamep[1]) {
 #if defined(__linux__)
+	case KERN_OSTYPE:
+	    do {
+	        static const char ostype[] = "FreeBSD";
+		holdlen = sizeof(ostype);
+		ret_str = ostype;
+	    } while (0);
+	    goto out_str;
+
+	case KERN_OSRELEASE:
+	    do {
+	        static const char osrelease[] = "14.1-RELEASE";
+		holdlen = sizeof(osrelease);
+		ret_str = osrelease;
+	    } while (0);
+	    goto out_str;
+
+	case KERN_VERSION:
+	    do {
+		static const char kversion[] = "FreeBSD 14.1-RELEASE gitidxxx GENERIC";
+		holdlen = sizeof(kversion);
+		ret_str = kversion;
+	    } while (0);
+	    goto out_str;
+
         case KERN_ARND:
             if (oldlen) {
 		(*(abi_ulong *)holdp) = tswapal(0x42434445);
@@ -1644,6 +1669,16 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
 out:
     *holdlenp = holdlen;
     return ret;
+out_str:
+    if (oldlen) {
+        if (oldlen < holdlen) {
+            ret = -TARGET_EINVAL;
+            goto out;
+        }
+        strlcpy(holdp, ret_str, holdlen);
+    }
+    ret = 0;
+    goto out;
 }
 
 /*
