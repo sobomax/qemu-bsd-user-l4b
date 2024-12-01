@@ -1145,6 +1145,11 @@ static const typeof(FIOGETOWN) HOST_FIOGETOWN = FIOGETOWN;
 #endif /* found in: sys/filio.h */
 #undef FIOGETOWN
 #define FIOGETOWN	_IOR('f', 123, int)	/* get owner */
+#if defined(FREEBSD_ABI_VENDOR) && !defined(HOST_FREEBSD_ABI_VENDOR)
+static const typeof(FREEBSD_ABI_VENDOR) HOST_FREEBSD_ABI_VENDOR = FREEBSD_ABI_VENDOR;
+#endif /* found in: sys/imgact_elf.h */
+#undef FREEBSD_ABI_VENDOR
+#define FREEBSD_ABI_VENDOR	"FreeBSD"
 #if defined(IOCPARM_SHIFT) && !defined(HOST_IOCPARM_SHIFT)
 static const typeof(IOCPARM_SHIFT) HOST_IOCPARM_SHIFT = IOCPARM_SHIFT;
 #endif /* found in: sys/ioccom.h */
