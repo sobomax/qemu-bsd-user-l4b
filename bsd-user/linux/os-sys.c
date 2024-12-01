@@ -78,6 +78,35 @@ static const int host_ctl_size[CTLTYPE + 1] = {
 	[CTLTYPE_U64] = sizeof(uint64_t),
 };
 
+#define _STR(x) #x
+#define _2STR(x) _STR(x)
+#define FreeBSD_version_str _2STR(__FreeBSD_version)
+
+static char osrelease_str[16] = FreeBSD_version_str;
+static char kversion_str[64] = (FREEBSD_ABI_VENDOR " " FreeBSD_version_str);
+
+#define QEMU_REL_SUF "-QEMU-L4B"
+#define QEMU_REL_POS 4
+
+static_assert(sizeof(QEMU_REL_SUF) < sizeof(osrelease_str) - QEMU_REL_POS,
+             "osrelease_str is too small");
+
+static void
+patch_osrelease(char *osp, off_t at, size_t olen) {
+    assert (olen >= (QEMU_REL_POS + sizeof(QEMU_REL_SUF) + at));
+    osp += at;
+    assert(osp[2] == '0' && osp[QEMU_REL_POS] == '0');
+    osp[2] = '.';
+    memcpy(osp + QEMU_REL_POS, QEMU_REL_SUF, sizeof(QEMU_REL_SUF));
+}
+
+void
+init_bsd_sysctl(void)
+{
+    patch_osrelease(osrelease_str, 0, sizeof(osrelease_str));
+    patch_osrelease(kversion_str, sizeof(FREEBSD_ABI_VENDOR), sizeof(kversion_str));
+}
+
 #ifdef TARGET_ABI32
 /*
  * Limit the amount of available memory to be most of the 32-bit address
@@ -1258,37 +1287,28 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
     case CTL_KERN:
         switch (snamep[1]) {
 #if defined(__linux__)
-	case KERN_OSTYPE:
-	    do {
-	        static const char ostype[] = "FreeBSD";
-		holdlen = sizeof(ostype);
-		ret_str = ostype;
-	    } while (0);
+        case KERN_OSTYPE:
+            holdlen = sizeof(FREEBSD_ABI_VENDOR);
+            ret_str = FREEBSD_ABI_VENDOR;
 	    goto out_str;
 
 	case KERN_OSRELEASE:
-	    do {
-	        static const char osrelease[] = "14.1-RELEASE";
-		holdlen = sizeof(osrelease);
-		ret_str = osrelease;
-	    } while (0);
-	    goto out_str;
+            holdlen = strlen(osrelease_str) + 1;
+            ret_str = osrelease_str;
+            goto out_str;
 
-	case KERN_VERSION:
-	    do {
-		static const char kversion[] = "FreeBSD 14.1-RELEASE gitidxxx GENERIC";
-		holdlen = sizeof(kversion);
-		ret_str = kversion;
-	    } while (0);
-	    goto out_str;
+        case KERN_VERSION:
+            holdlen = strlen(kversion_str) + 1;
+            ret_str = kversion_str;
+            goto out_str;
 
         case KERN_ARND:
             if (oldlen) {
-		(*(abi_ulong *)holdp) = tswapal(0x42434445);
-	    }
-	    holdlen = sizeof(abi_ulong);
-	    ret = 0;
-	    goto out;
+                (*(abi_ulong *)holdp) = tswapal(0x42434445);
+            }
+            holdlen = sizeof(abi_ulong);
+            ret = 0;
+            goto out;
 #endif
 
         case KERN_USRSTACK:

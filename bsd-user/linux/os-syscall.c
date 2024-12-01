@@ -1827,4 +1827,5 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
 void syscall_init(void)
 {
     init_bsd_ioctl();
+    init_bsd_sysctl();
 }
