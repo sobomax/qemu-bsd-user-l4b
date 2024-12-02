@@ -560,12 +560,14 @@ load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr, int fd,
             elf_prot |= PROT_EXEC;
         }
 
+        int flags = MAP_FIXED | MAP_PRIVATE | MAP_DENYWRITE;
+        if (rbase == 0) {
+            flags |= MAP_EXCL;
+        }
         error = target_mmap(TARGET_ELF_PAGESTART(rbase + elf_ppnt->p_vaddr),
                             (elf_ppnt->p_filesz +
                              TARGET_ELF_PAGEOFFSET(elf_ppnt->p_vaddr)),
-                            elf_prot,
-                            (MAP_FIXED | MAP_PRIVATE | MAP_DENYWRITE),
-                            fd,
+                            elf_prot, flags, fd,
                             (elf_ppnt->p_offset -
                              TARGET_ELF_PAGEOFFSET(elf_ppnt->p_vaddr)));
         if (error == -1) {
