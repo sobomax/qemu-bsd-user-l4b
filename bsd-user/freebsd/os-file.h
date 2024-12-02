@@ -23,7 +23,7 @@
 #if defined(__FreeBSD_version) && __FreeBSD_version >= 1300133
 #include <sys/specialfd.h>
 
-int __sys___specialfd(int, const void *, size_t);
+#define fast___specialfd(a1, a2, a3) syscall(SYS___specialfd, (a1), (a2), (a3))
 #endif
 
 /*
@@ -134,7 +134,7 @@ static inline abi_long do_freebsd___specialfd(int type, abi_ulong req,
 
         evfd.initval = tswap32(target_eventfd->initval);
         evfd.flags = tswap32(target_eventfd->flags);
-        ret = get_errno(__sys___specialfd(type, &evfd, sizeof(evfd)));
+        ret = get_errno(fast___specialfd(type, &evfd, sizeof(evfd)));
         unlock_user_struct(target_eventfd, req, 0);
         break;
     }

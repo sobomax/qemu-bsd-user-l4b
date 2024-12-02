@@ -635,8 +635,9 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
 }
 
 #if defined(__FreeBSD_version) && __FreeBSD_version >= 1300080
-extern int __realpathat(int fd, const char *path, char *buf, size_t size,
-        int flags);
+#define fast___realpathat(a1, a2, a3, a4, a5) \
+          syscall(SYS___realpathat, (a1), (a2), (a3), (a4), (a5))
+
 /* https://svnweb.freebsd.org/base?view=revision&revision=358172 */
 /* no man page */
 static inline abi_long do_freebsd_realpathat(abi_long arg1, abi_long arg2,
@@ -652,7 +653,7 @@ static inline abi_long do_freebsd_realpathat(abi_long arg1, abi_long arg2,
         return -TARGET_EFAULT;
     }
 
-    ret = get_errno(__realpathat(arg1, p, b, arg4, arg5));
+    ret = get_errno(fast___realpathat(arg1, p, b, arg4, arg5));
     UNLOCK_PATH(p, arg2);
     unlock_user(b, arg3, ret);
 
