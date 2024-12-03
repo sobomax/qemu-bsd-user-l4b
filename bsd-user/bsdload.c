@@ -143,12 +143,13 @@ static bool is_there(const char *candidate)
     return false;
 }
 
-int loader_exec(const char *filename, char **argv, char **envp,
+struct load_res loader_exec(const char *filename, char **argv, char **envp,
                 struct target_pt_regs *regs, struct image_info *infop,
                 struct bsd_binprm *bprm)
 {
     char *path = NULL, fullpath[PATH_MAX];
-    int retval, i;
+    int i;
+    struct load_res retval = {0};
 
     bprm->p = TARGET_PAGE_SIZE * MAX_ARG_PAGES;
     bprm->page = g_malloc0(MAX_ARG_PAGES * sizeof(void *));
@@ -157,37 +158,38 @@ int loader_exec(const char *filename, char **argv, char **envp,
         path = realpath(filename, fullpath);
         if (path == NULL) {
             /* Failed to resolve. */
-            retval = -1;
+            retval.error = -1;
             goto errout;
         }
         if (!is_there(path)) {
-            retval = -1;
+            retval.error = -1;
             goto errout;
         }
     } else {
         path = g_find_program_in_path(filename);
         if (path == NULL) {
-            retval = -1;
+            retval.error = -1;
             goto errout;
         }
     }
 
-    retval = open(path, O_RDONLY);
-    if (retval < 0) {
+    int fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        retval.error = -1;
         goto errout;
     }
 
     bprm->fullpath = path;
-    bprm->fd = retval;
+    bprm->fd = fd;
     bprm->filename = (char *)filename;
     bprm->argc = count(argv);
     bprm->argv = argv;
     bprm->envc = count(envp);
     bprm->envp = envp;
 
-    retval = prepare_binprm(bprm);
+    retval.error = (prepare_binprm(bprm) >= 0) ? 0 : -1;
 
-    if (retval >= 0) {
+    if (retval.error == 0) {
         if (bprm->buf[0] == 0x7f
                 && bprm->buf[1] == 'E'
                 && bprm->buf[2] == 'L'
@@ -195,18 +197,17 @@ int loader_exec(const char *filename, char **argv, char **envp,
             retval = load_elf_binary(bprm, regs, infop);
         } else {
             fprintf(stderr, "Unknown binary format\n");
-            retval = -1;
+            retval.error = -1;
             goto errout;
         }
     }
 
-    if (retval >= 0) {
+    if (retval.error == 0) {
         /* success.  Initialize important registers */
         do_init_thread(regs, infop);
         return retval;
     }
 errout:
-    g_free(path);
     /* Something went wrong, return the inode and free the argument pages*/
     for (i = 0 ; i < MAX_ARG_PAGES ; i++) {
         g_free(bprm->page[i]);

@@ -288,6 +288,23 @@ adjust_ssize(void)
     setrlimit(RLIMIT_STACK, &rl);
 }
 
+static uintptr_t
+find_unmapped_area(uintptr_t start, uintptr_t size) {
+    uintptr_t incr = (uintptr_t)1 << ((sizeof(size) * 8) - __builtin_clzl(size));
+    for (uintptr_t s = start + incr; s < start + (incr * 16); s += incr) {
+         abi_long p = target_mmap((abi_ulong)s, size, PROT_NONE,
+                        MAP_ANON | MAP_PRIVATE | MAP_FIXED | MAP_EXCL, -1, 0);
+         if (p == (abi_long)MAP_FAILED) {
+             if (errno == TARGET_ENOMEM)
+                 continue;
+             return 0;
+         }
+         assert(target_munmap((abi_ulong)s, size) == 0);
+         return s;
+    }
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     const char *filename;
@@ -607,11 +624,24 @@ int main(int argc, char **argv)
         }
     }
 
-    if (loader_exec(filename, argv + optind, target_environ, regs, info,
-                    &bprm) != 0) {
+    do {
+        struct load_res lres;
+        lres = loader_exec(filename, argv + optind, target_environ, regs, info,
+                           &bprm);
+        if (lres.error == 0)
+            break;
+        if (lres.error == L_ERR_MMAP && !have_guest_base) {
+            uintptr_t unres = find_unmapped_area(lres.failed.addr,
+                                                 lres.failed.size);
+            if (unres != 0) {
+                guest_base = unres - lres.failed.addr;
+                have_guest_base = true;
+                continue;
+            }
+        }
         printf("Error loading %s\n", filename);
         _exit(1);
-    }
+    } while(1);
 
     for (wrk = target_environ; *wrk; wrk++) {
         g_free(*wrk);

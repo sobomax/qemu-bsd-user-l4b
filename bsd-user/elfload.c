@@ -35,7 +35,7 @@ abi_ulong target_stksiz;
 abi_ulong target_stkbas;
 
 static int elf_core_dump(int signr, CPUArchState *env);
-static int load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr,
+static struct load_res load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr,
     int fd, abi_ulong rbase, abi_ulong *baddrp);
 
 static inline void memcpy_fromfs(void *to, const void *from, unsigned long n)
@@ -203,6 +203,8 @@ static void setup_arg_pages(struct bsd_binprm *bprm, struct image_info *info,
 
     target_stksiz = size;
     target_stkbas = addr + qemu_host_page_size;
+    bprm->stack.base = addr;
+    bprm->stack.size = size + qemu_host_page_size;
 
     if (setup_initial_stack(bprm, stackp, stringp) != 0) {
         perror("stk setup");
@@ -268,35 +270,34 @@ static void padzero(abi_ulong elf_bss, abi_ulong last_bss)
     }
 }
 
-static abi_ulong load_elf_interp(struct elfhdr *interp_elf_ex,
+static struct load_res load_elf_interp(struct elfhdr *interp_elf_ex,
                                  int interpreter_fd,
                                  abi_ulong *interp_load_addr)
 {
     struct elf_phdr *elf_phdata  =  NULL;
     abi_ulong rbase;
     int retval;
-    abi_ulong baddr, error;
-
-    error = 0;
+    abi_ulong baddr;
+    struct load_res res;
 
     bswap_ehdr(interp_elf_ex);
     /* First of all, some simple consistency checks */
     if ((interp_elf_ex->e_type != ET_EXEC && interp_elf_ex->e_type != ET_DYN) ||
           !elf_check_arch(interp_elf_ex->e_machine)) {
-        return ~((abi_ulong)0UL);
+        return LOAD_ERR_FATL;
     }
 
 
     /* Now read in all of the header information */
     if (sizeof(struct elf_phdr) * interp_elf_ex->e_phnum > TARGET_PAGE_SIZE) {
-        return ~(abi_ulong)0UL;
+        return LOAD_ERR_FATL;
     }
 
     elf_phdata =  (struct elf_phdr *) malloc(sizeof(struct elf_phdr) *
             interp_elf_ex->e_phnum);
 
     if (!elf_phdata) {
-        return ~((abi_ulong)0UL);
+        return LOAD_ERR_FATL;
     }
 
     /*
@@ -305,7 +306,7 @@ static abi_ulong load_elf_interp(struct elfhdr *interp_elf_ex,
      */
     if (interp_elf_ex->e_phentsize != sizeof(struct elf_phdr)) {
         free(elf_phdata);
-        return ~((abi_ulong)0UL);
+        return LOAD_ERR_FATL;
     }
 
     retval = lseek(interpreter_fd, interp_elf_ex->e_phoff, SEEK_SET);
@@ -317,7 +318,7 @@ static abi_ulong load_elf_interp(struct elfhdr *interp_elf_ex,
         perror("load_elf_interp");
         exit(-1);
         free(elf_phdata);
-        return retval;
+        return LOAD_ERR(retval);
     }
     bswap_phdr(elf_phdata, interp_elf_ex->e_phnum);
 
@@ -335,11 +336,14 @@ static abi_ulong load_elf_interp(struct elfhdr *interp_elf_ex,
         }
     }
 
-    error = load_elf_sections(interp_elf_ex, elf_phdata, interpreter_fd, rbase,
+    res = load_elf_sections(interp_elf_ex, elf_phdata, interpreter_fd, rbase,
         &baddr);
-    if (error != 0) {
-        perror("load_elf_sections");
-        exit(-1);
+    if (res.error != 0) {
+        if (interp_elf_ex->e_type == ET_DYN || res.error != L_ERR_MMAP) {
+            perror("load_elf_sections");
+            exit(-1);
+        }
+        return res;
     }
 
     /* Now use mmap to map the library into memory. */
@@ -347,7 +351,7 @@ static abi_ulong load_elf_interp(struct elfhdr *interp_elf_ex,
     free(elf_phdata);
 
     *interp_load_addr = baddr;
-    return ((abi_ulong) interp_elf_ex->e_entry) + rbase;
+    return LOAD_RES(((abi_ulong) interp_elf_ex->e_entry) + rbase);
 }
 
 static int symfind(const void *s0, const void *s1)
@@ -525,7 +529,7 @@ int is_target_elf_binary(int fd)
     }
 }
 
-static int
+static struct load_res
 load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr, int fd,
     abi_ulong rbase, abi_ulong *baddrp)
 {
@@ -564,16 +568,17 @@ load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr, int fd,
         if (rbase == 0) {
             flags |= MAP_EXCL;
         }
-        error = target_mmap(TARGET_ELF_PAGESTART(rbase + elf_ppnt->p_vaddr),
-                            (elf_ppnt->p_filesz +
-                             TARGET_ELF_PAGEOFFSET(elf_ppnt->p_vaddr)),
+        abi_ulong taddr = TARGET_ELF_PAGESTART(rbase + elf_ppnt->p_vaddr);
+        abi_ulong tsize = elf_ppnt->p_filesz +
+                          TARGET_ELF_PAGEOFFSET(elf_ppnt->p_vaddr);
+        error = target_mmap(taddr, tsize,
                             elf_prot, flags, fd,
                             (elf_ppnt->p_offset -
                              TARGET_ELF_PAGEOFFSET(elf_ppnt->p_vaddr)));
         if (error == -1) {
-            perror("mmap");
-            exit(-1);
-        } else if (elf_ppnt->p_memsz != elf_ppnt->p_filesz) {
+            return LOAD_ERR_MMAP(taddr, tsize);
+        }
+        if (elf_ppnt->p_memsz != elf_ppnt->p_filesz) {
             abi_ulong start_bss, end_bss;
 
             start_bss = rbase + elf_ppnt->p_vaddr + elf_ppnt->p_filesz;
@@ -596,11 +601,11 @@ load_elf_sections(const struct elfhdr *hdr, struct elf_phdr *phdr, int fd,
     if (baddrp != NULL) {
         *baddrp = baddr;
     }
-    return 0;
+    return LOAD_RES(0);
 }
 
-int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
-                    struct image_info *info)
+struct load_res load_elf_binary(struct bsd_binprm *bprm,
+                    struct target_pt_regs *regs, struct image_info *info)
 {
     struct elfhdr elf_ex;
     struct elfhdr interp_elf_ex;
@@ -610,7 +615,7 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
     struct elf_phdr *elf_ppnt;
     struct elf_phdr *elf_phdata;
     abi_ulong elf_brk;
-    int error, retval;
+    int retval;
     char *elf_interpreter;
     abi_ulong baddr, elf_entry, et_dyn_addr, interp_load_addr = 0;
     abi_ulong reloc_func_desc = 0;
@@ -622,20 +627,20 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
     /* First of all, some simple consistency checks */
     if ((elf_ex.e_type != ET_EXEC && elf_ex.e_type != ET_DYN) ||
         (!elf_check_arch(elf_ex.e_machine))) {
-            return -ENOEXEC;
+            return LOAD_ERR(-ENOEXEC);
     }
 
     bprm->p = copy_elf_strings(1, &bprm->filename, bprm->page, bprm->p);
     bprm->p = copy_elf_strings(bprm->envc, bprm->envp, bprm->page, bprm->p);
     bprm->p = copy_elf_strings(bprm->argc, bprm->argv, bprm->page, bprm->p);
     if (!bprm->p) {
-        retval = -E2BIG;
+        return LOAD_ERR(-E2BIG);
     }
 
     /* Now read in all of the header information */
     elf_phdata = (struct elf_phdr *)malloc(elf_ex.e_phentsize * elf_ex.e_phnum);
     if (elf_phdata == NULL) {
-        return -ENOMEM;
+        return LOAD_ERR(-ENOMEM);
     }
 
     retval = lseek(bprm->fd, elf_ex.e_phoff, SEEK_SET);
@@ -647,8 +652,6 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
     if (retval < 0) {
         perror("load_elf_binary");
         exit(-1);
-        free(elf_phdata);
-        return -errno;
     }
 
     bswap_phdr(elf_phdata, elf_ex.e_phnum);
@@ -664,14 +667,14 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
                 free(elf_phdata);
                 free(elf_interpreter);
                 close(bprm->fd);
-                return -EINVAL;
+                return LOAD_ERR(-EINVAL);
             }
 
             elf_interpreter = (char *)malloc(elf_ppnt->p_filesz);
             if (elf_interpreter == NULL) {
                 free(elf_phdata);
                 close(bprm->fd);
-                return -ENOMEM;
+                return LOAD_ERR(-ENOMEM);
             }
 
             retval = lseek(bprm->fd, elf_ppnt->p_offset, SEEK_SET);
@@ -709,7 +712,7 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
                 free(elf_phdata);
                 free(elf_interpreter);
                 close(bprm->fd);
-                return retval;
+                return LOAD_ERR(retval);
             }
         }
         elf_ppnt++;
@@ -722,7 +725,7 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
             free(elf_interpreter);
             free(elf_phdata);
             close(bprm->fd);
-            return -ELIBBAD;
+            return LOAD_ERR(-ELIBBAD);
         }
     }
 
@@ -734,7 +737,7 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
         free(elf_interpreter);
         free(elf_phdata);
         close(bprm->fd);
-        return -E2BIG;
+        return LOAD_ERR(-E2BIG);
     }
 
     /* OK, This is the point of no return */
@@ -767,7 +770,8 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
 
     info->elf_flags = elf_ex.e_flags;
 
-    error = load_elf_sections(&elf_ex, elf_phdata, bprm->fd, et_dyn_addr,
+    struct load_res res;
+    res = load_elf_sections(&elf_ex, elf_phdata, bprm->fd, et_dyn_addr,
         &load_addr);
     for (i = 0, elf_ppnt = elf_phdata; i < elf_ex.e_phnum; i++, elf_ppnt++) {
         if (elf_ppnt->p_type != PT_LOAD) {
@@ -777,25 +781,29 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
             elf_brk = MAX(elf_brk, et_dyn_addr + elf_ppnt->p_vaddr +
                 elf_ppnt->p_memsz);
     }
-    if (error != 0) {
-        perror("load_elf_sections");
-        exit(-1);
+    if (res.error != 0) {
+        if (res.error != L_ERR_MMAP) {
+            perror("load_elf_sections");
+            exit(-1);
+        }
+        assert(target_munmap(bprm->stack.base, bprm->stack.size) == 0);
+        return res;
     }
 
     if (elf_interpreter) {
-        elf_entry = load_elf_interp(&interp_elf_ex, interpreter_fd,
+        res = load_elf_interp(&interp_elf_ex, interpreter_fd,
                                     &interp_load_addr);
         reloc_func_desc = interp_load_addr;
 
         close(interpreter_fd);
         free(elf_interpreter);
 
-        if (elf_entry == ~((abi_ulong)0UL)) {
+        if (res.error != 0) {
             printf("Unable to load interpreter\n");
             free(elf_phdata);
             exit(-1);
-            return 0;
         }
+        elf_entry = res.start_addr;
     } else {
         interp_load_addr = et_dyn_addr;
         elf_entry += interp_load_addr;
@@ -825,7 +833,7 @@ int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
     bprm->core_dump = NULL;
 #endif
 
-    return 0;
+    return LOAD_RES(0);
 }
 
 void do_init_thread(struct target_pt_regs *regs, struct image_info *infop)

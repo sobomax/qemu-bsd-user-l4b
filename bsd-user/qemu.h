@@ -175,16 +175,39 @@ struct bsd_binprm {
         char *filename;         /* (Given) Name of binary */
         char *fullpath;         /* Full path of binary */
         int (*core_dump)(int, CPUArchState *);
+        struct {
+            abi_ulong base;
+            abi_ulong size;
+        } stack;
 };
 
 void do_init_thread(struct target_pt_regs *regs, struct image_info *infop);
 abi_ulong loader_build_argptr(int envc, int argc, abi_ulong sp,
                               abi_ulong stringp);
-int loader_exec(const char *filename, char **argv, char **envp,
+struct load_res {
+    int error;
+    union {
+        abi_ulong start_addr;
+        struct {
+            abi_ulong addr;
+            abi_ulong size;
+        } failed;
+    };
+};
+
+#define L_ERR_FATL (INT_MIN)
+#define L_ERR_MMAP (L_ERR_FATL + 1)
+
+#define LOAD_RES(x) ((struct load_res){.start_addr = (x)})
+#define LOAD_ERR(x) ((struct load_res){.error = (x)})
+#define LOAD_ERR_MMAP(x, s) ((struct load_res){.error = L_ERR_MMAP, \
+    .failed = {.addr = (x), .size = (s)}})
+#define LOAD_ERR_FATL LOAD_ERR(L_ERR_FATL)
+
+struct load_res loader_exec(const char *filename, char **argv, char **envp,
              struct target_pt_regs *regs, struct image_info *infop,
              struct bsd_binprm *bprm);
-
-int load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
+struct load_res load_elf_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
                     struct image_info *info);
 int load_flt_binary(struct bsd_binprm *bprm, struct target_pt_regs *regs,
                     struct image_info *info);
