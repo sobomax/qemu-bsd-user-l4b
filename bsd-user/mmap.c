@@ -831,7 +831,11 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int target_prot,
     return start;
 fail:
     mmap_unlock();
-    return -1;
+    if (flags & MAP_EXCL) {
+        if (errno == EEXIST)
+            errno = ENOMEM;
+    }
+    return get_errno(-1);
 }
 
 void mmap_reserve(abi_ulong start, abi_ulong size)

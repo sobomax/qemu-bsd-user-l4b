@@ -134,17 +134,14 @@ static inline abi_long do_freebsd_thr_suspend(abi_ulong target_ts)
 #endif
 }
 
-static inline abi_long do_freebsd_thr_wake(long tid)
+static inline abi_long do_freebsd_thr_wake(abi_long tid)
 {
-#if !defined(__linux__)
+    qemu_log("do_freebsd_thr_wake(%ld): stub\n", tid);
 
-    return get_errno(thr_wake(tid));
-#else
-    abort();
-#endif
+    return get_errno(sched_yield());
 }
 
-static inline abi_long do_freebsd_thr_set_name(long tid, abi_ulong target_name)
+static inline abi_long do_freebsd_thr_set_name(abi_long tid, abi_ulong target_name)
 {
 #if !defined(__linux__)
     abi_long ret;
@@ -170,21 +167,26 @@ typedef abi_long lwpid_t;
 static inline abi_long do_freebsd_rtprio_thread(int function, lwpid_t lwpid,
         abi_ulong target_addr)
 {
-#if !defined(__linux__)
     int ret;
-    struct rtprio rtp;
+    struct sched_param rtp;
+    int policy;
 
-    ret = t2h_freebsd_rtprio(&rtp, target_addr);
-    if (!is_error(ret)) {
-        ret = get_errno(rtprio_thread(function, lwpid, &rtp));
+    if (function == TARGET_RTP_LOOKUP) {
+	policy = sched_getscheduler(lwpid);
+	if (policy < 0)
+            return policy;
+	ret = sched_getparam(lwpid, &rtp);
+	if (ret < 0)
+            return ret;
+        return h2t_freebsd_rtprio(policy, &rtp, target_addr);
     }
-    if (!is_error(ret)) {
-        ret = h2t_freebsd_rtprio(target_addr, &rtp);
-    }
+    if (function != TARGET_RTP_SET)
+        return -TARGET_EINVAL;
+    policy = t2h_freebsd_rtprio(&rtp, target_addr);
+    if (policy < 0)
+	return -TARGET_EINVAL;
+    ret = get_errno(sched_setscheduler(lwpid, policy, &rtp));
     return ret;
-#else
-    abort();
-#endif
 }
 
 static inline abi_long do_freebsd_getcontext(void *cpu_env, abi_ulong arg1)

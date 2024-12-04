@@ -16,6 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "qemu/osdep.h"
  
 #include "qemu.h"
@@ -27,6 +28,7 @@
 #include "exec/exec-all.h"
 #include "exec/tb-flush.h"
 
+#include <linux/futex.h>
 #include "os-thread.h"
 
 // #define DEBUG_UMTX(...)   fprintf(stderr, __VA_ARGS__)
@@ -37,6 +39,10 @@
 #define DEADLOCK_TO	1200
 
 #define NEW_STACK_SIZE  0x40000
+
+static safe_syscall6(long, futex, uint32_t *, uaddr, int, futex_op, uint32_t, val,
+		 const struct timespec *, timeout, /* or: uint32_t val2 */
+		 uint32_t *, uaddr2, uint32_t, val3);
 
 /* sys/_umtx.h */
 struct target_umtx {
@@ -750,38 +756,89 @@ abi_long freebsd_umtx_sem_wake(abi_ulong obj)
 #endif /* _UMTX_OPTIMIZED */
 }
 
-abi_long t2h_freebsd_rtprio(struct rtprio *host_rtp, abi_ulong target_addr)
+int t2h_freebsd_rtprio(struct sched_param *host_rtp, abi_ulong target_addr)
 {
-#if !defined(__linux__)
     struct target_freebsd_rtprio *target_rtp;
+    int policy;
+    int type, prio;
 
     if (!lock_user_struct(VERIFY_READ, target_rtp, target_addr, 1)) {
         return -TARGET_EFAULT;
     }
-    __get_user(host_rtp->type, &target_rtp->type);
-    __get_user(host_rtp->prio, &target_rtp->prio);
+    __get_user(type, &target_rtp->type);
+    __get_user(prio, &target_rtp->prio);
     unlock_user_struct(target_rtp, target_addr, 0);
-    return 0;
-#else
-    abort();
-#endif
+    switch (type) {
+    case TARGET_RTP_PRIO_NORMAL:
+        policy = SCHED_OTHER;
+	break;
+    case TARGET_RTP_PRIO_REALTIME:
+	policy = SCHED_RR;
+	break;
+    case TARGET_RTP_PRIO_IDLE:
+	policy = SCHED_IDLE;
+	break;
+    case TARGET_RTP_PRIO_FIFO:
+	policy = SCHED_FIFO;
+	break;
+    default:
+	return -TARGET_EINVAL;
+    }
+    if (policy == SCHED_RR || policy == SCHED_FIFO) {
+	if (prio < TARGET_RTP_PRIO_MIN || prio > TARGET_RTP_PRIO_MAX)
+            return -TARGET_EINVAL;
+	int hpmin = sched_get_priority_min(policy);
+	int hpmax = sched_get_priority_max(policy);
+	if (hpmin < 0 || hpmax < 0)
+            return -TARGET_EINVAL;
+        int hpscale = hpmax - hpmin;
+	int tscale = TARGET_RTP_PRIO_MAX - TARGET_RTP_PRIO_MIN;
+	host_rtp->sched_priority = (TARGET_RTP_PRIO_MAX - prio) * hpscale / tscale;
+    } else {
+        host_rtp->sched_priority = sched_get_priority_min(policy);
+    }
+    return policy;
 }
 
-abi_long h2t_freebsd_rtprio(abi_ulong target_addr, struct rtprio *host_rtp)
+abi_long h2t_freebsd_rtprio(int host_policy, const struct sched_param *host_rtp, abi_ulong target_addr)
 {
-#if !defined(__linux__)
     struct target_freebsd_rtprio *target_rtp;
+    abi_long target_type, target_prio;
 
+    int hpmin = sched_get_priority_min(host_policy);
+    int hpmax = sched_get_priority_max(host_policy);
+    if (hpmin < 0 || hpmax < 0)
+        return -TARGET_EINVAL;
     if (!lock_user_struct(VERIFY_WRITE, target_rtp, target_addr, 0)) {
         return -TARGET_EFAULT;
     }
-    __put_user(host_rtp->type, &target_rtp->type);
-    __put_user(host_rtp->prio, &target_rtp->prio);
+    switch (host_policy) {
+    case SCHED_OTHER:
+        target_type = TARGET_RTP_PRIO_NORMAL;
+	break;
+    case SCHED_RR:
+	target_type = TARGET_RTP_PRIO_REALTIME;
+	break;
+    case SCHED_IDLE:
+	target_type = TARGET_RTP_PRIO_IDLE;
+	break;
+    case SCHED_FIFO:
+	target_type = TARGET_RTP_PRIO_FIFO;
+	break;
+    default:
+	abort();
+    }
+    if (host_policy == SCHED_RR || host_policy == SCHED_FIFO) {
+	int hpscale = hpmax - hpmin;
+	int tscale = TARGET_RTP_PRIO_MAX - TARGET_RTP_PRIO_MIN;
+        target_prio = (hpmax - host_rtp->sched_priority) * tscale / hpscale;
+    } else {
+	target_prio = 0;
+    }
+    __put_user(target_type, &target_rtp->type);
+    __put_user(target_prio, &target_rtp->prio);
     unlock_user_struct(target_rtp, target_addr, 1);
     return 0;
-#else
-    abort();
-#endif
 }
 
 /* XXX We should never see this? OP_LOCK and OP_UNLOCK are now RESERVED{0,1} */
@@ -885,15 +942,11 @@ abi_long freebsd_unlock_umtx(abi_ulong target_addr, abi_long id)
 
 abi_long freebsd_umtx_wake(abi_ulong target_addr, uint32_t n_wake)
 {
-#if !defined(__linux__)
 
-    DEBUG_UMTX("<WAKE> %s: _umtx_op(%p, %d, 0x%x, NULL, NULL)\n",
+    DEBUG_UMTX("<WAKE> %s: futex(%p, %d, 0x%x, 0, 0, NULL)\n",
             __func__, g2h_untagged(target_addr), UMTX_OP_WAKE, n_wake);
-    return get_errno(safe__umtx_op(g2h_untagged(target_addr), QEMU_UMTX_OP(UMTX_OP_WAKE),
-        n_wake, NULL, 0));
-#else
-    abort();
-#endif
+    return get_errno(safe_futex(g2h_untagged(target_addr), FUTEX_WAKE_PRIVATE,
+        n_wake, 0, 0, 0));
 }
 
 abi_long freebsd_umtx_wake_unsafe(abi_ulong target_addr, uint32_t n_wake)
