@@ -84,6 +84,7 @@ static const int host_ctl_size[CTLTYPE + 1] = {
 
 static char osrelease_str[16] = FreeBSD_version_str;
 static char kversion_str[64] = (FREEBSD_ABI_VENDOR " " FreeBSD_version_str);
+static abi_ulong pagesizes[2] = {4096, 1024 * 1024 * 2};
 
 #define QEMU_REL_SUF "-QEMU-L4B"
 #define QEMU_REL_POS 4
@@ -105,6 +106,9 @@ init_bsd_sysctl(void)
 {
     patch_osrelease(osrelease_str, 0, sizeof(osrelease_str));
     patch_osrelease(kversion_str, sizeof(FREEBSD_ABI_VENDOR), sizeof(kversion_str));
+    for (abi_ulong *ps = pagesizes; (void *)ps < ((void *)pagesizes+sizeof(pagesizes)); ps++) {
+        *ps = tswapal(*ps);
+    }
 }
 
 #ifdef TARGET_ABI32
@@ -1302,6 +1306,31 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
             ret_str = kversion_str;
             goto out_str;
 
+	case KERN_OSRELDATE:
+	    if (oldlen) {
+                (*(abi_uint *)holdp) = tswapal(__FreeBSD_version);
+	    }
+	    holdlen = sizeof(abi_uint);
+	    ret = 0;
+	    goto out;
+
+	case KERN_HOSTNAME:
+            do {
+                size_t nlen = sysconf(_SC_HOST_NAME_MAX);
+                char *name = alloca(sysconf(_SC_HOST_NAME_MAX));
+                if (name == NULL)
+                    break;
+                ret = gethostname(name, nlen);
+                if (ret != 0)
+                    break;
+                ret_str = name;
+                holdlen = strlen(name) + 1;
+                goto out_str;
+            } while (0);
+            holdlen = 0;
+            ret = -TARGET_ENOMEM;
+            goto out;
+
         case KERN_ARND:
             if (oldlen) {
                 (*(abi_ulong *)holdp) = tswapal(0x42434445);
@@ -1331,14 +1360,14 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
             switch (snamep[2]) {
             case KERN_PROC_PATHNAME:
                 holdlen = strlen(ts->bprm->fullpath) + 1;
+                ret = 0;
                 if (holdp) {
                     if (oldlen < holdlen) {
-                        ret = -TARGET_EINVAL;
-                        goto out;
+                        ret = -TARGET_ENOMEM;
+                        holdlen = oldlen;
                     }
-                    strlcpy(holdp, ts->bprm->fullpath, oldlen);
+                    memcpy(holdp, ts->bprm->fullpath, holdlen);
                 }
-                ret = 0;
                 goto out;
 
             case KERN_PROC_ALL:
@@ -1690,14 +1719,14 @@ out:
     *holdlenp = holdlen;
     return ret;
 out_str:
+    ret = 0;
     if (oldlen) {
         if (oldlen < holdlen) {
-            ret = -TARGET_EINVAL;
-            goto out;
+            ret = -TARGET_ENOMEM;
+            holdlen = oldlen;
         }
-        strlcpy(holdp, ret_str, holdlen);
+        memcpy(holdp, ret_str, holdlen);
     }
-    ret = 0;
     goto out;
 }
 
@@ -1712,7 +1741,6 @@ abi_long do_freebsd_sysctlbyname(CPUArchState *env, abi_ulong namep,
         int32_t namelen, abi_ulong oldp, abi_ulong oldlenp, abi_ulong newp,
         abi_ulong newlen)
 {
-#if !defined(__linux__)
     abi_long ret = -TARGET_EFAULT;
     void *holdp = NULL, *hnewp = NULL;
     char *snamep = NULL;
@@ -1745,6 +1773,17 @@ abi_long do_freebsd_sysctlbyname(CPUArchState *env, abi_ulong namep,
     }
     holdlen = oldlen;
 
+    if (namelen == strlen("hw.pagesizes") && strcmp(snamep, "hw.pagesizes") == 0) {
+        holdlen = sizeof(pagesizes);
+        if (oldlen) {
+            if (holdlen > oldlen)
+                holdlen = oldlen;
+            memcpy(holdp, pagesizes, holdlen);
+        }
+        ret = 0;
+        goto out;
+    }
+
     oidplen = ARRAY_SIZE(oid);
     if (sysctlnametomib(snamep, oid, &oidplen) != 0) {
         ret = -TARGET_EINVAL;
@@ -1767,9 +1806,6 @@ out:
     unlock_user(hnewp, newp, 0);
 
     return ret;
-#else
-    abort();
-#endif
 }
 
 abi_long do_freebsd_sysctl(CPUArchState *env, abi_ulong namep, int32_t namelen,
@@ -1816,11 +1852,12 @@ abi_long do_freebsd_sysctl(CPUArchState *env, abi_ulong namep, int32_t namelen,
      * writeability pre-checked above. __sysctl(2) returns ENOMEM and updates
      * oldlenp for the proper size to use.
      */
-    if (oldlenp && (ret == 0 || ret == -TARGET_ENOMEM)) {
+    int is_nomem = (ret == -TARGET_ENOMEM);
+    if (oldlenp && (ret == 0 || is_nomem)) {
         put_user_ual(holdlen, oldlenp);
     }
     unlock_user(hnamep, namep, 0);
-    unlock_user(holdp, oldp, ret == 0 ? holdlen : 0);
+    unlock_user(holdp, oldp, (ret == 0 || is_nomem) ? holdlen : 0);
 out:
     g_free(snamep);
     return ret;

@@ -567,9 +567,10 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
     if (dirp == NULL) {
         return -TARGET_EFAULT;
     }
-    adirp = aligned_alloca(nbytes, __alignof__(struct freebsd11_dirent));
+    adirp = aligned_alloca(nbytes, __alignof__(*adirp));
     if (adirp == NULL) {
-        return -TARGET_ENOMEM;
+        ret = -TARGET_ENOMEM;
+        goto out;
     }
     ret = get_errno(getdirentries(arg1, (char *)adirp, nbytes, &basep));
     if (!is_error(ret)) {
@@ -582,13 +583,16 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
         while (len > 0) {
             reclen = hde->d_reclen;
             if (reclen > len) {
-                return -TARGET_EFAULT;
+                ret = -TARGET_EFAULT;
+                goto out;
             }
             int namelen = reclen - offsetof(typeof(*hde), d_name);
             int target_reclen = ALIGN(offsetof(typeof(*tde), d_name) + namelen, __alignof__(typeof(*tde)));
             if ((nbytes - ret) < target_reclen) {
-                if (ret == 0)
-                    return -TARGET_EINVAL;
+                if (ret == 0) {
+                    ret = -TARGET_EINVAL;
+                    goto out;
+		}
                 break;
             }
             *tde = (typeof(*tde)){0};
@@ -615,40 +619,79 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
         }
     }
     return ret;
+out:
+    unlock_user(dirp, arg2, ret);
+    return ret;
 }
+
+struct target_dirent {
+        ino_t      d_fileno;            /* file number of entry */
+        off_t      d_off;               /* directory offset of next entry */
+        __uint16_t d_reclen;            /* length of this record */
+        __uint8_t  d_type;              /* file type, see below */
+        __uint8_t  d_pad0;
+        __uint16_t d_namlen;            /* length of string in d_name */
+        __uint16_t d_pad1;
+        char    d_name[TARGET_MAXNAMLEN + 1];  /* name must be no longer than this */
+};
 
 /* getdirecentries(2) */
 static inline abi_long do_freebsd_getdirentries(abi_long arg1,
         abi_ulong arg2, abi_long nbytes, abi_ulong arg4)
 {
-#if !defined(__linux__)
     abi_long ret;
-    struct dirent *dirp;
+    struct target_dirent *dirp;
+    struct dirent *adirp;
     long basep;
 
     dirp = lock_user(VERIFY_WRITE, arg2, nbytes, 0);
     if (dirp == NULL) {
         return -TARGET_EFAULT;
     }
-    ret = get_errno(getdirentries(arg1, (char *)dirp, nbytes, &basep));
-    if (!is_error(ret)) {
-        struct dirent *de;
-        int len = ret;
-        int reclen;
+    adirp = aligned_alloca(nbytes, __alignof__(*adirp));
+    if (adirp == NULL) {
+        ret = -TARGET_ENOMEM;
+        goto out;
+    }
+    ret = get_errno(getdirentries(arg1, (char *)adirp, nbytes, &basep));
+    if (is_error(ret))
+        goto out;
+    struct target_dirent *tde = dirp;
+    struct dirent *hde = adirp;
+    int len = ret;
+    ret = 0;
+    int reclen;
 
-        de = dirp;
-        while (len > 0) {
-            reclen = de->d_reclen;
-            if (reclen > len) {
-                return -TARGET_EFAULT;
-            }
-            de->d_fileno = tswap64(de->d_fileno);
-            de->d_off = tswap64(de->d_off);
-            de->d_reclen = tswap16(de->d_reclen);
-            de->d_namlen = tswap16(de->d_namlen);
-            len -= reclen;
-            de = (struct dirent *)((void *)de + reclen);
+    while (len > 0) {
+        reclen = hde->d_reclen;
+        if (reclen > len) {
+            ret = -TARGET_EFAULT;
+            goto out;
         }
+        int namelen = reclen - offsetof(typeof(*hde), d_name);
+        int target_reclen = ALIGN(offsetof(typeof(*tde), d_name) + namelen, __alignof__(typeof(*tde)));
+        if ((nbytes - ret) < target_reclen) {
+            if (ret == 0) {
+                ret = -TARGET_EINVAL;
+                goto out;
+            }
+	    break;
+        }
+        *tde = (typeof(*tde)){0};
+        abi_long tft = host_to_target_bitmask(DTTOIF(hde->d_type), fcntl_flags_tbl);
+        tde->d_type = IFTODT(tft);
+        tde->d_fileno = tswap32(hde->d_fileno);
+        tde->d_reclen = tswap16(target_reclen);
+        char *ep = memchr(hde->d_name, '\0', namelen);
+        if (ep > hde->d_name) {
+            int sl = ep - hde->d_name;
+            memcpy(tde->d_name, hde->d_name, sl + 1);
+            tde->d_namlen = tswap16(sl);
+        }
+        len -= reclen;
+        ret += target_reclen;
+        tde = (typeof(tde))((void *)tde + target_reclen);
+        hde = (typeof(hde))((void *)hde + reclen);
     }
     unlock_user(dirp, arg2, ret);
     if (arg4) {
@@ -657,9 +700,9 @@ static inline abi_long do_freebsd_getdirentries(abi_long arg1,
         }
     }
     return ret;
-#else
-    abort();
-#endif
+out:
+    unlock_user(dirp, arg2, ret);
+    return ret;
 }
 
 /* fcntl(2) */
@@ -740,8 +783,8 @@ extern int __realpathat(int fd, const char *path, char *buf, size_t size,
         int flags);
 /* https://svnweb.freebsd.org/base?view=revision&revision=358172 */
 /* no man page */
-static inline abi_long do_freebsd_realpathat(abi_long arg1, abi_long arg2,
-        abi_long arg3, abi_long arg4, abi_long arg5)
+static inline abi_long do_freebsd_realpathat(abi_int arg1, abi_long arg2,
+        abi_long arg3, abi_long arg4, abi_int arg5)
 {
     abi_long ret;
     void *p, *b;
@@ -753,11 +796,23 @@ static inline abi_long do_freebsd_realpathat(abi_long arg1, abi_long arg2,
         return -TARGET_EFAULT;
     }
 
-#if !defined(__linux__)
-    ret = get_errno(__realpathat(arg1, p, b, arg4, arg5));
-#else
-    abort();
-#endif
+    if (arg1 != AT_FDCWD || arg5 != 0)
+        abort();
+    char *rets = realpath(p, NULL);
+    if (rets == NULL) {
+        ret = get_errno(-1);
+        goto out;
+    }
+    int plen = strlen(rets) + 1;
+    if (arg4 < plen) {
+        free(rets);
+        ret = -TARGET_ENOMEM;
+        goto out;
+    }
+    memcpy(b, rets, plen);
+    free(rets);
+    ret = 0;
+ out:
     UNLOCK_PATH(p, arg2);
     unlock_user(b, arg3, ret);
 

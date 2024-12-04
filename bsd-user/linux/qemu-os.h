@@ -40,6 +40,7 @@
 #define SIGRTMAX __SIGRTMAX
 #undef SIGRTMIN
 #define SIGRTMIN __SIGRTMIN
+#define TARGET_STRERR_FILENO 2
 
 #include "target_os_defs.h"
 
@@ -162,8 +163,9 @@ abi_long h2t_freebsd_statfs(abi_ulong target_addr,
     struct statfs *host_statfs);
 
 /* os-thread.c */
-abi_long t2h_freebsd_rtprio(struct rtprio *host_rtp, abi_ulong target_addr);
-abi_long h2t_freebsd_rtprio(abi_ulong target_addr, struct rtprio *host_rtp);
+int t2h_freebsd_rtprio(struct sched_param *host_rtp, abi_ulong target_addr);
+abi_long h2t_freebsd_rtprio(int host_policy, const struct sched_param *host_rtp,
+        abi_ulong target_addr);
 abi_long do_freebsd_thr_new(CPUArchState *env, abi_ulong target_param_addr,
         int32_t param_size);
 

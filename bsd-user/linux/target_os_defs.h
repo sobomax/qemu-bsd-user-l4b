@@ -912,6 +912,10 @@ static const typeof(DT_WHT) HOST_DT_WHT = DT_WHT;
 #define IFTODT(mode)	(((mode) & 0170000) >> 12)
 #undef DTTOIF /* found in: sys/dirent.h */
 #define DTTOIF(dirtype)	((dirtype) << 12)
+#if defined(TARGET_MAXNAMLEN)
+#undef TARGET_MAXNAMLEN
+#endif /* found in: sys/dirent.h */
+#define TARGET_MAXNAMLEN	255
 #undef DIOCGSECTORSIZE /* found in: sys/disk.h */
 #define DIOCGSECTORSIZE	_IOR('d', 128, u_int)
 #undef DIOCGMEDIASIZE /* found in: sys/disk.h */
@@ -1334,6 +1338,60 @@ static const typeof(INFTIM) HOST_INFTIM = INFTIM;
 #endif /* found in: sys/poll.h */
 #undef INFTIM
 #define INFTIM		(-1)
+#if defined(PRI_TIMESHARE) && !defined(HOST_PRI_TIMESHARE)
+static const typeof(PRI_TIMESHARE) HOST_PRI_TIMESHARE = PRI_TIMESHARE;
+#endif /* found in: sys/priority.h */
+#undef PRI_TIMESHARE
+#define PRI_TIMESHARE		3	/* Time sharing process. */
+#if defined(PRI_REALTIME) && !defined(HOST_PRI_REALTIME)
+static const typeof(PRI_REALTIME) HOST_PRI_REALTIME = PRI_REALTIME;
+#endif /* found in: sys/priority.h */
+#undef PRI_REALTIME
+#define PRI_REALTIME		2	/* Real time process. */
+#if defined(PRI_IDLE) && !defined(HOST_PRI_IDLE)
+static const typeof(PRI_IDLE) HOST_PRI_IDLE = PRI_IDLE;
+#endif /* found in: sys/priority.h */
+#undef PRI_IDLE
+#define PRI_IDLE		4	/* Idle process. */
+#undef PRI_FIFO /* found in: sys/priority.h */
+#define PRI_FIFO		(PRI_FIFO_BIT | PRI_REALTIME)
+#if defined(PRI_FIFO_BIT) && !defined(HOST_PRI_FIFO_BIT)
+static const typeof(PRI_FIFO_BIT) HOST_PRI_FIFO_BIT = PRI_FIFO_BIT;
+#endif /* found in: sys/priority.h */
+#undef PRI_FIFO_BIT
+#define PRI_FIFO_BIT		8
+#if defined(TARGET_RTP_PRIO_REALTIME)
+#undef TARGET_RTP_PRIO_REALTIME
+#endif /* found in: sys/rtprio.h */
+#define TARGET_RTP_PRIO_REALTIME	PRI_REALTIME	/* real time process */
+#if defined(TARGET_RTP_PRIO_NORMAL)
+#undef TARGET_RTP_PRIO_NORMAL
+#endif /* found in: sys/rtprio.h */
+#define TARGET_RTP_PRIO_NORMAL		PRI_TIMESHARE	/* time sharing process */
+#if defined(TARGET_RTP_PRIO_FIFO)
+#undef TARGET_RTP_PRIO_FIFO
+#endif /* found in: sys/rtprio.h */
+#define TARGET_RTP_PRIO_FIFO		PRI_FIFO
+#if defined(TARGET_RTP_PRIO_IDLE)
+#undef TARGET_RTP_PRIO_IDLE
+#endif /* found in: sys/rtprio.h */
+#define TARGET_RTP_PRIO_IDLE		PRI_IDLE	/* idle process */
+#if defined(TARGET_RTP_PRIO_MAX)
+#undef TARGET_RTP_PRIO_MAX
+#endif /* found in: sys/rtprio.h */
+#define TARGET_RTP_PRIO_MAX		31	/* Lowest priority */
+#if defined(TARGET_RTP_PRIO_MIN)
+#undef TARGET_RTP_PRIO_MIN
+#endif /* found in: sys/rtprio.h */
+#define TARGET_RTP_PRIO_MIN		0	/* Highest priority */
+#if defined(TARGET_RTP_LOOKUP)
+#undef TARGET_RTP_LOOKUP
+#endif /* found in: sys/rtprio.h */
+#define TARGET_RTP_LOOKUP		0
+#if defined(TARGET_RTP_SET)
+#undef TARGET_RTP_SET
+#endif /* found in: sys/rtprio.h */
+#define TARGET_RTP_SET			1
 #if defined(SIGBUS) && !defined(HOST_SIGBUS)
 static const typeof(SIGBUS) HOST_SIGBUS = SIGBUS;
 #endif /* found in: sys/signal.h */
@@ -3894,6 +3952,11 @@ static const typeof(KERN_VERSION) HOST_KERN_VERSION = KERN_VERSION;
 #endif /* found in: sys/sysctl.h */
 #undef KERN_VERSION
 #define KERN_VERSION		 4	/* string: compile time info */
+#if defined(KERN_HOSTNAME) && !defined(HOST_KERN_HOSTNAME)
+static const typeof(KERN_HOSTNAME) HOST_KERN_HOSTNAME = KERN_HOSTNAME;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_HOSTNAME
+#define KERN_HOSTNAME		10	/* string: hostname */
 #if defined(TIOCSETD) && !defined(HOST_TIOCSETD)
 static const typeof(TIOCSETD) HOST_TIOCSETD = TIOCSETD;
 #endif /* found in: sys/ttycom.h */
@@ -4154,6 +4217,10 @@ static const typeof(UMTX_OP_SEM_WAKE) HOST_UMTX_OP_SEM_WAKE = UMTX_OP_SEM_WAKE;
 #endif /* found in: sys/umtx.h */
 #undef UMTX_OP_SEM_WAKE
 #define UMTX_OP_SEM_WAKE	20	/* deprecated */
+#if defined(TARGET_SEEK_CUR)
+#undef TARGET_SEEK_CUR
+#endif /* found in: sys/unistd.h */
+#define TARGET_SEEK_CUR	1	/* set file offset to current plus offset */
 #if defined(WNOHANG) && !defined(HOST_WNOHANG)
 static const typeof(WNOHANG) HOST_WNOHANG = WNOHANG;
 #endif /* found in: sys/wait.h */
