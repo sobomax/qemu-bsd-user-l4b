@@ -21,10 +21,13 @@
 #define TARGET_ARCH_THREAD_H
 
 /* Compare to vm_machdep.c cpu_set_upcall_kse() */
-static inline void target_thread_set_upcall(CPUX86State *regs, abi_ulong entry,
+static inline void target_thread_set_upcall(CPUX86State *env, abi_ulong entry,
     abi_ulong arg, abi_ulong stack_base, abi_ulong stack_size)
 {
-    /* XXX */
+    env->regs[R_EBP] = 0;
+    env->regs[R_ESP] = ((stack_base + stack_size) & ~0x0f) - 8;
+    env->eip = entry;
+    env->regs[R_EDI] = arg;
 }
 
 static inline void target_thread_init(struct target_pt_regs *regs,
