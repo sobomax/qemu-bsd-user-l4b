@@ -86,6 +86,4 @@ Most of the basic syscalls are working. Dynamic linking, shared library support,
 Things that are missing at the moment:
 
 * IPC and networking;
-* Terminal and process control;
-* ioctl()'s;
 * Threading.
