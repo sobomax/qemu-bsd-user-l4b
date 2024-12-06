@@ -240,7 +240,6 @@ static int tcmpset_32(uint32_t *addr, uint32_t a, uint32_t b)
 static abi_long _umtx_wait_uint(uint32_t *addr, uint32_t target_val,
 	size_t tsz, void *t, const char *where)
 {
-#if !defined(__linux__)
 #if DETECT_DEADLOCK
     abi_long ret;
     long cnt = 0;
@@ -269,11 +268,9 @@ static abi_long _umtx_wait_uint(uint32_t *addr, uint32_t target_val,
         } while (1);
     } else
 #endif
-	return get_errno(safe__umtx_op(addr, QEMU_UMTX_OP(UMTX_OP_WAIT_UINT),
-            target_val, (void *)tsz, t));
-#else
-    abort();
-#endif
+    assert(tsz == 0 && t == 0);
+    return get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAIT_UINT),
+            target_val, 0, 0, 0));
 }
 
 abi_long freebsd_umtx_wait_uint(abi_ulong obj, uint32_t target_val,
@@ -399,11 +396,10 @@ abi_long freebsd_umtx_wake_private(abi_ulong obj, uint32_t val)
         val, NULL, NULL, 0));
 }
 
-#if defined(UMTX_OP_NWAKE_PRIVATE)
 #define BATCH_SIZE 128
 abi_long freebsd_umtx_nwake_private(abi_ulong target_array_addr, uint32_t num)
 {
-#ifdef _UMTX_OPTIMIZED
+#if defined(_UMTX_OPTIMIZED) && !defined(__linux__)
     abi_ulong *tp;
     uintptr_t uaddrs[BATCH_SIZE];
     int count, error, i, j;
@@ -450,10 +446,10 @@ abi_long freebsd_umtx_nwake_private(abi_ulong target_array_addr, uint32_t num)
 
     uaddr = (abi_ulong *)g2h_untagged(target_array_addr);
     for (i = 0; i < (int32_t)num; i++) {
-        DEBUG_UMTX("%p (%u) ", g2h_untagged(tswapal(uaddr[i])),
-                tswap32(*(uint32_t *)g2h_untagged(tswapal(uaddr[i]))) );
-        ret = get_errno(safe__umtx_op(g2h_untagged(tswapal(uaddr[i])), UMTX_OP_WAKE_PRIVATE,
-            INT_MAX, NULL, NULL));
+        uint32_t *iaddr = g2h_untagged(tswapal(uaddr[i]));
+        DEBUG_UMTX("%p (%u) ", iaddr, tswap32(*iaddr));
+        ret = get_errno(safe_futex(iaddr, QEMU_UMTX_OP(UMTX_OP_WAKE_PRIVATE),
+            INT_MAX, NULL, NULL, 0));
         if (is_error(ret)) {
             DEBUG_UMTX("\n");
             return ret;
@@ -463,12 +459,10 @@ abi_long freebsd_umtx_nwake_private(abi_ulong target_array_addr, uint32_t num)
     return ret;
 #endif /* _UMTX_OPTIMIZED */
 }
-#endif /* UMTX_OP_NWAKE_PRIVATE */
 
-#if defined(UMTX_OP_MUTEX_WAKE2)
 abi_long freebsd_umtx_mutex_wake2(abi_ulong target_addr, uint32_t flags)
 {
-#ifdef _UMTX_OPTIMIZED
+#if defined(_UMTX_OPTIMIZED) && !defined(__linux__)
     if (!access_ok(VERIFY_WRITE, target_addr, sizeof(struct target_umutex))) {
         return -TARGET_EFAULT;
     }
@@ -497,14 +491,13 @@ abi_long freebsd_umtx_mutex_wake2(abi_ulong target_addr, uint32_t flags)
         __get_user(owner, &target_umutex->m_owner);
     }
     pthread_mutex_unlock(&umtx_wait_lck);
-    addr = (uintptr_t)&target_umutex->m_owner;
+    addr = (uint32_t *)&target_umutex->m_owner;
     unlock_user(target_umutex, target_addr, 0);
 
-    return get_errno(safe__umtx_op(addr, UMTX_OP_WAKE_PRIVATE, 1, NULL,
-        NULL));
+    return get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAKE_PRIVATE), 1, NULL,
+        NULL, 0));
 #endif /* _UMTX_OPTIMIZED */
 }
-#endif /* UMTX_OP_MUTEX_WAKE2 */
 
 abi_long freebsd_umtx_sem2_wait(abi_ulong obj, size_t tsz, void *t)
 {
@@ -1382,7 +1375,7 @@ abi_long freebsd_rw_rdlock(abi_ulong target_addr, long fflag, size_t tsz,
 abi_long freebsd_rw_wrlock(abi_ulong target_addr, long fflag, size_t tsz,
         void *t)
 {
-#ifdef _UMTX_OPTIMIZED
+#if defined(_UMTX_OPTIMIZED) && !defined(__linux__)
     if (!access_ok(VERIFY_WRITE, target_addr, sizeof(struct target_urwlock))) {
         return -TARGET_EFAULT;
     }
@@ -1417,8 +1410,8 @@ abi_long freebsd_rw_wrlock(abi_ulong target_addr, long fflag, size_t tsz,
             DEBUG_UMTX("<WAKE> %s: _umtx_op(%p, %d, 0x%x, NULL, NULL)\n",
                 __func__, &target_urwlock->rw_state, UMTX_OP_WAKE,
                 tswap32(state));
-            ret = get_errno(safe__umtx_op(&target_urwlock->rw_state,
-                UMTX_OP_WAKE, INT_MAX, NULL, NULL));
+            ret = get_errno(safe_futex(&target_urwlock->rw_state,
+                QEMU_UMTX_OP(UMTX_OP_WAKE), INT_MAX, NULL, NULL, 0));
             return ret;
         }
         /* re-read the state */
@@ -1485,7 +1478,7 @@ abi_long freebsd_rw_wrlock(abi_ulong target_addr, long fflag, size_t tsz,
 
 abi_long freebsd_rw_unlock(abi_ulong target_addr)
 {
-#ifdef _UMTX_OPTIMIZED
+#if defined(_UMTX_OPTIMIZED) && !defined(__linux__)
     if (!access_ok(VERIFY_WRITE, target_addr, sizeof(struct target_urwlock))) {
         return -TARGET_EFAULT;
     }
@@ -1562,8 +1555,8 @@ abi_long freebsd_rw_unlock(abi_ulong target_addr)
     if (count != 0) {
         DEBUG_UMTX("<WAKE> %s: _umtx_op(%p, %d, 0x%x, NULL, NULL)\n",
                 __func__, &target_urwlock->rw_state, UMTX_OP_WAKE, count);
-        return get_errno(safe__umtx_op(&target_urwlock->rw_state, UMTX_OP_WAKE,
-                    count, NULL, NULL));
+        return get_errno(safe_futex(&target_urwlock->rw_state, QEMU_UMTX_OP(UMTX_OP_WAKE),
+                    count, NULL, NULL, 0));
     } else {
         return 0;
     }
