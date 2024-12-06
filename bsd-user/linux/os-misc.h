@@ -208,9 +208,10 @@ static abi_ulong copy_from_user_cpuset_mask(cpuset_t *mask,
 
 	return 0;
 }
+#endif
 
 static abi_ulong copy_to_user_cpuset_mask(abi_ulong target_mask_addr,
-	cpuset_t *mask)
+	cpu_set_t *mask)
 {
 	int i, j, k;
 	abi_ulong b, *target_mask;
@@ -233,39 +234,40 @@ static abi_ulong copy_to_user_cpuset_mask(abi_ulong target_mask_addr,
 
 	return 0;
 }
-#endif
 
 /* cpuset_getaffinity(2) */
 /* cpuset_getaffinity(cpulevel_t, cpuwhich_t, id_t, size_t, cpuset_t *); */
 static inline abi_long do_freebsd_cpuset_getaffinity(cpulevel_t level,
-        cpuwhich_t which, abi_ulong arg3, abi_ulong arg4, abi_ulong arg5,
+        cpuwhich_t which, abi_long arg3, abi_ulong arg4, abi_ulong arg5,
         abi_ulong arg6)
 {
-#if !defined(__linux__)
-	cpuset_t mask;
-	abi_long ret;
-    id_t id;    /* 64-bit */
-    abi_ulong setsize, target_mask;
+    cpu_set_t mask;
+    abi_long ret;
+    pid_t id;    /* 64-bit */
+    abi_ulong target_mask;
+
+    if (level != TARGET_CPU_LEVEL_WHICH && which != TARGET_CPU_WHICH_TID)
+        abort();
 
 #if TARGET_ABI_BITS == 32
-    id = (id_t)target_arg64(arg3, arg4);
-    setsize = arg5;
+    id = (pid_t)target_arg64(arg3, arg4);
+    //setsize = arg5;
     target_mask = arg6;
 #else
-    id = (id_t)arg3;
-    setsize = arg4;
+    id = (pid_t)arg3;
+    //setsize = arg4;
     target_mask = arg5;
 #endif
 
-	ret = get_errno(cpuset_getaffinity(level, which, id, setsize, &mask));
-	if (ret == 0) {
-		ret = copy_to_user_cpuset_mask(target_mask, &mask);
-	}
+    if (id == -1)
+        id = 0;
+
+    ret = get_errno(sched_getaffinity(id, sizeof(mask), &mask));
+    if (ret == 0) {
+        ret = copy_to_user_cpuset_mask(target_mask, &mask);
+    }
 
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* cpuset_setaffinity(2) */

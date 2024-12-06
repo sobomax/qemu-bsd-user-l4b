@@ -4,6 +4,9 @@
 /* Forward declarations: */
 struct freebsd11_dirent;
 struct fiodgname_arg;
+struct rtprio;
+struct umutex;
+struct _umtx_time;
 
 /* Defines: */
 #if defined(_SIG_WORDS) && !defined(HOST__SIG_WORDS)
@@ -863,6 +866,14 @@ static const typeof(VTIME) HOST_VTIME = VTIME;
 #undef TARGET_EXDEV
 #endif /* found in: sys/errno.h */
 #define TARGET_EXDEV		18		/* Cross-device link */
+#if defined(TARGET_CPU_LEVEL_WHICH)
+#undef TARGET_CPU_LEVEL_WHICH
+#endif /* found in: sys/cpuset.h */
+#define TARGET_CPU_LEVEL_WHICH		3	/* Actual mask/id for which. */
+#if defined(TARGET_CPU_WHICH_TID)
+#undef TARGET_CPU_WHICH_TID
+#endif /* found in: sys/cpuset.h */
+#define TARGET_CPU_WHICH_TID		1	/* Specifies a thread id. */
 #if defined(DT_UNKNOWN) && !defined(HOST_DT_UNKNOWN)
 static const typeof(DT_UNKNOWN) HOST_DT_UNKNOWN = DT_UNKNOWN;
 #endif /* found in: sys/dirent.h */
@@ -4221,6 +4232,10 @@ static const typeof(UMTX_OP_SEM_WAKE) HOST_UMTX_OP_SEM_WAKE = UMTX_OP_SEM_WAKE;
 #undef TARGET_SEEK_CUR
 #endif /* found in: sys/unistd.h */
 #define TARGET_SEEK_CUR	1	/* set file offset to current plus offset */
+#if defined(TARGET_RFSPAWN)
+#undef TARGET_RFSPAWN
+#endif /* found in: sys/unistd.h */
+#define TARGET_RFSPAWN		(1U<<31)
 #if defined(WNOHANG) && !defined(HOST_WNOHANG)
 static const typeof(WNOHANG) HOST_WNOHANG = WNOHANG;
 #endif /* found in: sys/wait.h */
@@ -4267,6 +4282,31 @@ struct freebsd11_dirent {
 struct fiodgname_arg {
 	int	len;
 	void	*buf;
+};
+
+/* 'rtprio' found in: sys/rtprio.h */
+struct rtprio {
+	u_short type;			/* scheduling class */
+	u_short prio;
+};
+
+/* 'umutex' found in: sys/_umtx.h */
+struct umutex {
+	volatile __lwpid_t	m_owner;	/* Owner of the mutex */
+	__uint32_t		m_flags;	/* Flags of the mutex */
+	__uint32_t		m_ceilings[2];	/* Priority protect ceiling */
+	__uintptr_t		m_rb_lnk;	/* Robust linkage */
+#ifndef __LP64__
+	__uint32_t		m_pad;
+#endif
+	__uint32_t		m_spare[2];
+};
+
+/* '_umtx_time' found in: sys/_umtx.h */
+struct _umtx_time {
+	struct timespec		_timeout;
+	__uint32_t		_flags;
+	__uint32_t		_clockid;
 };
 
 /* Forward declarations: */
