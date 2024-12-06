@@ -284,6 +284,9 @@ static inline abi_long do_freebsd_swapcontext(void *cpu_env, abi_ulong arg1,
 }
 
 
+#undef qemu_log
+#define qemu_log(...)
+
 #define safe_g2h_untagged(x) ((x) != 0 ? g2h_untagged(x) : NULL)
 
 /* undocumented _umtx_op(void *obj, int op, u_long val, void *uaddr,
@@ -301,6 +304,8 @@ static inline abi_long do_freebsd__umtx_op(abi_ulong obj, int op, abi_ulong val,
     switch (op) {
     case TARGET_UMTX_OP_WAIT:
         /* args: obj *, val, (void *)sizeof(ut), ut * */
+        qemu_log("%d: <UMTX_OP_WAIT>: _umtx_op(%p, %d, 0x%lx, %lu, %jx)\n",
+          gettid(), g2h_untagged(obj), op, val, uaddr, target_time);
 #ifdef _UMTX_OPTIMIZED
         if (target_time != 0 && !access_ok(VERIFY_READ, target_time, uaddr))
             return -TARGET_EFAULT;
@@ -319,6 +324,8 @@ static inline abi_long do_freebsd__umtx_op(abi_ulong obj, int op, abi_ulong val,
 
     case TARGET_UMTX_OP_WAKE:
         /* args: obj *, nr_wakeup */
+        qemu_log("%d: <UMTX_OP_WAKE>: _umtx_op(%p, %d, 0x%lx, %lu, %jx)\n",
+          gettid(), g2h_untagged(obj), op, val, uaddr, target_time);
         ret = freebsd_umtx_wake(obj, val);
         break;
 
@@ -369,6 +376,9 @@ static inline abi_long do_freebsd__umtx_op(abi_ulong obj, int op, abi_ulong val,
         break;
 
     case TARGET_UMTX_OP_MUTEX_WAIT:
+        qemu_log("%d: <UMTX_OP_MUTEX_WAIT>: _umtx_op(%p, %d, 0x%lx, %lu, %jx)\n",
+          gettid(), g2h_untagged(obj), op, val, uaddr, target_time);
+
 #if defined(_UMTX_OPTIMIZED) && !defined(__linux__)
         if (target_time != 0 && !access_ok(VERIFY_READ, target_time, uaddr))
             return -TARGET_EFAULT;
@@ -464,6 +474,8 @@ static inline abi_long do_freebsd__umtx_op(abi_ulong obj, int op, abi_ulong val,
         break;
 
     case TARGET_UMTX_OP_WAIT_UINT_PRIVATE:
+        qemu_log("%d: <UMTX_OP_WAIT_UINT_PRIVATE>: _umtx_op(%p, %d, 0x%lx, %lu, %jx)\n",
+          gettid(), g2h_untagged(obj), op, val, uaddr, target_time);
 #ifdef _UMTX_OPTIMIZED
         if (target_time != 0 && !access_ok(VERIFY_READ, target_time, uaddr))
             return -TARGET_EFAULT;
@@ -488,6 +500,8 @@ static inline abi_long do_freebsd__umtx_op(abi_ulong obj, int op, abi_ulong val,
         break;
 
     case TARGET_UMTX_OP_WAKE_PRIVATE:
+        qemu_log("%d: <UMTX_OP_WAKE_PRIVATE>: _umtx_op(%p, %d, 0x%lx, %lu, %jx)\n",
+          gettid(), g2h_untagged(obj), op, val, uaddr, target_time);
         /* Don't need to do access_ok(). */
         ret = freebsd_umtx_wake_private(obj, val);
         break;
@@ -530,17 +544,17 @@ static inline abi_long do_freebsd__umtx_op(abi_ulong obj, int op, abi_ulong val,
         ret = freebsd_rw_unlock(obj);
         break;
 
-#ifdef UMTX_OP_MUTEX_WAKE2
     case TARGET_UMTX_OP_MUTEX_WAKE2:
+        qemu_log("%d: <UMTX_OP_MUTEX_WAKE2>: _umtx_op(%p, %d, 0x%lx, %lu, %jx)\n",
+          gettid(), g2h_untagged(obj), op, val, uaddr, target_time);
         ret = freebsd_umtx_mutex_wake2(obj, val);
         break;
-#endif /* UMTX_OP_MUTEX_WAKE2 */
 
-#ifdef UMTX_OP_NWAKE_PRIVATE
     case TARGET_UMTX_OP_NWAKE_PRIVATE:
+        qemu_log("%d: <UMTX_OP_NWAKE_PRIVATE>: _umtx_op(%p, %d, 0x%lx, %lu, %jx)\n",
+          gettid(), g2h_untagged(obj), op, val, uaddr, target_time);
         ret = freebsd_umtx_nwake_private(obj, val);
         break;
-#endif /* UMTX_OP_NWAKE_PRIVATE */
 
     case TARGET_UMTX_OP_SEM2_WAIT:
         /* args: obj *, val, (void *)sizeof(ut), ut * */
@@ -605,12 +619,6 @@ static inline abi_long do_freebsd__umtx_op(abi_ulong obj, int op, abi_ulong val,
     case TARGET_UMTX_OP_ROBUST_LISTS:
         ret = freebsd_umtx_robust_list(uaddr, val);
         break;
-    case TARGET_UMTX_OP_NWAKE_PRIVATE:
-	assert(val == 1);
-	if (!access_ok(VERIFY_READ, obj, val * sizeof(abi_ulong)))
-            return -TARGET_EFAULT;
-	ret = freebsd_umtx_wake_private(*(abi_ulong *)g2h_untagged(obj), val);
-	break;
     default:
         return -TARGET_EINVAL;
     }

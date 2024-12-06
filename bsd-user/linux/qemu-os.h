@@ -43,6 +43,7 @@
 #define TARGET_STRERR_FILENO 2
 #define __lwpid_t int32_t
 #define __uintptr_t uintptr_t
+#define __LP64__ 1
 
 #include "target_os_defs.h"
 
