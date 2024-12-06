@@ -147,7 +147,27 @@ int bsd_get_ncpu(void)
 
     return ncpu;
 #else
-    fprintf(stderr, "bsd_get_ncpu: stub\n");
-    return 1;
+    int ncpu = -1;
+    cpu_set_t mask;
+
+    CPU_ZERO(&mask);
+
+    // Get the CPU affinity for the calling thread
+    if (sched_getaffinity(0, sizeof(mask), &mask) == 0) {
+        ncpu = CPU_COUNT(&mask);
+    } else {
+        perror("sched_getaffinity failed");
+    }
+
+    // Fallback to sysconf if sched_getaffinity fails or returns invalid count
+    if (ncpu <= 0) {
+        ncpu = sysconf(_SC_NPROCESSORS_ONLN);
+        if (ncpu == -1) {
+            perror("sysconf failed");
+            ncpu = 1; // Default to 1 CPU if all else fails
+        }
+    }
+
+    return ncpu;
 #endif
 }
