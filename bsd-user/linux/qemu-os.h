@@ -41,6 +41,8 @@
 #undef SIGRTMIN
 #define SIGRTMIN __SIGRTMIN
 #define TARGET_STRERR_FILENO 2
+#define __lwpid_t int32_t
+#define __uintptr_t uintptr_t
 
 #include "target_os_defs.h"
 

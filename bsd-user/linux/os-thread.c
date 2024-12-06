@@ -27,7 +27,9 @@
 #include "tcg/startup.h"
 #include "exec/exec-all.h"
 #include "exec/tb-flush.h"
+#include "qemu/guest-random.h"
 
+#include <stdatomic.h>
 #include <linux/futex.h>
 #include "os-thread.h"
 
@@ -43,6 +45,7 @@
 static safe_syscall6(long, futex, uint32_t *, uaddr, int, futex_op, uint32_t, val,
 		 const struct timespec *, timeout, /* or: uint32_t val2 */
 		 uint32_t *, uaddr2, uint32_t, val3);
+#define fast_futex(a1, a2, a3, a4, a5, a6) syscall(SYS_futex, (a1), (a2), (a3), (a4), (a5), (a6))
 
 /* sys/_umtx.h */
 struct target_umtx {
@@ -110,20 +113,19 @@ pthread_mutex_t *new_freebsd_thread_lock_ptr = &new_thread_lock;
 static pthread_mutex_t umtx_wait_lck = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t *freebsd_umtx_wait_lck_ptr = &umtx_wait_lck;
 
-#if !defined(__linux__)
 static void rtp_to_schedparam(const struct rtprio *rtp, int *policy,
         struct sched_param *param)
 {
 
     switch (rtp->type) {
-    case RTP_PRIO_REALTIME:
+    case TARGET_RTP_PRIO_REALTIME:
         *policy = SCHED_RR;
-        param->sched_priority = RTP_PRIO_MAX - rtp->prio;
+        param->sched_priority = TARGET_RTP_PRIO_MAX - rtp->prio;
         break;
 
-    case RTP_PRIO_FIFO:
+    case TARGET_RTP_PRIO_FIFO:
         *policy = SCHED_FIFO;
-        param->sched_priority = RTP_PRIO_MAX - rtp->prio;
+        param->sched_priority = TARGET_RTP_PRIO_MAX - rtp->prio;
         break;
 
     default:
@@ -132,11 +134,9 @@ static void rtp_to_schedparam(const struct rtprio *rtp, int *policy,
         break;
     }
 }
-#endif
 
 void *new_freebsd_thread_start(void *arg)
 {
-#if !defined(__linux__)
     new_freebsd_thread_info_t *info = arg;
     CPUArchState *env;
     CPUState *cpu;
@@ -147,7 +147,9 @@ void *new_freebsd_thread_start(void *arg)
     env = info->env;
     cpu = env_cpu(env);
     thread_cpu = cpu;
-    (void)thr_self(&tid);
+    tid = gettid();
+    TaskState *ts = get_task_state(cpu);
+    ts->ts_tid = tid;
 
     /* copy out the child TID to both locations */
     if (info->param.child_tid) {
@@ -156,6 +158,7 @@ void *new_freebsd_thread_start(void *arg)
     if (info->param.parent_tid) {
         put_user_ual(tid, info->param.parent_tid);
     }
+    qemu_guest_random_seed_thread_part2(cpu->random_seed);
 
     /* Set arch dependent registers to start thread. */
     target_thread_set_upcall(env, info->param.start_func, info->param.arg,
@@ -176,9 +179,6 @@ void *new_freebsd_thread_start(void *arg)
     /* never exits */
 
     return NULL;
-#else
-    abort();
-#endif
 }
 
 /*
@@ -214,7 +214,6 @@ static int optimized_umtx_op(abi_ulong obj, int op, abi_ulong val,
 }
 
 #else /* !_UMTX_OPTIMIZED */
-
 /*
  * _cv_mutex keeps other threads from doing a signal or broadcast until
  * the thread is actually asleep and ready.  This is a global mutex for all
@@ -223,15 +222,19 @@ static int optimized_umtx_op(abi_ulong obj, int op, abi_ulong val,
  *
  */
 static struct umutex _cv_mutex;
+#endif
 
+#if !defined(_UMTX_OPTIMIZED) || defined(__linux__)
 static int tcmpset_32(uint32_t *addr, uint32_t a, uint32_t b)
 {
     uint32_t current = tswap32(a);
     uint32_t new = tswap32(b);
+    _Atomic(uint32_t) *aa = (void *)addr;
 
-    return atomic_cmpset_acq_32(addr, current, new);
+    int r = atomic_compare_exchange_strong_explicit(aa, &current, new,
+              memory_order_acquire, memory_order_relaxed);
+    return r ? 1 : 0;
 }
-
 #endif /* _UMTX_OPTIMIZED */
 
 static abi_long _umtx_wait_uint(uint32_t *addr, uint32_t target_val,
@@ -287,11 +290,11 @@ abi_long freebsd_umtx_wait_uint(abi_ulong obj, uint32_t target_val,
 static abi_long _umtx_wait_uint_private(uint32_t *addr, uint32_t target_val,
         size_t tsz, void *t, const char *where)
 {
-#if !defined(__linux__)
 #if DETECT_DEADLOCK
     abi_long ret;
     long cnt = 0;
 
+    abort();
     /* target_val has already been tswap'ed. */
     if (t == NULL) {
         struct timespec ts;
@@ -300,11 +303,11 @@ static abi_long _umtx_wait_uint_private(uint32_t *addr, uint32_t target_val,
         ts.tv_nsec = 0;
 
         do {
-            if (target_val != *addr)
+            if (target_val != __atomic_load_n(addr, __ATOMIC_SEQ_CST))
                 return 0;
 
-            ret = get_errno(safe__umtx_op(addr, QEMU_UMTX_OP(UMTX_OP_WAIT_UINT_PRIVATE),
-                        target_val, NULL, &ts));
+            ret = get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAIT_UINT_PRIVATE),
+                        target_val, &ts, NULL, 0));
 
             if (ret != -TARGET_ETIMEDOUT)
                 return ret;
@@ -314,13 +317,11 @@ static abi_long _umtx_wait_uint_private(uint32_t *addr, uint32_t target_val,
                 abort();
             }
         } while (1);
-    } else
+    }
 #endif /* DETECT_DEADLOCK */
-	return get_errno(safe__umtx_op(addr, QEMU_UMTX_OP(UMTX_OP_WAIT_UINT_PRIVATE),
-            target_val, (void *)tsz, t));
-#else
-    abort();
-#endif
+    assert (t == 0 && tsz == 0); /* "Not implemented yet: open PR!" */
+    return get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAIT_UINT_PRIVATE),
+			    target_val, NULL, NULL, 0));
 }
 
 abi_long freebsd_umtx_wait_uint_private(abi_ulong obj, uint32_t target_val,
@@ -333,14 +334,14 @@ abi_long freebsd_umtx_wait_uint_private(abi_ulong obj, uint32_t target_val,
     return _umtx_wait_uint_private(g2h_untagged(obj), target_val, tsz, t, __func__);
 }
 
-static abi_long _umtx_wait(abi_ulong *addr, abi_ulong target_val, size_t tsz,
+static abi_long _umtx_wait(uint32_t *addr, uint32_t target_val, size_t tsz,
         void *t, const char *where)
 {
-#if !defined(__linux__)
 #if DETECT_DEADLOCK
     abi_long ret;
     long cnt = 0;
 
+    abort();
     /* target_val has already been tswap'ed. */
 
     if (t == NULL) {
@@ -366,11 +367,8 @@ static abi_long _umtx_wait(abi_ulong *addr, abi_ulong target_val, size_t tsz,
         } while (1);
     } else
 #endif /* DETECT_DEADLOCK */
-	return get_errno(safe__umtx_op(addr, QEMU_UMTX_OP(UMTX_OP_WAIT),
-                target_val, (void *)tsz, t));
-#else
-    abort();
-#endif
+    assert (t == 0 && tsz == 0); /* "Not implemented yet: open PR!" */
+    return get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAIT), target_val, NULL, NULL, 0));
 }
 
 abi_long freebsd_umtx_wait(abi_ulong targ_addr, abi_ulong target_id, size_t tsz,
@@ -393,16 +391,12 @@ abi_long freebsd_umtx_wait(abi_ulong targ_addr, abi_ulong target_id, size_t tsz,
 
 abi_long freebsd_umtx_wake_private(abi_ulong obj, uint32_t val)
 {
-#if !defined(__linux__)
 
     DEBUG_UMTX("<WAKE_PRIVATE> %s: _umtx_op(%p (%d), %d, %u, NULL, NULL)\n",
             __func__, g2h_untagged(obj), tswap32(*(uint32_t *)g2h_untagged(obj)),
             UMTX_OP_WAKE_PRIVATE, val);
-    return get_errno(safe__umtx_op(g2h_untagged(obj), QEMU_UMTX_OP(UMTX_OP_WAKE_PRIVATE),
-        val, NULL, NULL));
-#else
-    abort();
-#endif
+    return get_errno(safe_futex(g2h_untagged(obj), QEMU_UMTX_OP(UMTX_OP_WAKE_PRIVATE),
+        val, NULL, NULL, 0));
 }
 
 #if defined(UMTX_OP_NWAKE_PRIVATE)
@@ -503,7 +497,7 @@ abi_long freebsd_umtx_mutex_wake2(abi_ulong target_addr, uint32_t flags)
         __get_user(owner, &target_umutex->m_owner);
     }
     pthread_mutex_unlock(&umtx_wait_lck);
-    addr = g2h_untagged((uintptr_t)&target_umutex->m_owner);
+    addr = (uintptr_t)&target_umutex->m_owner;
     unlock_user(target_umutex, target_addr, 0);
 
     return get_errno(safe__umtx_op(addr, UMTX_OP_WAKE_PRIVATE, 1, NULL,
@@ -945,21 +939,17 @@ abi_long freebsd_umtx_wake(abi_ulong target_addr, uint32_t n_wake)
 
     DEBUG_UMTX("<WAKE> %s: futex(%p, %d, 0x%x, 0, 0, NULL)\n",
             __func__, g2h_untagged(target_addr), UMTX_OP_WAKE, n_wake);
-    return get_errno(safe_futex(g2h_untagged(target_addr), FUTEX_WAKE_PRIVATE,
+    return get_errno(safe_futex(g2h_untagged(target_addr), QEMU_UMTX_OP(UMTX_OP_WAKE),
         n_wake, 0, 0, 0));
 }
 
 abi_long freebsd_umtx_wake_unsafe(abi_ulong target_addr, uint32_t n_wake)
 {
-#if !defined(__linux__)
 
     DEBUG_UMTX("<WAKE> %s: _umtx_op(%p, %d, 0x%x, NULL, NULL)\n",
             __func__, g2h_untagged(target_addr), UMTX_OP_WAKE, n_wake);
-    return get_errno(_umtx_op(g2h_untagged(target_addr), QEMU_UMTX_OP(UMTX_OP_WAKE),
-        n_wake, NULL, 0));
-#else
-    abort();
-#endif
+    return get_errno(fast_futex(g2h_untagged(target_addr), QEMU_UMTX_OP(UMTX_OP_WAKE),
+        n_wake, 0, 0, 0));
 }
 
 abi_long freebsd_umtx_mutex_wake(abi_ulong obj, abi_long val)
@@ -978,7 +968,7 @@ abi_long freebsd_umtx_mutex_wake(abi_ulong obj, abi_long val)
 abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
         void *ts, size_t tsz, int mode, abi_ulong val)
 {
-#ifdef _UMTX_OPTIMIZED
+#if defined(_UMTX_OPTIMIZED) && !defined(__linux__)
     int op;
 
     if (!access_ok(VERIFY_WRITE, target_addr, sizeof(struct target_umutex))) {
@@ -1085,12 +1075,12 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
         __put_user(count, &target_umutex->m_count);
         pthread_mutex_unlock(&umtx_wait_lck);
 
-        addr = g2h_untagged((uintptr_t)&target_umutex->m_owner);
+        addr = &target_umutex->m_owner;
 
         unlock_user_struct(target_umutex, target_addr, 1);
 
         DEBUG_UMTX("<WAIT UMUTEX> %s: _umtx_op(%p, %d, 0x%x, %d, %jx) "
-                "count = %d\n", __func__, g2h_untagged(target_addr), UMTX_OP_WAIT_PRIVATE,
+                "count = %d\n", __func__, g2h_untagged(target_addr), UMTX_OP_WAIT_UINT_PRIVATE,
                 tswap32(target_umutex->m_owner), tsz, (uintmax_t)ts, count);
         ret = _umtx_wait_uint_private(addr, owner, tsz, (void *)ts, __func__);
 
@@ -1114,7 +1104,7 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
 
 abi_long freebsd_unlock_umutex(abi_ulong target_addr, uint32_t id)
 {
-#ifdef _UMTX_OPTIMIZED
+#if defined(_UMTX_OPTIMIZED) && !defined(__linux__)
     if (!access_ok(VERIFY_WRITE, target_addr, sizeof(struct target_umutex))) {
         return -TARGET_EFAULT;
     }
@@ -1144,7 +1134,7 @@ abi_long freebsd_unlock_umutex(abi_ulong target_addr, uint32_t id)
     __put_user(flags, &target_umutex->m_owner);
     pthread_mutex_unlock(&umtx_wait_lck);
 
-    addr = g2h_untagged((uintptr_t)&target_umutex->m_owner);
+    addr = &target_umutex->m_owner;
 
     unlock_user_struct(target_umutex, target_addr, 1);
 
@@ -1156,7 +1146,7 @@ abi_long freebsd_unlock_umutex(abi_ulong target_addr, uint32_t id)
      */
     DEBUG_UMTX("<WAKE> %s: _umtx_op(%p, %d, 0x%x, NULL, NULL)\n",
             __func__, g2h_untagged(target_addr), UMTX_OP_WAKE, 0);
-    return get_errno(safe__umtx_op(addr, UMTX_OP_WAKE_PRIVATE, 1, NULL, NULL));
+    return get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAKE_PRIVATE), 1, NULL, NULL, 0));
 #endif  /* _UMTX_OPTIMIZED */
 }
 
@@ -1295,7 +1285,7 @@ abi_long freebsd_cv_broadcast(abi_ulong target_ucond_addr)
 abi_long freebsd_rw_rdlock(abi_ulong target_addr, long fflag, size_t tsz,
         void *t)
 {
-#ifdef _UMTX_OPTIMIZED
+#if defined(_UMTX_OPTIMIZED) && !defined(__linux__)
     if (!access_ok(VERIFY_WRITE, target_addr, sizeof(struct target_urwlock))) {
         return -TARGET_EFAULT;
     }
@@ -1630,7 +1620,6 @@ freebsd_umtx_robust_list(abi_ulong target_addr, size_t rbsize)
 abi_long do_freebsd_thr_new(CPUArchState *env,
         abi_ulong target_param_addr, int32_t param_size)
 {
-#if !defined(__linux__)
     new_freebsd_thread_info_t info;
     pthread_attr_t attr;
     TaskState *ts;
@@ -1664,7 +1653,7 @@ abi_long do_freebsd_thr_new(CPUArchState *env,
     target_rtp_addr = info.param.rtp = tswapal(target_param->rtp);
     unlock_user(target_param, target_param_addr, 0);
 
-    thr_self(&info.parent_tid);
+    info.parent_tid = gettid();;
 
     if (target_rtp_addr) {
         if (!lock_user_struct(VERIFY_READ, target_rtp, target_rtp_addr, 1)) {
@@ -1747,7 +1736,4 @@ abi_long do_freebsd_thr_new(CPUArchState *env,
     pthread_mutex_unlock(new_freebsd_thread_lock_ptr);
 
     return ret;
-#else
-    abort();
-#endif
 }

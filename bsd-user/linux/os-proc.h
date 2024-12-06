@@ -247,7 +247,6 @@ static inline abi_long do_freebsd_vfork(void *cpu_env)
 /* rfork(2) */
 static inline abi_long do_freebsd_rfork(void *cpu_env, abi_long flags)
 {
-#if !defined(__linux__)
     abi_long ret;
     abi_ulong child_flag;
 
@@ -263,9 +262,22 @@ static inline abi_long do_freebsd_rfork(void *cpu_env, abi_long flags)
         return -TARGET_EINVAL;
     }
     fork_start();
-    ret = rfork(flags);
+    ret = vfork();
     if (ret == 0) {
         /* child */
+        // Reset all signal handlers to default
+        struct sigaction sa;
+        sa.sa_handler = SIG_DFL;
+        sa.sa_flags = 0;
+        sigemptyset(&sa.sa_mask);
+
+        for (int sig = 1; sig < NSIG; sig++) {
+            // Skip SIGKILL and SIGSTOP because they cannot be caught or ignored
+            if (sig == SIGKILL || sig == SIGSTOP) {
+                continue;
+            }
+            sigaction(sig, &sa, NULL);
+        }
         child_flag = 1;
         target_cpu_clone_regs(cpu_env, 0);
     } else {
@@ -281,9 +293,6 @@ static inline abi_long do_freebsd_rfork(void *cpu_env, abi_long flags)
     fork_end(ret);
 
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* pdfork(2) */
