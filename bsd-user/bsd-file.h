@@ -499,8 +499,15 @@ static abi_long do_bsd___getcwd(abi_long arg1, abi_long arg2)
     if (p == NULL) {
         return -TARGET_EFAULT;
     }
+#if !defined(__linux__)
     ret = safe_syscall(SYS___getcwd, p, arg2);
     unlock_user(p, arg1, ret == 0 ? strlen(p) + 1 : 0);
+#else
+    ret = safe_getcwd(p, arg2);
+    assert (ret <= 0 || (strlen(p) == ret - 1));
+    unlock_user(p, arg1, ret > 0 ? ret : 0);
+    ret = (ret >  0) ? 0 : -1;
+#endif
 
     return get_errno(ret);
 }

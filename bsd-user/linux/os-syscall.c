@@ -37,6 +37,8 @@
 #include "truss_hdr.h"
 #include "systruss.h"
 
+static safe_syscall2(long, getcwd, char *, buf, size_t, size);
+
 /* BSD independent syscall shims */
 #include "bsd-file.h"
 #include "bsd-ioctl.h"
