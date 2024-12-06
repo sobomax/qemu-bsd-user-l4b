@@ -983,7 +983,7 @@ static inline abi_long do_freebsd_futimens(abi_ulong arg1,
     return get_errno(futimens(arg1, tvp));
 }
 
-static inline abi_long do_freebsd_utimensat(abi_ulong arg1,
+static inline abi_long do_freebsd_utimensat(abi_int arg1,
         abi_ulong arg2, abi_ulong arg3, abi_ulong arg4)
 {
     abi_long ret = 0;

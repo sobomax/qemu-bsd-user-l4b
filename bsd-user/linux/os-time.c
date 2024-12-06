@@ -67,6 +67,14 @@ abi_long t2h_freebsd_timespec(struct timespec *ts, abi_ulong target_ts_addr)
     }
     __get_user(ts->tv_sec, &target_ts->tv_sec);
     __get_user(ts->tv_nsec, &target_ts->tv_nsec);
+    switch (ts->tv_nsec | ts->tv_sec) {
+    case TARGET_UTIME_NOW:
+        ts->tv_nsec = UTIME_NOW;
+        break;
+    case TARGET_UTIME_OMIT:
+        ts->tv_nsec = UTIME_OMIT;
+        break;
+    }
     unlock_user_struct(target_ts, target_ts_addr, 1);
 
     return 0;
@@ -80,7 +88,16 @@ abi_long h2t_freebsd_timespec(abi_ulong target_ts_addr, struct timespec *ts)
         return -TARGET_EFAULT;
     }
     __put_user(ts->tv_sec, &target_ts->tv_sec);
-    __put_user(ts->tv_nsec, &target_ts->tv_nsec);
+    switch (ts->tv_nsec | ts->tv_sec) {
+    case UTIME_NOW:
+        __put_user(TARGET_UTIME_NOW, &target_ts->tv_nsec);
+        break;
+    case UTIME_OMIT:
+        __put_user(TARGET_UTIME_OMIT, &target_ts->tv_nsec);
+        break;
+    default:
+        __put_user(ts->tv_nsec, &target_ts->tv_nsec);
+    }
     unlock_user_struct(target_ts, target_ts_addr, 1);
 
     return 0;

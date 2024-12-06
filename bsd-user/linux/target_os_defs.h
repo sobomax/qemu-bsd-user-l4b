@@ -1598,6 +1598,14 @@ static const typeof(SIOCDELMULTI) HOST_SIOCDELMULTI = SIOCDELMULTI;
 #endif /* found in: sys/sockio.h */
 #undef SIOCDELMULTI
 #define SIOCDELMULTI	 _IOW('i', 50, struct ifreq)	/* del m'cast addr */
+#if defined(TARGET_UTIME_NOW)
+#undef TARGET_UTIME_NOW
+#endif /* found in: sys/stat.h */
+#define TARGET_UTIME_NOW	-1
+#if defined(TARGET_UTIME_OMIT)
+#undef TARGET_UTIME_OMIT
+#endif /* found in: sys/stat.h */
+#define TARGET_UTIME_OMIT	-2
 #if defined(SYS_syscall) && !defined(HOST_SYS_syscall)
 static const typeof(SYS_syscall) HOST_SYS_syscall = SYS_syscall;
 #endif /* found in: sys/syscall.h */
