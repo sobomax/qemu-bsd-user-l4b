@@ -8,5 +8,6 @@ bsd_user_ss.add(files(
   'os-thread.c',
   'os-time.c',
   'os-file.c',
-  'truss.c'
+  'truss.c',
+  'os-dev_proc.c',
 ))
