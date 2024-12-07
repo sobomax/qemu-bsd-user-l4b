@@ -967,16 +967,26 @@ static abi_long do_bsd_pathconf(abi_long arg1, abi_long arg2)
 /* lpathconf(2) */
 static abi_long do_bsd_lpathconf(abi_long arg1, abi_long arg2)
 {
-#if !defined(__linux__)
     abi_long ret;
     void *p;
 
     LOCK_PATH(p, arg1);
+#if !defined(__linux__)
     ret = get_errno(lpathconf(p, arg2)); /* XXX path(p)? */
     UNLOCK_PATH(p, arg1);
 
     return ret;
 #else
+    struct stat st;
+    ret = get_errno(lstat(p, &st));
+    UNLOCK_PATH(p, arg1);
+    if (ret != 0)
+        return ret;
+    switch (arg2) {
+    case TARGET__PC_ACL_EXTENDED:
+    case TARGET__PC_ACL_NFS4:
+        return 0;
+    }
     fprintf(stderr, "do_bsd_lpathconf: stub\n");
     return -TARGET_ENOENT;
 #endif
