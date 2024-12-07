@@ -716,7 +716,8 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_linkat: /* linkat(2) */
-        ret = do_bsd_linkat(arg1, arg2, arg3, arg4, arg5);
+        ret = do_bsd_linkat(arg1, arg2, arg3, arg4,
+                target_to_host_bitmask(arg5, at_flags_tbl));
         break;
 
     case TARGET_FREEBSD_NR_unlink: /* unlink(2) */
@@ -724,7 +725,8 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_unlinkat: /* unlinkat(2) */
-        ret = do_bsd_unlinkat(arg1, arg2, arg3);
+        ret = do_bsd_unlinkat(arg1, arg2,
+                target_to_host_bitmask(arg3, at_flags_tbl));
         break;
 
     case TARGET_FREEBSD_NR_mkdir: /* mkdir(2) */
@@ -732,7 +734,8 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_mkdirat: /* mkdirat(2) */
-        ret = do_bsd_mkdirat(arg1, arg2, arg3);
+        ret = do_bsd_mkdirat(arg1, arg2,
+                target_to_host_bitmask(arg3, at_flags_tbl));
         break;
 
     case TARGET_FREEBSD_NR_rmdir: /* rmdir(2) (XXX no rmdirat()?) */
@@ -808,7 +811,8 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_fchmodat: /* fchmodat(2) */
-        ret = do_bsd_fchmodat(arg1, arg2, arg3, arg4);
+        ret = do_bsd_fchmodat(arg1, arg2, arg3,
+                target_to_host_bitmask(arg4, at_flags_tbl));
         break;
 
     case TARGET_FREEBSD_NR_freebsd11_mknod: /* mknod(2) */
@@ -836,7 +840,8 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_fchownat: /* fchownat(2) */
-        ret = do_bsd_fchownat(arg1, arg2, arg3, arg4, arg5);
+        ret = do_bsd_fchownat(arg1, arg2, arg3, arg4,
+                target_to_host_bitmask(arg5, at_flags_tbl));
         break;
 
     case TARGET_FREEBSD_NR_chflags: /* chflags(2) */
@@ -844,7 +849,8 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_chflagsat: /* chflagsat(2) */
-        ret = do_bsd_chflagsat(arg1, arg2, arg3, arg4);
+        ret = do_bsd_chflagsat(arg1, arg2, arg3,
+                target_to_host_bitmask(arg4, at_flags_tbl));
         break;
 
     case TARGET_FREEBSD_NR_lchflags: /* lchflags(2) */

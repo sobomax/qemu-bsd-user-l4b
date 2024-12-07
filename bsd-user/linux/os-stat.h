@@ -134,7 +134,7 @@ static inline abi_long do_freebsd11_fstatat(abi_long arg1, abi_long arg2,
 }
 
 /* fstatat(2) */
-static inline abi_long do_freebsd_fstatat(abi_long arg1, abi_long arg2,
+static inline abi_long do_freebsd_fstatat(abi_int arg1, abi_long arg2,
         abi_long arg3, abi_long arg4)
 {
     abi_long ret;
@@ -567,12 +567,13 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
     if (dirp == NULL) {
         return -TARGET_EFAULT;
     }
-    adirp = aligned_alloca(nbytes, __alignof__(*adirp));
+    int h_nbytes = (nbytes * offsetof(struct dirent, d_name)) / offsetof(struct freebsd11_dirent, d_name);
+    adirp = aligned_alloca(h_nbytes, __alignof__(*adirp));
     if (adirp == NULL) {
         ret = -TARGET_ENOMEM;
         goto out;
     }
-    ret = get_errno(getdirentries(arg1, (char *)adirp, nbytes, &basep));
+    ret = get_errno(getdirentries(arg1, (char *)adirp, h_nbytes, &basep));
     if (!is_error(ret)) {
         struct freebsd11_dirent *tde = dirp;
         struct dirent *hde = adirp;
@@ -584,6 +585,7 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
             reclen = hde->d_reclen;
             if (reclen > len) {
                 ret = -TARGET_EFAULT;
+                abort();
                 goto out;
             }
             int namelen = reclen - offsetof(typeof(*hde), d_name);
@@ -591,6 +593,7 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
             if ((nbytes - ret) < target_reclen) {
                 if (ret == 0) {
                     ret = -TARGET_EINVAL;
+                    abort();
                     goto out;
 		}
                 break;
@@ -648,12 +651,13 @@ static inline abi_long do_freebsd_getdirentries(abi_long arg1,
     if (dirp == NULL) {
         return -TARGET_EFAULT;
     }
-    adirp = aligned_alloca(nbytes, __alignof__(*adirp));
+    int h_nbytes = (nbytes * offsetof(struct dirent, d_name)) / offsetof(struct target_dirent, d_name);
+    adirp = aligned_alloca(h_nbytes, __alignof__(*adirp));
     if (adirp == NULL) {
         ret = -TARGET_ENOMEM;
         goto out;
     }
-    ret = get_errno(getdirentries(arg1, (char *)adirp, nbytes, &basep));
+    ret = get_errno(getdirentries(arg1, (char *)adirp, h_nbytes, &basep));
     if (is_error(ret))
         goto out;
     struct target_dirent *tde = dirp;
@@ -666,6 +670,7 @@ static inline abi_long do_freebsd_getdirentries(abi_long arg1,
         reclen = hde->d_reclen;
         if (reclen > len) {
             ret = -TARGET_EFAULT;
+            abort();
             goto out;
         }
         int namelen = reclen - offsetof(typeof(*hde), d_name);
@@ -673,6 +678,7 @@ static inline abi_long do_freebsd_getdirentries(abi_long arg1,
         if ((nbytes - ret) < target_reclen) {
             if (ret == 0) {
                 ret = -TARGET_EINVAL;
+                abort();
                 goto out;
             }
 	    break;

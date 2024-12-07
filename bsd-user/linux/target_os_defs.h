@@ -4274,6 +4274,22 @@ static const typeof(WTRAPPED) HOST_WTRAPPED = WTRAPPED;
 #endif /* found in: sys/wait.h */
 #undef WTRAPPED
 #define WTRAPPED	32	/* Wait for a process to hit a trap or */
+#if defined(TARGET_CLOCK_REALTIME)
+#undef TARGET_CLOCK_REALTIME
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_REALTIME		0
+#if defined(TARGET_CLOCK_MONOTONIC)
+#undef TARGET_CLOCK_MONOTONIC
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_MONOTONIC		4
+#if defined(TARGET_CLOCK_UPTIME)
+#undef TARGET_CLOCK_UPTIME
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_UPTIME		5
+#if defined(TARGET_CLOCK_SECOND)
+#undef TARGET_CLOCK_SECOND
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_SECOND		13
 
 /* Struct definitions: */
 
