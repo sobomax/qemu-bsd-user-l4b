@@ -42,6 +42,8 @@
 #include "target_os_vmparam.h"
 #include "target_os_user.h"
 
+#include "os-dev_proc.h"
+
 /*
  * Length for the fixed length types.
  * 0 means variable length for strings and structures
@@ -1338,6 +1340,14 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
             holdlen = sizeof(abi_ulong);
             ret = 0;
             goto out;
+
+        case KERN_ARGMAX:
+            if (oldlen) {
+                (*(abi_uint *)holdp) = tswapal(sysconf(_SC_ARG_MAX));
+            }
+            holdlen = sizeof(abi_uint);
+            ret = 0;
+            goto out;
 #endif
 
         case KERN_USRSTACK:
@@ -1779,6 +1789,19 @@ abi_long do_freebsd_sysctlbyname(CPUArchState *env, abi_ulong namep,
             if (holdlen > oldlen)
                 holdlen = oldlen;
             memcpy(holdp, pagesizes, holdlen);
+        }
+        ret = 0;
+        goto out;
+    }
+    if (namelen == strlen("hw.availpages") && strcmp(snamep, "hw.availpages") == 0) {
+        holdlen = sizeof(abi_long);
+        if (oldlen) {
+            struct meminfo_entry se = get_meminfo_value("MemAvailable");
+            if (se.error) {
+                ret = -TARGET_EINVAL;
+                goto out;
+            }
+            *((abi_long *)holdp) = se.value / PAGE_SIZE;
         }
         ret = 0;
         goto out;
