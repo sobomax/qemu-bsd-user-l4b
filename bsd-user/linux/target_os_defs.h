@@ -3976,6 +3976,11 @@ static const typeof(KERN_HOSTNAME) HOST_KERN_HOSTNAME = KERN_HOSTNAME;
 #endif /* found in: sys/sysctl.h */
 #undef KERN_HOSTNAME
 #define KERN_HOSTNAME		10	/* string: hostname */
+#if defined(KERN_ARGMAX) && !defined(HOST_KERN_ARGMAX)
+static const typeof(KERN_ARGMAX) HOST_KERN_ARGMAX = KERN_ARGMAX;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_ARGMAX
+#define KERN_ARGMAX		 8	/* int: max arguments to exec */
 #if defined(TIOCSETD) && !defined(HOST_TIOCSETD)
 static const typeof(TIOCSETD) HOST_TIOCSETD = TIOCSETD;
 #endif /* found in: sys/ttycom.h */
@@ -4244,6 +4249,14 @@ static const typeof(UMTX_OP_SEM_WAKE) HOST_UMTX_OP_SEM_WAKE = UMTX_OP_SEM_WAKE;
 #undef TARGET_RFSPAWN
 #endif /* found in: sys/unistd.h */
 #define TARGET_RFSPAWN		(1U<<31)
+#if defined(TARGET__PC_ACL_NFS4)
+#undef TARGET__PC_ACL_NFS4
+#endif /* found in: sys/unistd.h */
+#define TARGET__PC_ACL_NFS4		64
+#if defined(TARGET__PC_ACL_EXTENDED)
+#undef TARGET__PC_ACL_EXTENDED
+#endif /* found in: sys/unistd.h */
+#define TARGET__PC_ACL_EXTENDED	59
 #if defined(WNOHANG) && !defined(HOST_WNOHANG)
 static const typeof(WNOHANG) HOST_WNOHANG = WNOHANG;
 #endif /* found in: sys/wait.h */
