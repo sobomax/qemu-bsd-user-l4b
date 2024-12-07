@@ -52,6 +52,20 @@ int __sys_ktimer_settime(int, int, const struct itimerspec * restrict,
      struct itimerspec *restrict);
 int __sys_ktimer_delete(int);
 
+static clockid_t
+clockid_t2h(abi_long cid) {
+    switch (cid) {
+    case TARGET_CLOCK_SECOND:
+    case TARGET_CLOCK_REALTIME:
+        return CLOCK_REALTIME;
+    case TARGET_CLOCK_MONOTONIC:
+        return CLOCK_MONOTONIC;
+    case TARGET_CLOCK_UPTIME:
+        return CLOCK_BOOTTIME;
+    }
+    abort();
+}
+
 /* nanosleep(2) */
 static inline abi_long do_freebsd_nanosleep(abi_long arg1, abi_long arg2)
 {
@@ -82,7 +96,7 @@ static inline abi_long do_freebsd_clock_nanosleep(abi_long arg1, abi_long arg2,
     flags = arg2;
     ret = t2h_freebsd_timespec(&req, arg3);
     if (!is_error(ret)) {
-        ret = get_errno(safe_clock_nanosleep(clkid, flags, &req, &rem));
+        ret = get_errno(safe_clock_nanosleep(clockid_t2h(clkid), flags, &req, &rem));
         if (ret == -TARGET_EINTR && arg4) {
             h2t_freebsd_timespec(arg4, &rem);
         }
@@ -97,7 +111,7 @@ static inline abi_long do_freebsd_clock_gettime(abi_long arg1, abi_long arg2)
     abi_long ret;
     struct timespec ts;
 
-    ret = get_errno(clock_gettime(arg1, &ts));
+    ret = get_errno(clock_gettime(clockid_t2h(arg1), &ts));
     if (!is_error(ret)) {
         if (h2t_freebsd_timespec(arg2, &ts)) {
             return -TARGET_EFAULT;
@@ -116,7 +130,7 @@ static inline abi_long do_freebsd_clock_settime(abi_long arg1, abi_long arg2)
         return -TARGET_EFAULT;
     }
 
-    return get_errno(clock_settime(arg1, &ts));
+    return get_errno(clock_settime(clockid_t2h(arg1), &ts));
 }
 
 /* clock_getres(2) */
@@ -125,7 +139,7 @@ static inline abi_long do_freebsd_clock_getres(abi_long arg1, abi_long arg2)
     abi_long ret;
     struct timespec ts;
 
-    ret = get_errno(clock_getres(arg1, &ts));
+    ret = get_errno(clock_getres(clockid_t2h(arg1), &ts));
     if (!is_error(ret)) {
         if (h2t_freebsd_timespec(arg2, &ts)) {
             return -TARGET_EFAULT;
@@ -1006,7 +1020,7 @@ static inline abi_long do_freebsd_utimensat(abi_int arg1,
         return -TARGET_EFAULT;
     }
     ret = get_errno(utimensat(arg1, p, tvp,
-	target_to_host_bitmask(arg4, fcntl_flags_tbl)));
+	target_to_host_bitmask(arg4, at_flags_tbl)));
     unlock_user(p, arg2, 0);
     return ret;
 }

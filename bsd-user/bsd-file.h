@@ -740,7 +740,13 @@ static abi_long do_bsd_lchmod(abi_long arg1, abi_long arg2)
     void *p;
 
     LOCK_PATH(p, arg1);
+#if !defined(__linux__)
     ret = get_errno(lchmod(p, arg2)); /* XXX path(p)? */
+#else
+    struct stat ls;
+    /* XXX no way to set permissions on linux, fake it */
+    ret = get_errno(lstat(p, &ls));
+#endif
     UNLOCK_PATH(p, arg1);
 
     return ret;
