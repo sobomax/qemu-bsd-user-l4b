@@ -554,7 +554,7 @@ static inline abi_long do_freebsd11_getdents(abi_long arg1,
 #define ALIGN(p, a) (((p) + ((a) - 1)) & ~((a) - 1))
 #define aligned_alloca(n, a) ({void *_x = alloca(n + a - 1); (void *)ALIGN((uintptr_t)_x, (a));})
 
-/* getdirecentries(2) */
+/* getdirentries(2) */
 static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
         abi_ulong arg2, abi_long nbytes, abi_ulong arg4)
 {
@@ -574,46 +574,48 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
         goto out;
     }
     ret = get_errno(getdirentries(arg1, (char *)adirp, h_nbytes, &basep));
-    if (!is_error(ret)) {
-        struct freebsd11_dirent *tde = dirp;
-        struct dirent *hde = adirp;
-        int len = ret;
-        ret = 0;
-        int reclen;
+    if (ret <= 0)
+        goto out;
+    struct freebsd11_dirent *tde = dirp;
+    struct dirent *hde = adirp;
+    int len = ret;
+    ret = 0;
+    int reclen;
 
-        while (len > 0) {
-            reclen = hde->d_reclen;
-            if (reclen > len) {
-                ret = -TARGET_EFAULT;
+    while (len > 0) {
+        reclen = hde->d_reclen;
+        if (reclen > len) {
+            ret = -TARGET_EFAULT;
+            abort();
+            goto out;
+        }
+        int namelen = reclen - offsetof(typeof(*hde), d_name);
+        int target_reclen = ALIGN(offsetof(typeof(*tde), d_name) + namelen, __alignof__(typeof(*tde)));
+        if ((nbytes - ret) < target_reclen) {
+            if (ret == 0) {
+                ret = -TARGET_EINVAL;
                 abort();
                 goto out;
-            }
-            int namelen = reclen - offsetof(typeof(*hde), d_name);
-            int target_reclen = ALIGN(offsetof(typeof(*tde), d_name) + namelen, __alignof__(typeof(*tde)));
-            if ((nbytes - ret) < target_reclen) {
-                if (ret == 0) {
-                    ret = -TARGET_EINVAL;
-                    abort();
-                    goto out;
-		}
-                break;
-            }
-            *tde = (typeof(*tde)){0};
-            abi_long tft = host_to_target_bitmask(DTTOIF(hde->d_type), fcntl_flags_tbl);
-            tde->d_type = IFTODT(tft);
-            tde->d_fileno = tswap32(hde->d_fileno);
-            tde->d_reclen = tswap16(target_reclen);
-            char *ep = memchr(hde->d_name, '\0', namelen);
-            if (ep > hde->d_name) {
-                int sl = ep - hde->d_name;
-                memcpy(tde->d_name, hde->d_name, sl + 1);
-                tde->d_namlen = tswap16(sl);
-            }
-            len -= reclen;
-            ret += target_reclen;
-            tde = (typeof(tde))((void *)tde + target_reclen);
-            hde = (typeof(hde))((void *)hde + reclen);
+	    }
+            break;
         }
+        *tde = (typeof(*tde)){0};
+        abi_long tft = host_to_target_bitmask(DTTOIF(hde->d_type), fcntl_flags_tbl);
+        tde->d_type = IFTODT(tft);
+        tde->d_fileno = tswap32(hde->d_fileno);
+        tde->d_reclen = tswap16(target_reclen);
+        char *ep = memchr(hde->d_name, '\0', namelen);
+        if (ep > hde->d_name) {
+            int sl = ep - hde->d_name;
+            memcpy(tde->d_name, hde->d_name, sl + 1);
+            tde->d_namlen = tswap16(sl);
+        } else {
+            abort();
+        }
+        len -= reclen;
+        ret += target_reclen;
+        tde = (typeof(tde))((void *)tde + target_reclen);
+        hde = (typeof(hde))((void *)hde + reclen);
     }
     unlock_user(dirp, arg2, ret);
     if (arg4) {
@@ -638,7 +640,7 @@ struct target_dirent {
         char    d_name[TARGET_MAXNAMLEN + 1];  /* name must be no longer than this */
 };
 
-/* getdirecentries(2) */
+/* getdirentries(2) */
 static inline abi_long do_freebsd_getdirentries(abi_long arg1,
         abi_ulong arg2, abi_long nbytes, abi_ulong arg4)
 {
@@ -651,60 +653,63 @@ static inline abi_long do_freebsd_getdirentries(abi_long arg1,
     if (dirp == NULL) {
         return -TARGET_EFAULT;
     }
-    int h_nbytes = (nbytes * offsetof(struct dirent, d_name)) / offsetof(struct target_dirent, d_name);
+    int h_nbytes = (nbytes * offsetof(struct dirent, d_name)) /
+                             offsetof(struct target_dirent, d_name);
     adirp = aligned_alloca(h_nbytes, __alignof__(*adirp));
     if (adirp == NULL) {
         ret = -TARGET_ENOMEM;
         goto out;
     }
     ret = get_errno(getdirentries(arg1, (char *)adirp, h_nbytes, &basep));
-    if (is_error(ret))
+    if (ret <= 0)
         goto out;
     struct target_dirent *tde = dirp;
     struct dirent *hde = adirp;
     int len = ret;
     ret = 0;
     int reclen;
+    off_t last_off = -1;
 
     while (len > 0) {
         reclen = hde->d_reclen;
-        if (reclen > len) {
-            ret = -TARGET_EFAULT;
+	int namelen = reclen - offsetof(typeof(*hde), d_name);
+        if (reclen > len || namelen <= 0) {
             abort();
-            goto out;
         }
-        int namelen = reclen - offsetof(typeof(*hde), d_name);
         int target_reclen = ALIGN(offsetof(typeof(*tde), d_name) + namelen, __alignof__(typeof(*tde)));
-        if ((nbytes - ret) < target_reclen) {
-            if (ret == 0) {
-                ret = -TARGET_EINVAL;
-                abort();
-                goto out;
-            }
-	    break;
+        if ((nbytes - ret) < (target_reclen * 8)) {
+            assert(last_off > 0 && lseek(arg1, last_off, SEEK_SET) == last_off);
+            goto early_out;
         }
         *tde = (typeof(*tde)){0};
         abi_long tft = host_to_target_bitmask(DTTOIF(hde->d_type), fcntl_flags_tbl);
         tde->d_type = IFTODT(tft);
+	last_off = tde->d_off = hde->d_off;
         tde->d_fileno = tswap32(hde->d_fileno);
         tde->d_reclen = tswap16(target_reclen);
         char *ep = memchr(hde->d_name, '\0', namelen);
         if (ep > hde->d_name) {
             int sl = ep - hde->d_name;
             memcpy(tde->d_name, hde->d_name, sl + 1);
+	    assert(tde->d_name[sl] == '\0');
             tde->d_namlen = tswap16(sl);
+        } else {
+            abort();
         }
         len -= reclen;
         ret += target_reclen;
         tde = (typeof(tde))((void *)tde + target_reclen);
         hde = (typeof(hde))((void *)hde + reclen);
     }
+    assert(len == 0);
+early_out:
     unlock_user(dirp, arg2, ret);
     if (arg4) {
         if (put_user(basep, arg4, abi_ulong)) {
             return -TARGET_EFAULT;
         }
     }
+    assert(ret <= nbytes);
     return ret;
 out:
     unlock_user(dirp, arg2, ret);
