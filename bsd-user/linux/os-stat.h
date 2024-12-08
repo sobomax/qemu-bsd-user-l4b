@@ -581,27 +581,24 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
     int len = ret;
     ret = 0;
     int reclen;
+    off_t last_off = -1;
 
     while (len > 0) {
         reclen = hde->d_reclen;
-        if (reclen > len) {
-            ret = -TARGET_EFAULT;
-            abort();
-            goto out;
-        }
         int namelen = reclen - offsetof(typeof(*hde), d_name);
+        if (reclen > len || namelen <= 0) {
+            abort();
+        }
         int target_reclen = ALIGN(offsetof(typeof(*tde), d_name) + namelen, __alignof__(typeof(*tde)));
-        if ((nbytes - ret) < target_reclen) {
-            if (ret == 0) {
-                ret = -TARGET_EINVAL;
-                abort();
-                goto out;
-	    }
+        if ((nbytes - ret) < (target_reclen * 8)) {
+            assert(last_off > 0 && lseek(arg1, last_off, SEEK_SET) == last_off);
+            basep = last_off;
             break;
         }
         *tde = (typeof(*tde)){0};
         abi_long tft = host_to_target_bitmask(DTTOIF(hde->d_type), fcntl_flags_tbl);
         tde->d_type = IFTODT(tft);
+        last_off = hde->d_off;
         tde->d_fileno = tswap32(hde->d_fileno);
         tde->d_reclen = tswap16(target_reclen);
         char *ep = memchr(hde->d_name, '\0', namelen);
@@ -679,12 +676,13 @@ static inline abi_long do_freebsd_getdirentries(abi_long arg1,
         int target_reclen = ALIGN(offsetof(typeof(*tde), d_name) + namelen, __alignof__(typeof(*tde)));
         if ((nbytes - ret) < (target_reclen * 8)) {
             assert(last_off > 0 && lseek(arg1, last_off, SEEK_SET) == last_off);
+            basep = last_off;
             goto early_out;
         }
         *tde = (typeof(*tde)){0};
         abi_long tft = host_to_target_bitmask(DTTOIF(hde->d_type), fcntl_flags_tbl);
         tde->d_type = IFTODT(tft);
-	last_off = tde->d_off = hde->d_off;
+        last_off = tde->d_off = hde->d_off;
         tde->d_fileno = tswap32(hde->d_fileno);
         tde->d_reclen = tswap16(target_reclen);
         char *ep = memchr(hde->d_name, '\0', namelen);
