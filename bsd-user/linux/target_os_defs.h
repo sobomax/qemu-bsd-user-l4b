@@ -1488,6 +1488,14 @@ static const typeof(NET_RT_IFLISTL) HOST_NET_RT_IFLISTL = NET_RT_IFLISTL;
 #endif /* found in: sys/socket.h */
 #undef NET_RT_IFLISTL
 #define NET_RT_IFLISTL	5		/* Survey interface list, using 'l'en */
+#if defined(TARGET_SOCK_CLOEXEC)
+#undef TARGET_SOCK_CLOEXEC
+#endif /* found in: sys/socket.h */
+#define TARGET_SOCK_CLOEXEC	0x10000000
+#if defined(TARGET_SOCK_NONBLOCK)
+#undef TARGET_SOCK_NONBLOCK
+#endif /* found in: sys/socket.h */
+#define TARGET_SOCK_NONBLOCK	0x20000000
 #undef SIOCGIFMAC /* found in: sys/sockio.h */
 #define SIOCGIFMAC	_IOWR('i', 38, struct ifreq)	/* get IF MAC label */
 #undef SIOCGIFFIB /* found in: sys/sockio.h */

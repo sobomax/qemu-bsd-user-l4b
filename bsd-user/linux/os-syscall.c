@@ -278,6 +278,40 @@ int host_to_target_errno(int err)
     abort();
 }
 
+#define TARGET_SOCK_TYPE_MASK ~(TARGET_SOCK_CLOEXEC | TARGET_SOCK_NONBLOCK)
+
+static inline int
+target_to_host_sock_type(int target_type)
+{
+    int host_type = 0;
+
+    switch (target_type & TARGET_SOCK_TYPE_MASK) {
+    case TARGET_SOCK_DGRAM:
+        host_type = SOCK_DGRAM;
+        break;
+    case TARGET_SOCK_STREAM:
+        host_type = SOCK_STREAM;
+        break;
+    default:
+        abort();
+    }
+    if (target_type & TARGET_SOCK_CLOEXEC) {
+#if defined(SOCK_CLOEXEC)
+        host_type |= SOCK_CLOEXEC;
+#else
+        abort();
+#endif
+    }
+    if (target_type & TARGET_SOCK_NONBLOCK) {
+#if defined(SOCK_NONBLOCK)
+        host_type |= SOCK_NONBLOCK;
+#elif !defined(O_NONBLOCK)
+        abort();
+#endif
+    }
+    return host_type;
+}
+
 bool is_error(abi_long ret)
 {
     return (abi_ulong)ret >= (abi_ulong)(-4096);
@@ -1280,7 +1314,8 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_socketpair: /* socketpair(2) */
-        ret = do_bsd_socketpair(arg1, arg2, arg3, arg4);
+        ret = do_bsd_socketpair(arg1,
+                target_to_host_sock_type(arg2), arg3, arg4);
         break;
 
     case TARGET_FREEBSD_NR_shutdown: /* shutdown(2) */
