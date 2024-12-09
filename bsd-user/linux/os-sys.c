@@ -1806,6 +1806,10 @@ abi_long do_freebsd_sysctlbyname(CPUArchState *env, abi_ulong namep,
         ret = 0;
         goto out;
     }
+    if (namelen == strlen("kern.ps_strings") && strcmp(snamep, "kern.ps_strings") == 0) {
+        ret = -TARGET_EINVAL;
+	goto out;
+    }
 
     oidplen = ARRAY_SIZE(oid);
     if (sysctlnametomib(snamep, oid, &oidplen) != 0) {

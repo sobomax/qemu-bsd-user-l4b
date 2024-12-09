@@ -24,6 +24,7 @@
 #include <sys/signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <linux/sched.h>
 #include <unistd.h>
 
 #include "target_arch_cpu.h"
@@ -37,6 +38,8 @@ static const bitmask_transtbl wait4_opts_tbl[] = {
     { WEXITED, WEXITED, HOST_WEXITED, HOST_WEXITED },
 #endif
 };
+
+#define fast_clone3(a1, a2) syscall(SYS_clone3, (a1), (a2))
 
 pid_t safe_wait4(pid_t wpid, int *status, int options, struct rusage *rusage);
 pid_t safe_wait6(idtype_t idtype, id_t id, int *status, int options,
@@ -299,13 +302,19 @@ static inline abi_long do_freebsd_rfork(void *cpu_env, abi_long flags)
 static inline abi_long do_freebsd_pdfork(void *cpu_env, abi_ulong target_fdp,
         abi_long flags)
 {
-#if !defined(__linux__)
     abi_long ret;
     abi_ulong child_flag;
     int fd;
 
     fork_start();
+#if !defined(__linux__)
     ret = pdfork(&fd, flags);
+#else
+    assert(flags == 0);
+    struct clone_args ca = {.flags = CLONE_PIDFD|CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID};
+    ca.pidfd = (uintptr_t)&fd;
+    ret = get_errno(fast_clone3(&ca, sizeof(ca)));
+#endif
     if (ret == 0) {
         /* child */
         child_flag = 1;
@@ -326,9 +335,6 @@ static inline abi_long do_freebsd_pdfork(void *cpu_env, abi_ulong target_fdp,
     fork_end(ret);
 
     return ret;
-#else
-    abort();
-#endif
 }
 
 #endif /* BSD_USER_FREEBSD_OS_PROC_H */
