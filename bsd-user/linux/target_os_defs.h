@@ -4311,6 +4311,10 @@ static const typeof(WTRAPPED) HOST_WTRAPPED = WTRAPPED;
 #undef TARGET_CLOCK_SECOND
 #endif /* found in: sys/_clock_id.h */
 #define TARGET_CLOCK_SECOND		13
+#if defined(TARGET_CLOCK_MONOTONIC_FAST)
+#undef TARGET_CLOCK_MONOTONIC_FAST
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_MONOTONIC_FAST	12
 
 /* Struct definitions: */
 

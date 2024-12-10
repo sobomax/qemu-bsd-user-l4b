@@ -60,6 +60,8 @@ clockid_t2h(abi_long cid) {
         return CLOCK_REALTIME;
     case TARGET_CLOCK_MONOTONIC:
         return CLOCK_MONOTONIC;
+    case TARGET_CLOCK_MONOTONIC_FAST:
+	return CLOCK_MONOTONIC_COARSE;
     case TARGET_CLOCK_UPTIME:
         return CLOCK_BOOTTIME;
     }

@@ -26,6 +26,8 @@
 #include <sys/mount.h>
 #if !defined(__linux__)
 #include <sys/sysctl.h>
+#else
+#include <sys/utsname.h>
 #endif
 #include <sys/user.h>   /* For struct kinfo_* */
 #include <net/route.h>  /* For rt_msghdr */
@@ -1740,6 +1742,69 @@ out_str:
     goto out;
 }
 
+
+struct handler {
+    const char *name;
+    int (*func)(void *holdp, size_t oldlen, size_t *holdlen);
+};
+
+// Handlers for each case
+static int
+handle_hw_pagesizes(void *holdp, size_t oldlen, size_t *holdlen)
+{
+    *holdlen = sizeof(pagesizes);
+    if (oldlen) {
+        if (*holdlen > oldlen)
+            *holdlen = oldlen;
+        memcpy(holdp, pagesizes, *holdlen);
+    }
+    return 0; // success
+}
+
+static int
+handle_hw_availpages(void *holdp, size_t oldlen, size_t *holdlen)
+{
+    *holdlen = sizeof(abi_long);
+    if (oldlen) {
+        struct meminfo_entry se = get_meminfo_value("MemAvailable");
+        if (se.error) {
+            return -TARGET_EINVAL;
+        }
+        *((abi_long *)holdp) = se.value / PAGE_SIZE;
+    }
+    return 0; // success
+}
+
+static int
+handle_kern_ps_strings(void *holdp, size_t oldlen, size_t *holdlen)
+{
+    return -TARGET_EINVAL;
+}
+
+static int
+handle_hw_machine_arch(void *holdp, size_t oldlen, size_t *holdlen)
+{
+    struct utsname buffer;
+    if (uname(&buffer) == -1) {
+        return -TARGET_EINVAL;
+    }
+    *holdlen = strlen(buffer.machine) + 1;
+    if (oldlen) {
+        if (*holdlen > oldlen)
+            *holdlen = oldlen;
+        memcpy(holdp, buffer.machine, *holdlen);
+    }
+    return 0;
+}
+
+static const struct handler handlers[] = {
+    {"hw.pagesizes", handle_hw_pagesizes},
+    {"hw.availpages", handle_hw_availpages},
+    {"kern.ps_strings", handle_kern_ps_strings},
+    {"hw.machine_arch", handle_hw_machine_arch},
+    {NULL, NULL} // Terminator
+};
+
 /*
  * This syscall was created to make sysctlbyname(3) more efficient, but we can't
  * really provide it in bsd-user.  Notably, we must always translate the names
@@ -1783,32 +1848,11 @@ abi_long do_freebsd_sysctlbyname(CPUArchState *env, abi_ulong namep,
     }
     holdlen = oldlen;
 
-    if (namelen == strlen("hw.pagesizes") && strcmp(snamep, "hw.pagesizes") == 0) {
-        holdlen = sizeof(pagesizes);
-        if (oldlen) {
-            if (holdlen > oldlen)
-                holdlen = oldlen;
-            memcpy(holdp, pagesizes, holdlen);
+    for (const struct handler *h = handlers; h->name; h++) {
+        if (namelen == strlen(h->name) && strcmp(snamep, h->name) == 0) {
+            ret = h->func(holdp, oldlen, &holdlen);
+	    goto out;
         }
-        ret = 0;
-        goto out;
-    }
-    if (namelen == strlen("hw.availpages") && strcmp(snamep, "hw.availpages") == 0) {
-        holdlen = sizeof(abi_long);
-        if (oldlen) {
-            struct meminfo_entry se = get_meminfo_value("MemAvailable");
-            if (se.error) {
-                ret = -TARGET_EINVAL;
-                goto out;
-            }
-            *((abi_long *)holdp) = se.value / PAGE_SIZE;
-        }
-        ret = 0;
-        goto out;
-    }
-    if (namelen == strlen("kern.ps_strings") && strcmp(snamep, "kern.ps_strings") == 0) {
-        ret = -TARGET_EINVAL;
-	goto out;
     }
 
     oidplen = ARRAY_SIZE(oid);

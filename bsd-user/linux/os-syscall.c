@@ -1310,7 +1310,8 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_socket: /* socket(2) */
-        ret = do_bsd_socket(arg1, arg2, arg3);
+        ret = do_bsd_socket(arg1,
+                target_to_host_sock_type(arg2), arg3);
         break;
 
     case TARGET_FREEBSD_NR_socketpair: /* socketpair(2) */
