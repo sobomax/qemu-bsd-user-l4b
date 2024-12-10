@@ -1,0 +1,73 @@
+#!/bin/sh
+
+set -e
+
+debug_broken() {
+  echo "${BASE_IMAGE}: ${1} is BROKEN: ${2}" >&2
+}
+
+fltplatforms() {
+   FILT="grep -v -e unknown" # docker multi-arch is weird
+   case "${BASE_IMAGE}" in
+   debian:sid*)
+     FILT_ADD="linux/mips64le"
+     debug_broken "linux/mips64le" 'apt-get: Exec format error'
+     ;;
+   debian:12*)
+     FILT_ADD="linux/arm/v7 linux/ppc64le linux/mips64le"
+     debug_broken "linux/arm/v7" 'Unable to locate package llvm-18'
+     debug_broken "linux/ppc64le" 'Unable to locate package llvm-18'
+     debug_broken "linux/mips64le" 'Unable to locate package llvm-18'
+     ;;
+   ubuntu:latest)
+     FILT_ADD="linux/ppc64le linux/arm/v7"
+     debug_broken "linux/ppc64le" 'ERROR: C compiler "clang-18" either does not exist or does not work.'
+     debug_broken "linux/arm/v7" 'Unable to locate package llvm-18'
+     ;;
+   *)
+     ;;
+  esac
+  for f in linux/riscv64 linux/s390x
+  do
+    FILT_ADD="${FILT_ADD} ${f}"
+    debug_broken "${f}" "host is not supported yet (send PR!)"
+  done
+  if [ ! -z "${FILT_ADD}" ]
+  then
+    for f in ${FILT_ADD}
+    do
+      FILT="${FILT} -e ^${f}\$"
+    done
+  fi
+  ${FILT}
+}
+
+platformopts() {
+  case "${BASE_IMAGE}" in
+  debian:12*)
+    EXTRA_CFLAGS="-DHAVE_BSD_STRING_H=1"
+    case "${TARGETPLATFORM}" in
+    linux/386|linux/arm/v5)
+      EXTRA_CFLAGS="${EXTRA_CFLAGS} -Wno-atomic-alignment"
+      ;;
+    esac
+    echo "export EXTRA_CFLAGS=\"${EXTRA_CFLAGS}\""
+    echo "export EXTRA_LDFLAGS=\"-lbsd -lmd\""
+    ;;
+  esac
+  test ! -z "${@}" && echo "${@}"
+}
+
+case "${1}" in
+platformopts)
+  shift
+  platformopts "${@}"
+  ;;
+fltplatforms)
+  fltplatforms
+  ;;
+*)
+  echo "usage: `basename "${0}"` (platformopts|fltplatforms) [opts]" 2>&1
+  exit 1
+  ;;
+esac
