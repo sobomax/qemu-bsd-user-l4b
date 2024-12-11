@@ -49,7 +49,7 @@ void qemu_aio_unref(void *p);
 void qemu_aio_ref(void *p);
 
 typedef struct AioHandler AioHandler;
-typedef QLIST_HEAD(, AioHandler) AioHandlerList;
+typedef QLIST_HEAD_ATOMIC(, AioHandler) AioHandlerList;
 typedef void QEMUBHFunc(void *opaque);
 typedef bool AioPollFn(void *opaque);
 typedef void IOHandler(void *opaque);
@@ -170,7 +170,7 @@ struct AioContext {
      * Instead, the aio_poll calls include both the prepare and the
      * dispatch phase, hence a simple counter is enough for them.
      */
-    uint32_t notify_me;
+    _Atomic(uint32_t) notify_me;
 
     /* A lock to protect between QEMUBH and AioHandler adders and deleter,
      * and to ensure that no callbacks are removed while we're walking and
@@ -196,7 +196,7 @@ struct AioContext {
      * more information on the problem that would result, see "#ifdef BUG2"
      * in the docs/aio_notify_accept.promela formal model.
      */
-    bool notified;
+    _Atomic(bool) notified;
     EventNotifier notifier;
 
     QSLIST_HEAD(, Coroutine) scheduled_coroutines;
@@ -226,7 +226,7 @@ struct AioContext {
     QEMUTimerListGroup tlg;
 
     /* Number of AioHandlers without .io_poll() */
-    int poll_disable_cnt;
+    _Atomic(int) poll_disable_cnt;
 
     /* Polling mode parameters */
     int64_t poll_ns;        /* current polling time in nanoseconds */

@@ -130,8 +130,8 @@ struct ObjectClass
     Type type;
     GSList *interfaces;
 
-    const char *object_cast_cache[OBJECT_CLASS_CAST_CACHE];
-    const char *class_cast_cache[OBJECT_CLASS_CAST_CACHE];
+    _Atomic(const char *) object_cast_cache[OBJECT_CLASS_CAST_CACHE];
+    _Atomic(const char *) class_cast_cache[OBJECT_CLASS_CAST_CACHE];
 
     ObjectUnparent *unparent;
 
@@ -156,7 +156,7 @@ struct Object
     ObjectClass *class;
     ObjectFree *free;
     GHashTable *properties;
-    uint32_t ref;
+    _Atomic(uint32_t) ref;
     Object *parent;
 };
 

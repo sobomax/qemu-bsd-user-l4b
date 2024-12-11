@@ -1096,7 +1096,7 @@ struct AddressSpace {
     MemoryRegion *root;
 
     /* Accessed via RCU.  */
-    struct FlatView *current_map;
+    _Atomic(struct FlatView *) current_map;
 
     int ioeventfd_nb;
     int ioeventfd_notifiers;

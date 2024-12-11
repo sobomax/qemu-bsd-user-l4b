@@ -126,7 +126,7 @@
  */
 
 /* The core part of this function is implemented in assembly */
-long safe_syscall_base(int *pending, long number, ...);
+long safe_syscall_base(_Atomic(int) *pending, long number, ...);
 long safe_syscall_set_errno_tail(int value);
 
 /* These are defined by the safe-syscall.inc.S file */

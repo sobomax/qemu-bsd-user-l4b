@@ -113,7 +113,7 @@ struct TaskState {
      * the qatomic_read() and qatomic_set() functions. (It is not accessed
      * from multiple threads.)
      */
-    int signal_pending;
+    _Atomic(int) signal_pending;
     /* True if we're leaving a sigsuspend and sigsuspend_mask is valid. */
     bool in_sigsuspend;
     /*

@@ -49,7 +49,7 @@ static unsigned long lookup_range = DEFAULT_RANGE;
 static unsigned long update_range = DEFAULT_RANGE;
 static size_t init_range = DEFAULT_RANGE;
 static size_t init_size = DEFAULT_RANGE;
-static size_t n_ready_threads;
+static _Atomic(size_t) n_ready_threads;
 static long populate_offset;
 static long *keys;
 
@@ -69,8 +69,8 @@ static uint64_t resize_threshold;
 static size_t qht_n_elems = DEFAULT_QHT_N_ELEMS;
 static int qht_mode;
 
-static bool test_start;
-static bool test_stop;
+static _Atomic(bool) test_start;
+static _Atomic(bool) test_stop;
 
 static struct thread_info *rw_info;
 

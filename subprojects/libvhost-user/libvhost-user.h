@@ -408,7 +408,7 @@ struct VuDev {
     pthread_mutex_t backend_mutex;
     int backend_fd;
     uint64_t log_size;
-    uint8_t *log_table;
+    _Atomic(uint8_t) *log_table;
     uint64_t features;
     uint64_t protocol_features;
     bool broken;

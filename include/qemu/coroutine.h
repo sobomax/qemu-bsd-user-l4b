@@ -49,7 +49,7 @@ struct CoMutex {
     /* Count of pending lockers; 0 for a free mutex, 1 for an
      * uncontended mutex.
      */
-    unsigned locked;
+    _Atomic(unsigned) locked;
 
     /* Context that is holding the lock.  Useful to avoid spinning
      * when two coroutines on the same AioContext try to get the lock. :)

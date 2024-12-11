@@ -21,7 +21,7 @@
 typedef struct QemuSeqLock QemuSeqLock;
 
 struct QemuSeqLock {
-    unsigned sequence;
+    _Atomic(unsigned) sequence;
 };
 
 static inline void seqlock_init(QemuSeqLock *sl)

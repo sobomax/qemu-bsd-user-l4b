@@ -20,7 +20,7 @@ struct QemuLockCnt {
 #ifndef CONFIG_LINUX
     QemuMutex mutex;
 #endif
-    unsigned count;
+    _Atomic(unsigned) count;
 };
 
 /**

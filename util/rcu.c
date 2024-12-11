@@ -43,10 +43,10 @@
 #define RCU_GP_LOCKED           (1UL << 0)
 #define RCU_GP_CTR              (1UL << 1)
 
-unsigned long rcu_gp_ctr = RCU_GP_LOCKED;
+_Atomic(unsigned long) rcu_gp_ctr = RCU_GP_LOCKED;
 
 QemuEvent rcu_gp_event;
-static int in_drain_call_rcu;
+static _Atomic(int) in_drain_call_rcu;
 static QemuMutex rcu_registry_lock;
 static QemuMutex rcu_sync_lock;
 
@@ -54,7 +54,7 @@ static QemuMutex rcu_sync_lock;
  * Check whether a quiescent state was crossed between the beginning of
  * update_counter_and_wait and now.
  */
-static inline int rcu_gp_ongoing(unsigned long *ctr)
+static inline int rcu_gp_ongoing(_Atomic(unsigned long) *ctr)
 {
     unsigned long v;
 
@@ -180,13 +180,14 @@ void synchronize_rcu(void)
  * from liburcu.  Note that head is only used by the consumer.
  */
 static struct rcu_head dummy;
-static struct rcu_head *head = &dummy, **tail = &dummy.next;
-static int rcu_call_count;
+static struct rcu_head *head = &dummy;
+static _Atomic(_Atomic(struct rcu_head *) *) tail = &dummy.next;
+static _Atomic(int) rcu_call_count;
 static QemuEvent rcu_call_ready_event;
 
 static void enqueue(struct rcu_head *node)
 {
-    struct rcu_head **old_tail;
+    _Atomic(struct rcu_head *) *old_tail;
 
     node->next = NULL;
 

@@ -40,7 +40,7 @@ typedef struct RCUCloseFILE {
 /* Mutex covering the other global_* variables. */
 static QemuMutex global_mutex;
 static char *global_filename;
-static FILE *global_file;
+static _Atomic(FILE *) global_file;
 static __thread FILE *thread_file;
 static __thread Notifier qemu_log_thread_cleanup_notifier;
 
@@ -115,7 +115,7 @@ static FILE *qemu_log_trylock_with_err(Error **errp)
              * Since all we want is a read of a pointer, cast to void**,
              * which does work with typeof_strip_qual.
              */
-            logfile = qatomic_rcu_read((void **)&global_file);
+            logfile = qatomic_rcu_read(&global_file);
             if (!logfile) {
                 rcu_read_unlock();
                 return NULL;

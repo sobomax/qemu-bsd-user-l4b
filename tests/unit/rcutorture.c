@@ -64,7 +64,7 @@
 #include "qemu/rcu.h"
 #include "qemu/thread.h"
 
-int nthreadsrunning;
+_Atomic(int) nthreadsrunning;
 
 #define GOFLAG_INIT 0
 #define GOFLAG_RUN  1
@@ -229,12 +229,12 @@ static void uperftest(int nupdaters, int duration)
 #define RCU_STRESS_PIPE_LEN 10
 
 struct rcu_stress {
-    int age;  /* how many update cycles while not rcu_stress_current */
-    int mbtest;
+    _Atomic(int) age;  /* how many update cycles while not rcu_stress_current */
+    _Atomic(int) mbtest;
 };
 
 struct rcu_stress rcu_stress_array[RCU_STRESS_PIPE_LEN] = { { 0 } };
-struct rcu_stress *rcu_stress_current;
+_Atomic(struct rcu_stress *) rcu_stress_current;
 int n_mberror;
 
 /* Updates protected by counts_mutex */

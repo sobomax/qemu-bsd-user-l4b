@@ -98,7 +98,7 @@ static void tcg_accel_instance_init(Object *obj)
 }
 
 bool mttcg_enabled;
-bool one_insn_per_tb;
+_Atomic(bool) one_insn_per_tb;
 
 static int tcg_init_machine(MachineState *ms)
 {

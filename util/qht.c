@@ -144,9 +144,9 @@ static inline void qht_unlock(struct qht *ht)
 struct qht_bucket {
     QemuSpin lock;
     QemuSeqLock sequence;
-    uint32_t hashes[QHT_BUCKET_ENTRIES];
-    void *pointers[QHT_BUCKET_ENTRIES];
-    struct qht_bucket *next;
+    _Atomic(uint32_t) hashes[QHT_BUCKET_ENTRIES];
+    _Atomic(void *) pointers[QHT_BUCKET_ENTRIES];
+    _Atomic(struct qht_bucket *) next;
 } QEMU_ALIGNED(QHT_BUCKET_ALIGN);
 
 QEMU_BUILD_BUG_ON(sizeof(struct qht_bucket) > QHT_BUCKET_ALIGN);
@@ -184,7 +184,7 @@ struct qht_map {
     struct rcu_head rcu;
     struct qht_bucket *buckets;
     size_t n_buckets;
-    size_t n_added_buckets;
+    _Atomic(size_t) n_added_buckets;
     size_t n_added_buckets_threshold;
 #ifdef CONFIG_TSAN
     struct qht_tsan_lock tsan_bucket_locks[QHT_TSAN_BUCKET_LOCKS];

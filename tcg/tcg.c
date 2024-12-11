@@ -236,10 +236,10 @@ bool tcg_use_softmmu;
 #endif
 
 TCGContext tcg_init_ctx;
-__thread TCGContext *tcg_ctx;
+__thread _Atomic(TCGContext *) tcg_ctx;
 
-TCGContext **tcg_ctxs;
-unsigned int tcg_cur_ctxs;
+_Atomic(TCGContext *)*tcg_ctxs;
+_Atomic(unsigned int) tcg_cur_ctxs;
 unsigned int tcg_max_ctxs;
 TCGv_env tcg_env;
 const void *tcg_code_gen_epilogue;

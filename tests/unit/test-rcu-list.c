@@ -32,18 +32,18 @@
 static QemuMutex counts_mutex;
 static long long n_reads = 0LL;
 static long long n_updates = 0LL;
-static int64_t n_reclaims;
-static int64_t n_nodes_removed;
+static _Atomic(int64_t) n_reclaims;
+static _Atomic(int64_t) n_nodes_removed;
 static long long n_nodes = 0LL;
 static int g_test_in_charge = 0;
 
-static int nthreadsrunning;
+static _Atomic(int) nthreadsrunning;
 
 #define GOFLAG_INIT 0
 #define GOFLAG_RUN  1
 #define GOFLAG_STOP 2
 
-static int goflag = GOFLAG_INIT;
+static _Atomic(int) goflag = GOFLAG_INIT;
 
 #define RCU_READ_RUN 1000
 #define RCU_UPDATE_RUN 10
@@ -87,13 +87,13 @@ static void wait_all_threads(void)
 
 struct list_element {
 #if TEST_LIST_TYPE == 1
-    QLIST_ENTRY(list_element) entry;
+    QLIST_ENTRY_ATOMIC(list_element) entry;
 #elif TEST_LIST_TYPE == 2
-    QSIMPLEQ_ENTRY(list_element) entry;
+    QSIMPLEQ_ENTRY_ATOMIC(list_element) entry;
 #elif TEST_LIST_TYPE == 3
-    QTAILQ_ENTRY(list_element) entry;
+    QTAILQ_ENTRY_ATOMIC(list_element) entry;
 #elif TEST_LIST_TYPE == 4
-    QSLIST_ENTRY(list_element) entry;
+    QSLIST_ENTRY_ATOMIC(list_element) entry;
 #else
 #error Invalid TEST_LIST_TYPE
 #endif
@@ -109,7 +109,7 @@ static void reclaim_list_el(struct rcu_head *prcu)
 }
 
 #if TEST_LIST_TYPE == 1
-static QLIST_HEAD(, list_element) Q_list_head;
+static QLIST_HEAD_ATOMIC(, list_element) Q_list_head;
 
 #define TEST_NAME "qlist"
 #define TEST_LIST_REMOVE_RCU        QLIST_REMOVE_RCU
@@ -119,7 +119,7 @@ static QLIST_HEAD(, list_element) Q_list_head;
 #define TEST_LIST_FOREACH_SAFE_RCU  QLIST_FOREACH_SAFE_RCU
 
 #elif TEST_LIST_TYPE == 2
-static QSIMPLEQ_HEAD(, list_element) Q_list_head =
+static QSIMPLEQ_HEAD_ATOMIC(, list_element) Q_list_head =
     QSIMPLEQ_HEAD_INITIALIZER(Q_list_head);
 
 #define TEST_NAME "qsimpleq"
@@ -134,7 +134,7 @@ static QSIMPLEQ_HEAD(, list_element) Q_list_head =
 #define TEST_LIST_FOREACH_SAFE_RCU  QSIMPLEQ_FOREACH_SAFE_RCU
 
 #elif TEST_LIST_TYPE == 3
-static QTAILQ_HEAD(, list_element) Q_list_head;
+static QTAILQ_HEAD_ATOMIC(, list_element) Q_list_head;
 
 #define TEST_NAME "qtailq"
 #define TEST_LIST_REMOVE_RCU(el, f) QTAILQ_REMOVE_RCU(&Q_list_head, el, f)
@@ -147,7 +147,7 @@ static QTAILQ_HEAD(, list_element) Q_list_head;
 #define TEST_LIST_FOREACH_SAFE_RCU  QTAILQ_FOREACH_SAFE_RCU
 
 #elif TEST_LIST_TYPE == 4
-static QSLIST_HEAD(, list_element) Q_list_head;
+static QSLIST_HEAD_ATOMIC(, list_element) Q_list_head;
 
 #define TEST_NAME "qslist"
 #define TEST_LIST_REMOVE_RCU(el, f)                              \

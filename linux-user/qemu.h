@@ -156,7 +156,7 @@ struct TaskState {
      * the qatomic_read() and qatomic_set() functions. (It is not accessed
      * from multiple threads.)
      */
-    int signal_pending;
+    _Atomic(int) signal_pending;
 
     /* This thread's sigaltstack, if it has one */
     struct target_sigaltstack sigaltstack_used;

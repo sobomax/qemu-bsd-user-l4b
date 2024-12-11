@@ -50,14 +50,14 @@
  * Using a int rather than a char to eliminate false register dependencies
  * causing stalls on some architectures.
  */
-extern unsigned long rcu_gp_ctr;
+extern _Atomic(unsigned long) rcu_gp_ctr;
 
 extern QemuEvent rcu_gp_event;
 
 struct rcu_reader_data {
     /* Data used by both reader and synchronize_rcu() */
-    unsigned long ctr;
-    bool waiting;
+    _Atomic(unsigned long) ctr;
+    _Atomic(bool) waiting;
 
     /* Data used by reader only */
     unsigned depth;
@@ -136,7 +136,7 @@ struct rcu_head;
 typedef void RCUCBFunc(struct rcu_head *head);
 
 struct rcu_head {
-    struct rcu_head *next;
+    _Atomic(struct rcu_head *) next;
     RCUCBFunc *func;
 };
 

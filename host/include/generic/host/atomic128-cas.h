@@ -13,9 +13,9 @@
 
 #if defined(CONFIG_ATOMIC128)
 static inline Int128 ATTRIBUTE_ATOMIC128_OPT
-atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new)
+atomic16_cmpxchg(_Atomic(Int128) *ptr, Int128 cmp, Int128 new)
 {
-    __int128_t *ptr_align = __builtin_assume_aligned(ptr, 16);
+    _Atomic(__int128_t) *ptr_align = __builtin_assume_aligned(ptr, 16);
     Int128Alias r, c, n;
 
     c.s = cmp;

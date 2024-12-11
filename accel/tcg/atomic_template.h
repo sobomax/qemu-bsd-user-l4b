@@ -81,7 +81,7 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, abi_ptr addr,
                               ABI_TYPE cmpv, ABI_TYPE newv,
                               MemOpIdx oi, uintptr_t retaddr)
 {
-    DATA_TYPE *haddr = atomic_mmu_lookup(env_cpu(env), addr, oi,
+    _Atomic(DATA_TYPE) *haddr = atomic_mmu_lookup(env_cpu(env), addr, oi,
                                          DATA_SIZE, retaddr);
     DATA_TYPE ret;
 
@@ -104,7 +104,7 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, abi_ptr addr,
 ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, abi_ptr addr, ABI_TYPE val,
                            MemOpIdx oi, uintptr_t retaddr)
 {
-    DATA_TYPE *haddr = atomic_mmu_lookup(env_cpu(env), addr, oi,
+    _Atomic(DATA_TYPE) *haddr = atomic_mmu_lookup(env_cpu(env), addr, oi,
                                          DATA_SIZE, retaddr);
     DATA_TYPE ret;
 
@@ -123,7 +123,8 @@ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, abi_ptr addr, ABI_TYPE val,
 ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, abi_ptr addr,            \
                         ABI_TYPE val, MemOpIdx oi, uintptr_t retaddr) \
 {                                                                   \
-    DATA_TYPE *haddr, ret;                                          \
+    DATA_TYPE ret;                                                  \
+    _Atomic(DATA_TYPE) *haddr;                                      \
     haddr = atomic_mmu_lookup(env_cpu(env), addr, oi, DATA_SIZE, retaddr);   \
     ret = qatomic_##X(haddr, val);                                  \
     ATOMIC_MMU_CLEANUP;                                             \
@@ -159,7 +160,8 @@ GEN_ATOMIC_HELPER(xor_fetch)
 ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, abi_ptr addr,            \
                         ABI_TYPE xval, MemOpIdx oi, uintptr_t retaddr) \
 {                                                                   \
-    XDATA_TYPE *haddr, cmp, old, new, val = xval;                   \
+    _Atomic(XDATA_TYPE) *haddr;                                     \
+    XDATA_TYPE cmp, old, new, val = xval;                           \
     haddr = atomic_mmu_lookup(env_cpu(env), addr, oi, DATA_SIZE, retaddr);   \
     smp_mb();                                                       \
     cmp = qatomic_read__nocheck(haddr);                             \
@@ -206,7 +208,7 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, abi_ptr addr,
                               ABI_TYPE cmpv, ABI_TYPE newv,
                               MemOpIdx oi, uintptr_t retaddr)
 {
-    DATA_TYPE *haddr = atomic_mmu_lookup(env_cpu(env), addr, oi,
+    _Atomic(DATA_TYPE) *haddr = atomic_mmu_lookup(env_cpu(env), addr, oi,
                                          DATA_SIZE, retaddr);
     DATA_TYPE ret;
 
@@ -229,7 +231,7 @@ ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, abi_ptr addr,
 ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, abi_ptr addr, ABI_TYPE val,
                            MemOpIdx oi, uintptr_t retaddr)
 {
-    DATA_TYPE *haddr = atomic_mmu_lookup(env_cpu(env), addr, oi,
+    _Atomic(DATA_TYPE) *haddr = atomic_mmu_lookup(env_cpu(env), addr, oi,
                                          DATA_SIZE, retaddr);
     ABI_TYPE ret;
 
@@ -248,7 +250,8 @@ ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, abi_ptr addr, ABI_TYPE val,
 ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, abi_ptr addr,            \
                         ABI_TYPE val, MemOpIdx oi, uintptr_t retaddr) \
 {                                                                   \
-    DATA_TYPE *haddr, ret;                                          \
+    _Atomic(DATA_TYPE) *haddr;                                      \
+    DATA_TYPE ret;                                                  \
     haddr = atomic_mmu_lookup(env_cpu(env), addr, oi, DATA_SIZE, retaddr);   \
     ret = qatomic_##X(haddr, BSWAP(val));                           \
     ATOMIC_MMU_CLEANUP;                                             \
@@ -281,7 +284,8 @@ GEN_ATOMIC_HELPER(xor_fetch)
 ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, abi_ptr addr,            \
                         ABI_TYPE xval, MemOpIdx oi, uintptr_t retaddr) \
 {                                                                   \
-    XDATA_TYPE *haddr, ldo, ldn, old, new, val = xval;              \
+    _Atomic(XDATA_TYPE) *haddr;                                     \
+    XDATA_TYPE ldo, ldn, old, new, val = xval;                      \
     haddr = atomic_mmu_lookup(env_cpu(env), addr, oi, DATA_SIZE, retaddr);   \
     smp_mb();                                                       \
     ldn = qatomic_read__nocheck(haddr);                             \

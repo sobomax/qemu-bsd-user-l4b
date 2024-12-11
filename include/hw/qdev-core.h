@@ -209,7 +209,7 @@ typedef struct {
 
 typedef QLIST_HEAD(, NamedGPIOList) NamedGPIOListHead;
 typedef QLIST_HEAD(, NamedClockList) NamedClockListHead;
-typedef QLIST_HEAD(, BusState) BusStateHead;
+typedef QLIST_HEAD_ATOMIC(, BusState) BusStateHead;
 
 /**
  * struct DeviceState - common device state, accessed with qdev helpers
@@ -233,7 +233,7 @@ struct DeviceState {
     /**
      * @realized: has device been realized?
      */
-    bool realized;
+    _Atomic(bool) realized;
     /**
      * @pending_deleted_event: track pending deletion events during unplug
      */
@@ -356,13 +356,13 @@ typedef struct BusChild {
     struct rcu_head rcu;
     DeviceState *child;
     int index;
-    QTAILQ_ENTRY(BusChild) sibling;
+    QTAILQ_ENTRY_ATOMIC(BusChild) sibling;
 } BusChild;
 
 #define QDEV_HOTPLUG_HANDLER_PROPERTY "hotplug-handler"
 
-typedef QTAILQ_HEAD(, BusChild) BusChildHead;
-typedef QLIST_ENTRY(BusState) BusStateEntry;
+typedef QTAILQ_HEAD_ATOMIC(, BusChild) BusChildHead;
+typedef QLIST_ENTRY_ATOMIC(BusState) BusStateEntry;
 
 /**
  * struct BusState:

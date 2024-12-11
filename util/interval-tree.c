@@ -132,7 +132,7 @@ static inline void rb_set_parent(RBNode *n, RBNode *p)
     rb_set_parent_color(n, p, rb_color(n));
 }
 
-static inline void rb_link_node(RBNode *node, RBNode *parent, RBNode **rb_link)
+static inline void rb_link_node(RBNode *node, RBNode *parent, _Atomic(RBNode *) *rb_link)
 {
     node->rb_parent_color = (uintptr_t)parent;
     node->rb_left = node->rb_right = NULL;
@@ -710,7 +710,8 @@ static const RBAugmentCallbacks interval_tree_augment = {
 /* Insert / remove interval nodes from the tree */
 void interval_tree_insert(IntervalTreeNode *node, IntervalTreeRoot *root)
 {
-    RBNode **link = &root->rb_root.rb_node, *rb_parent = NULL;
+    _Atomic(RBNode *) *link = &root->rb_root.rb_node;
+    RBNode *rb_parent = NULL;
     uint64_t start = node->start, last = node->last;
     IntervalTreeNode *parent;
     bool leftmost = true;

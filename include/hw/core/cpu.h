@@ -336,14 +336,14 @@ typedef struct CPUTLB {
  * for both decrementer underflow and exceptions.
  */
 typedef union IcountDecr {
-    uint32_t u32;
+    _Atomic(uint32_t) u32;
     struct {
 #if HOST_BIG_ENDIAN
-        uint16_t high;
+        _Atomic(uint16_t) high;
         uint16_t low;
 #else
         uint16_t low;
-        uint16_t high;
+        _Atomic(uint16_t) high;
 #endif
     } u16;
 } IcountDecr;
@@ -476,7 +476,8 @@ struct CPUState {
     QemuSemaphore sem;
 #endif
     int thread_id;
-    bool running, has_waiter;
+    _Atomic(bool) running;
+    bool has_waiter;
     struct QemuCond *halt_cond;
     bool thread_kicked;
     bool created;
@@ -488,11 +489,11 @@ struct CPUState {
 
     bool unplug;
     bool crash_occurred;
-    bool exit_request;
+    _Atomic(bool) exit_request;
     int exclusive_context_count;
     uint32_t cflags_next_tb;
     /* updates protected by BQL */
-    uint32_t interrupt_request;
+    _Atomic(uint32_t) interrupt_request;
     int singlestep_enabled;
     int64_t icount_budget;
     int64_t icount_extra;
@@ -513,7 +514,7 @@ struct CPUState {
     GArray *gdb_regs;
     int gdb_num_regs;
     int gdb_num_g_regs;
-    QTAILQ_ENTRY(CPUState) node;
+    QTAILQ_ENTRY_ATOMIC(CPUState) node;
 
     /* ice debug support */
     QTAILQ_HEAD(, CPUBreakpoint) breakpoints;
@@ -590,7 +591,7 @@ static inline CPUArchState *cpu_env(CPUState *cpu)
     return (CPUArchState *)(cpu + 1);
 }
 
-typedef QTAILQ_HEAD(CPUTailQ, CPUState) CPUTailQ;
+typedef QTAILQ_HEAD_ATOMIC(CPUTailQ, CPUState) CPUTailQ;
 extern CPUTailQ cpus_queue;
 
 #define first_cpu        QTAILQ_FIRST_RCU(&cpus_queue)

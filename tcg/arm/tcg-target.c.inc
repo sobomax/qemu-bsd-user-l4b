@@ -1795,7 +1795,7 @@ void tb_target_set_jmp_target(const TranslationBlock *tb, int n,
         insn = INSN_NOP;
     }
 
-    qatomic_set((uint32_t *)jmp_rw, insn);
+    qatomic_set(_MK_ATOMIC((typeof(&insn))jmp_rw), insn);
     flush_idcache_range(jmp_rx, jmp_rw, 4);
 }
 

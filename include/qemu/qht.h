@@ -14,7 +14,7 @@
 typedef bool (*qht_cmp_func_t)(const void *a, const void *b);
 
 struct qht {
-    struct qht_map *map;
+    _Atomic(struct qht_map *) map;
     qht_cmp_func_t cmp;
     QemuMutex lock; /* serializes setters of ht->map */
     unsigned int mode;

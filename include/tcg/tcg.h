@@ -487,7 +487,7 @@ struct TCGContext {
        extension that allows arithmetic on void*.  */
     void *code_gen_buffer;
     size_t code_gen_buffer_size;
-    void *code_gen_ptr;
+    _Atomic(void *) code_gen_ptr;
     void *data_gen_ptr;
 
     /* Threshold to flush the translated code buffer.  */
@@ -562,7 +562,7 @@ extern bool tcg_use_softmmu;
 #define tcg_use_softmmu  true
 #endif
 
-extern __thread TCGContext *tcg_ctx;
+extern __thread _Atomic(TCGContext *) tcg_ctx;
 extern const void *tcg_code_gen_epilogue;
 extern uintptr_t tcg_splitwx_diff;
 extern TCGv_env tcg_env;

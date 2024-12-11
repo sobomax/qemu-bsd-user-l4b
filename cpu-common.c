@@ -33,7 +33,7 @@ static QemuCond qemu_work_cond;
 /* >= 1 if a thread is inside start_exclusive/end_exclusive.  Written
  * under qemu_cpu_list_lock, read with atomic operations.
  */
-static int pending_cpus;
+static _Atomic(int) pending_cpus;
 
 void qemu_init_cpu_list(void)
 {
@@ -128,7 +128,8 @@ struct qemu_work_item {
     QSIMPLEQ_ENTRY(qemu_work_item) node;
     run_on_cpu_func func;
     run_on_cpu_data data;
-    bool free, exclusive, done;
+    bool free, exclusive;
+    _Atomic(bool) done;
 };
 
 static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)

@@ -51,7 +51,7 @@ static inline void set_bit_atomic(long nr, unsigned long *addr)
     unsigned long mask = BIT_MASK(nr);
     unsigned long *p = addr + BIT_WORD(nr);
 
-    qatomic_or(p, mask);
+    qatomic_or(_MK_ATOMIC(p), mask);
 }
 
 /**
@@ -77,7 +77,7 @@ static inline void clear_bit_atomic(long nr, unsigned long *addr)
     unsigned long mask = BIT_MASK(nr);
     unsigned long *p = addr + BIT_WORD(nr);
 
-    return qatomic_and(p, ~mask);
+    return qatomic_and(_MK_ATOMIC(p), ~mask);
 }
 
 /**

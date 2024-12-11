@@ -64,7 +64,7 @@ struct TranslationBlock {
     uint64_t cs_base;
 
     uint32_t flags; /* flags defining in which context the code was generated */
-    uint32_t cflags;    /* compile flags */
+    _Atomic(uint32_t) cflags;    /* compile flags */
 
 /* Note that TCG_MAX_INSNS is 512; we validate this match elsewhere. */
 #define CF_COUNT_MASK    0x000001ff
@@ -140,7 +140,7 @@ struct TranslationBlock {
      */
     uintptr_t jmp_list_head;
     uintptr_t jmp_list_next[2];
-    uintptr_t jmp_dest[2];
+    _Atomic(uintptr_t) jmp_dest[2];
 };
 
 /* The alignment given to TranslationBlock during allocation. */

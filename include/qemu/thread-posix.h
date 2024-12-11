@@ -37,7 +37,7 @@ struct QemuEvent {
     pthread_mutex_t lock;
     pthread_cond_t cond;
 #endif
-    unsigned value;
+    _Atomic(unsigned) value;
     bool initialized;
 };
 

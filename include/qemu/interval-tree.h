@@ -16,14 +16,14 @@
 typedef struct RBNode
 {
     /* Encodes parent with color in the lsb. */
-    uintptr_t rb_parent_color;
-    struct RBNode *rb_right;
-    struct RBNode *rb_left;
+    _Atomic(uintptr_t) rb_parent_color;
+    _Atomic(struct RBNode *) rb_right;
+    _Atomic(struct RBNode *) rb_left;
 } RBNode;
 
 typedef struct RBRoot
 {
-    RBNode *rb_node;
+    _Atomic(RBNode *) rb_node;
 } RBRoot;
 
 typedef struct RBRootLeftCached {

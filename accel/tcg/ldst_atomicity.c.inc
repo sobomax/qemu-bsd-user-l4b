@@ -108,7 +108,7 @@ static int required_atomicity(CPUState *cpu, uintptr_t p, MemOp memop)
 static inline uint16_t load_atomic2(void *pv)
 {
     uint16_t *p = __builtin_assume_aligned(pv, 2);
-    return qatomic_read(p);
+    return qatomic_read(_MK_ATOMIC(p));
 }
 
 /**
@@ -120,7 +120,7 @@ static inline uint16_t load_atomic2(void *pv)
 static inline uint32_t load_atomic4(void *pv)
 {
     uint32_t *p = __builtin_assume_aligned(pv, 4);
-    return qatomic_read(p);
+    return qatomic_read(_MK_ATOMIC(p));
 }
 
 /**
@@ -134,7 +134,7 @@ static inline uint64_t load_atomic8(void *pv)
     uint64_t *p = __builtin_assume_aligned(pv, 8);
 
     qemu_build_assert(HAVE_al8);
-    return qatomic_read__nocheck(p);
+    return qatomic_read__nocheck(_MK_ATOMIC(p));
 }
 
 /**
@@ -598,7 +598,7 @@ static Int128 load_atom_16(CPUState *cpu, uintptr_t ra,
 static inline void store_atomic2(void *pv, uint16_t val)
 {
     uint16_t *p = __builtin_assume_aligned(pv, 2);
-    qatomic_set(p, val);
+    qatomic_set(_MK_ATOMIC(p), val);
 }
 
 /**
@@ -611,7 +611,7 @@ static inline void store_atomic2(void *pv, uint16_t val)
 static inline void store_atomic4(void *pv, uint32_t val)
 {
     uint32_t *p = __builtin_assume_aligned(pv, 4);
-    qatomic_set(p, val);
+    qatomic_set(_MK_ATOMIC(p), val);
 }
 
 /**
@@ -626,7 +626,7 @@ static inline void store_atomic8(void *pv, uint64_t val)
     uint64_t *p = __builtin_assume_aligned(pv, 8);
 
     qemu_build_assert(HAVE_al8);
-    qatomic_set__nocheck(p, val);
+    qatomic_set__nocheck(_MK_ATOMIC(p), val);
 }
 
 /**
@@ -669,11 +669,11 @@ static void store_atom_insert_al4(uint32_t *p, uint32_t val, uint32_t msk)
     uint32_t old, new;
 
     p = __builtin_assume_aligned(p, 4);
-    old = qatomic_read(p);
+    old = qatomic_read(_MK_ATOMIC(p));
     do {
         new = (old & ~msk) | val;
-    } while (!__atomic_compare_exchange_n(p, &old, new, true,
-                                          __ATOMIC_RELAXED, __ATOMIC_RELAXED));
+    } while (!atomic_compare_exchange_weak_explicit(_MK_ATOMIC(p), &old, new,
+                     memory_order_relaxed, memory_order_relaxed));
 }
 
 /**
@@ -690,11 +690,11 @@ static void store_atom_insert_al8(uint64_t *p, uint64_t val, uint64_t msk)
 
     qemu_build_assert(HAVE_al8);
     p = __builtin_assume_aligned(p, 8);
-    old = qatomic_read__nocheck(p);
+    old = qatomic_read__nocheck(_MK_ATOMIC(p));
     do {
         new = (old & ~msk) | val;
-    } while (!__atomic_compare_exchange_n(p, &old, new, true,
-                                          __ATOMIC_RELAXED, __ATOMIC_RELAXED));
+    } while (!atomic_compare_exchange_weak_explicit(_MK_ATOMIC(p), &old, new,
+                     memory_order_relaxed, memory_order_relaxed));
 }
 
 /**

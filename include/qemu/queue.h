@@ -86,6 +86,11 @@ struct name {                                                           \
         struct type *lh_first;  /* first element */                     \
 }
 
+#define QLIST_HEAD_ATOMIC(name, type)                                   \
+struct name {                                                           \
+        _Atomic(struct type *) lh_first;  /* first element */           \
+}
+
 #define QLIST_HEAD_INITIALIZER(head)                                    \
         { NULL }
 
@@ -93,6 +98,12 @@ struct name {                                                           \
 struct {                                                                \
         struct type *le_next;   /* next element */                      \
         struct type **le_prev;  /* address of previous next element */  \
+}
+
+#define QLIST_ENTRY_ATOMIC(type)                                        \
+struct {                                                                \
+        _Atomic(struct type *) le_next;   /* next element */            \
+        _Atomic(struct type *) *le_prev;  /* address of previous next element */  \
 }
 
 /*
@@ -189,12 +200,22 @@ struct name {                                                           \
         struct type *slh_first; /* first element */                     \
 }
 
+#define QSLIST_HEAD_ATOMIC(name, type)                                  \
+struct name {                                                           \
+        _Atomic(struct type *) slh_first; /* first element */           \
+}
+
 #define QSLIST_HEAD_INITIALIZER(head)                                    \
         { NULL }
 
 #define QSLIST_ENTRY(type)                                               \
 struct {                                                                \
         struct type *sle_next;  /* next element */                      \
+}
+
+#define QSLIST_ENTRY_ATOMIC(type)                                       \
+struct {                                                                \
+        _Atomic(struct type *) sle_next;  /* next element */            \
 }
 
 /*
@@ -275,12 +296,23 @@ struct name {                                                           \
     struct type **sqh_last;    /* addr of last next element */          \
 }
 
+#define QSIMPLEQ_HEAD_ATOMIC(name, type)                                \
+struct name {                                                           \
+    _Atomic(struct type *) sqh_first;    /* first element */            \
+    _Atomic(struct type *) *sqh_last;    /* addr of last next element */\
+}
+
 #define QSIMPLEQ_HEAD_INITIALIZER(head)                                 \
     { NULL, &(head).sqh_first }
 
 #define QSIMPLEQ_ENTRY(type)                                            \
 struct {                                                                \
     struct type *sqe_next;    /* next element */                        \
+}
+
+#define QSIMPLEQ_ENTRY_ATOMIC(type)                                     \
+struct {                                                                \
+    _Atomic(struct type *) sqe_next;    /* next element */              \
 }
 
 /*
@@ -387,6 +419,11 @@ typedef struct QTailQLink {
     struct QTailQLink *tql_prev;
 } QTailQLink;
 
+typedef struct QTailQLink_atomic {
+    _Atomic(void *) tql_next;
+    struct QTailQLink_atomic *tql_prev;
+} QTailQLink_atomic;
+
 /*
  * Tail queue definitions.  The union acts as a poor man template, as if
  * it were QTailQLink<type>.
@@ -397,6 +434,12 @@ union name {                                                            \
         QTailQLink tqh_circ;          /* link for circular backwards list */ \
 }
 
+#define QTAILQ_HEAD_ATOMIC(name, type)                                  \
+union name {                                                            \
+        _Atomic(struct type *) tqh_first;       /* first element */     \
+        QTailQLink_atomic tqh_circ;          /* link for circular backwards list */ \
+}
+
 #define QTAILQ_HEAD_INITIALIZER(head)                                   \
         { .tqh_circ = { NULL, &(head).tqh_circ } }
 
@@ -404,6 +447,12 @@ union name {                                                            \
 union {                                                                 \
         struct type *tqe_next;        /* next element */                \
         QTailQLink tqe_circ;          /* link for circular backwards list */ \
+}
+
+#define QTAILQ_ENTRY_ATOMIC(type)                                       \
+union {                                                                 \
+        _Atomic(struct type *) tqe_next;        /* next element */      \
+        QTailQLink_atomic tqe_circ;          /* link for circular backwards list */ \
 }
 
 /*

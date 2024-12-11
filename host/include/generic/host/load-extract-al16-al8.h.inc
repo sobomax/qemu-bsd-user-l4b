@@ -28,8 +28,8 @@ load_atom_extract_al16_or_al8(void *pv, int s)
     pv = (void *)(pi & ~7);
     if (pi & 8) {
         uint64_t *p8 = __builtin_assume_aligned(pv, 16, 8);
-        uint64_t a = qatomic_read__nocheck(p8);
-        uint64_t b = qatomic_read__nocheck(p8 + 1);
+        uint64_t a = qatomic_read__nocheck(_MK_ATOMIC(p8));
+        uint64_t b = qatomic_read__nocheck(_MK_ATOMIC(p8 + 1));
 
         if (HOST_BIG_ENDIAN) {
             r = int128_make128(b, a);

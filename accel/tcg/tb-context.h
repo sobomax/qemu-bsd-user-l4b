@@ -33,8 +33,8 @@ struct TBContext {
     struct qht htable;
 
     /* statistics */
-    unsigned tb_flush_count;
-    unsigned tb_phys_invalidate_count;
+    _Atomic(unsigned) tb_flush_count;
+    _Atomic(unsigned) tb_phys_invalidate_count;
 };
 
 extern TBContext tb_ctx;

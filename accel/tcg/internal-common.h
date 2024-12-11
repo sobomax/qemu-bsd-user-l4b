@@ -15,7 +15,7 @@
 extern int64_t max_delay;
 extern int64_t max_advance;
 
-extern bool one_insn_per_tb;
+extern _Atomic(bool) one_insn_per_tb;
 
 /*
  * Return true if CS is not running in parallel with other cpus, either

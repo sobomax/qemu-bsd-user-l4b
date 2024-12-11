@@ -83,8 +83,8 @@ typedef struct QSPCallSite QSPCallSite;
 struct QSPEntry {
     void *thread_ptr;
     const QSPCallSite *callsite;
-    aligned_uint64_t n_acqs;
-    aligned_uint64_t ns;
+    _Atomic(aligned_uint64_t) n_acqs;
+    _Atomic(aligned_uint64_t) ns;
     unsigned int n_objs; /* count of coalesced objs; only used for reporting */
 };
 typedef struct QSPEntry QSPEntry;
@@ -114,8 +114,8 @@ static __thread int qsp_thread;
 static struct qht qsp_callsite_ht;
 
 static struct qht qsp_ht;
-static QSPSnapshot *qsp_snapshot;
-static bool qsp_initialized, qsp_initializing;
+static _Atomic(QSPSnapshot *) qsp_snapshot;
+static _Atomic(bool) qsp_initialized, qsp_initializing;
 
 static const char * const qsp_typenames[] = {
     [QSP_MUTEX]     = "mutex",
@@ -124,14 +124,14 @@ static const char * const qsp_typenames[] = {
     [QSP_CONDVAR]   = "condvar",
 };
 
-QemuMutexLockFunc bql_mutex_lock_func = qemu_mutex_lock_impl;
-QemuMutexLockFunc qemu_mutex_lock_func = qemu_mutex_lock_impl;
-QemuMutexTrylockFunc qemu_mutex_trylock_func = qemu_mutex_trylock_impl;
-QemuRecMutexLockFunc qemu_rec_mutex_lock_func = qemu_rec_mutex_lock_impl;
-QemuRecMutexTrylockFunc qemu_rec_mutex_trylock_func =
+_Atomic(QemuMutexLockFunc) bql_mutex_lock_func = qemu_mutex_lock_impl;
+_Atomic(QemuMutexLockFunc) qemu_mutex_lock_func = qemu_mutex_lock_impl;
+_Atomic(QemuMutexTrylockFunc) qemu_mutex_trylock_func = qemu_mutex_trylock_impl;
+_Atomic(QemuRecMutexLockFunc) qemu_rec_mutex_lock_func = qemu_rec_mutex_lock_impl;
+_Atomic(QemuRecMutexTrylockFunc) qemu_rec_mutex_trylock_func =
     qemu_rec_mutex_trylock_impl;
-QemuCondWaitFunc qemu_cond_wait_func = qemu_cond_wait_impl;
-QemuCondTimedWaitFunc qemu_cond_timedwait_func = qemu_cond_timedwait_impl;
+_Atomic(QemuCondWaitFunc) qemu_cond_wait_func = qemu_cond_wait_impl;
+_Atomic(QemuCondTimedWaitFunc) qemu_cond_timedwait_func = qemu_cond_timedwait_impl;
 
 /*
  * It pays off to _not_ hash callsite->file; hashing a string is slow, and

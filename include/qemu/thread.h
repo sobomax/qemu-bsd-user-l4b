@@ -47,13 +47,13 @@ typedef void (*QemuCondWaitFunc)(QemuCond *c, QemuMutex *m, const char *f,
 typedef bool (*QemuCondTimedWaitFunc)(QemuCond *c, QemuMutex *m, int ms,
                                       const char *f, int l);
 
-extern QemuMutexLockFunc bql_mutex_lock_func;
-extern QemuMutexLockFunc qemu_mutex_lock_func;
-extern QemuMutexTrylockFunc qemu_mutex_trylock_func;
-extern QemuRecMutexLockFunc qemu_rec_mutex_lock_func;
-extern QemuRecMutexTrylockFunc qemu_rec_mutex_trylock_func;
-extern QemuCondWaitFunc qemu_cond_wait_func;
-extern QemuCondTimedWaitFunc qemu_cond_timedwait_func;
+extern _Atomic(QemuMutexLockFunc) bql_mutex_lock_func;
+extern _Atomic(QemuMutexLockFunc) qemu_mutex_lock_func;
+extern _Atomic(QemuMutexTrylockFunc) qemu_mutex_trylock_func;
+extern _Atomic(QemuRecMutexLockFunc) qemu_rec_mutex_lock_func;
+extern _Atomic(QemuRecMutexTrylockFunc) qemu_rec_mutex_trylock_func;
+extern _Atomic(QemuCondWaitFunc) qemu_cond_wait_func;
+extern _Atomic(QemuCondTimedWaitFunc) qemu_cond_timedwait_func;
 
 /* convenience macros to bypass the profiler */
 #define qemu_mutex_lock__raw(m)                         \
@@ -230,7 +230,7 @@ void qemu_thread_atexit_remove(struct Notifier *notifier);
 #endif
 
 struct QemuSpin {
-    int value;
+    _Atomic(int) value;
 };
 
 static inline void qemu_spin_init(QemuSpin *spin)

@@ -15,6 +15,7 @@
 #ifndef QEMU_ATOMIC_H
 #define QEMU_ATOMIC_H
 
+#include <stdatomic.h>
 #include "compiler.h"
 
 /* Compiler barrier */
@@ -87,7 +88,7 @@
  * will get flagged by sanitizers as a violation.
  */
 #define qatomic_read__nocheck(ptr) \
-    __atomic_load_n(ptr, __ATOMIC_RELAXED)
+    atomic_load_explicit(ptr, memory_order_relaxed)
 
 #define qatomic_read(ptr)                              \
     ({                                                 \
@@ -96,7 +97,7 @@
     })
 
 #define qatomic_set__nocheck(ptr, i) \
-    __atomic_store_n(ptr, i, __ATOMIC_RELAXED)
+    atomic_store_explicit(ptr, i, memory_order_relaxed)
 
 #define qatomic_set(ptr, i)  do {                      \
     qemu_build_assert(sizeof(*ptr) <= ATOMIC_REG_SIZE); \
@@ -111,7 +112,7 @@
     __atomic_load(ptr, valptr, __ATOMIC_CONSUME);
 #else
 #define qatomic_rcu_read__nocheck(ptr, valptr)           \
-    __atomic_load(ptr, valptr, __ATOMIC_RELAXED);        \
+    *(valptr) = atomic_load_explicit(ptr, memory_order_relaxed);\
     smp_read_barrier_depends();
 #endif
 
@@ -132,27 +133,25 @@
 
 #define qatomic_rcu_set(ptr, i) do {                   \
     qemu_build_assert(sizeof(*ptr) <= ATOMIC_REG_SIZE); \
-    __atomic_store_n(ptr, i, __ATOMIC_RELEASE);        \
+    atomic_store_explicit(ptr, i, memory_order_release);\
 } while(0)
 
 #define qatomic_load_acquire(ptr)                       \
     ({                                                  \
     qemu_build_assert(sizeof(*ptr) <= ATOMIC_REG_SIZE); \
-    typeof_strip_qual(*ptr) _val;                       \
-    __atomic_load(ptr, &_val, __ATOMIC_ACQUIRE);        \
-    _val;                                               \
+    atomic_load_explicit(ptr, memory_order_acquire);    \
     })
 
 #define qatomic_store_release(ptr, i)  do {             \
     qemu_build_assert(sizeof(*ptr) <= ATOMIC_REG_SIZE); \
-    __atomic_store_n(ptr, i, __ATOMIC_RELEASE);         \
+    atomic_store_explicit(ptr, i, memory_order_release);\
 } while(0)
 
 
 /* All the remaining operations are fully sequentially consistent */
 
 #define qatomic_xchg__nocheck(ptr, i)    ({                 \
-    __atomic_exchange_n(ptr, (i), __ATOMIC_SEQ_CST);        \
+    atomic_exchange_explicit(ptr, (i), memory_order_seq_cst);        \
 })
 
 #define qatomic_xchg(ptr, i)    ({                          \
@@ -162,9 +161,9 @@
 
 /* Returns the old value of '*ptr' (whether the cmpxchg failed or not) */
 #define qatomic_cmpxchg__nocheck(ptr, old, new)    ({                   \
-    typeof_strip_qual(*ptr) _old = (old);                               \
-    (void)__atomic_compare_exchange_n(ptr, &_old, new, false,           \
-                              __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);      \
+    typeof(atomic_load_explicit(ptr, memory_order_relaxed)) _old = (old);\
+    (void)atomic_compare_exchange_strong_explicit(ptr, &_old, new,      \
+                      memory_order_seq_cst, memory_order_seq_cst);      \
     _old;                                                               \
 })
 
@@ -174,38 +173,38 @@
 })
 
 /* Provide shorter names for GCC atomic builtins, return old value */
-#define qatomic_fetch_inc(ptr)  __atomic_fetch_add(ptr, 1, __ATOMIC_SEQ_CST)
-#define qatomic_fetch_dec(ptr)  __atomic_fetch_sub(ptr, 1, __ATOMIC_SEQ_CST)
+#define qatomic_fetch_inc(ptr)  atomic_fetch_add_explicit(ptr, 1, memory_order_seq_cst)
+#define qatomic_fetch_dec(ptr)  atomic_fetch_sub_explicit(ptr, 1, memory_order_seq_cst)
 
-#define qatomic_fetch_add(ptr, n) __atomic_fetch_add(ptr, n, __ATOMIC_SEQ_CST)
-#define qatomic_fetch_sub(ptr, n) __atomic_fetch_sub(ptr, n, __ATOMIC_SEQ_CST)
-#define qatomic_fetch_and(ptr, n) __atomic_fetch_and(ptr, n, __ATOMIC_SEQ_CST)
-#define qatomic_fetch_or(ptr, n)  __atomic_fetch_or(ptr, n, __ATOMIC_SEQ_CST)
-#define qatomic_fetch_xor(ptr, n) __atomic_fetch_xor(ptr, n, __ATOMIC_SEQ_CST)
+#define qatomic_fetch_add(ptr, n) atomic_fetch_add_explicit(ptr, n, memory_order_seq_cst)
+#define qatomic_fetch_sub(ptr, n) atomic_fetch_sub_explicit(ptr, n, memory_order_seq_cst)
+#define qatomic_fetch_and(ptr, n) atomic_fetch_and_explicit(ptr, n, memory_order_seq_cst)
+#define qatomic_fetch_or(ptr, n)  atomic_fetch_or_explicit(ptr, n, memory_order_seq_cst)
+#define qatomic_fetch_xor(ptr, n) atomic_fetch_xor_explicit(ptr, n, memory_order_seq_cst)
 
-#define qatomic_inc_fetch(ptr)    __atomic_add_fetch(ptr, 1, __ATOMIC_SEQ_CST)
-#define qatomic_dec_fetch(ptr)    __atomic_sub_fetch(ptr, 1, __ATOMIC_SEQ_CST)
-#define qatomic_add_fetch(ptr, n) __atomic_add_fetch(ptr, n, __ATOMIC_SEQ_CST)
-#define qatomic_sub_fetch(ptr, n) __atomic_sub_fetch(ptr, n, __ATOMIC_SEQ_CST)
-#define qatomic_and_fetch(ptr, n) __atomic_and_fetch(ptr, n, __ATOMIC_SEQ_CST)
-#define qatomic_or_fetch(ptr, n)  __atomic_or_fetch(ptr, n, __ATOMIC_SEQ_CST)
-#define qatomic_xor_fetch(ptr, n) __atomic_xor_fetch(ptr, n, __ATOMIC_SEQ_CST)
+#define qatomic_inc_fetch(ptr)    (atomic_fetch_add_explicit(ptr, 1, memory_order_seq_cst) + 1)
+#define qatomic_dec_fetch(ptr)    (atomic_fetch_sub_explicit(ptr, 1, memory_order_seq_cst) - 1)
+#define qatomic_add_fetch(ptr, n) (atomic_fetch_add_explicit(ptr, n, memory_order_seq_cst) + n)
+#define qatomic_sub_fetch(ptr, n) (atomic_fetch_sub_explicit(ptr, n, memory_order_seq_cst) - n)
+#define qatomic_and_fetch(ptr, n) (atomic_fetch_and_explicit(ptr, n, memory_order_seq_cst) & n)
+#define qatomic_or_fetch(ptr, n)  (atomic_fetch_or_explicit(ptr,  n, memory_order_seq_cst) | n)
+#define qatomic_xor_fetch(ptr, n) (atomic_fetch_xor_explicit(ptr, n, memory_order_seq_cst) ^ n)
 
 /* And even shorter names that return void.  */
 #define qatomic_inc(ptr) \
-    ((void) __atomic_fetch_add(ptr, 1, __ATOMIC_SEQ_CST))
+    ((void) atomic_fetch_add_explicit(ptr, 1, memory_order_seq_cst))
 #define qatomic_dec(ptr) \
-    ((void) __atomic_fetch_sub(ptr, 1, __ATOMIC_SEQ_CST))
+    ((void) atomic_fetch_sub_explicit(ptr, 1, memory_order_seq_cst))
 #define qatomic_add(ptr, n) \
-    ((void) __atomic_fetch_add(ptr, n, __ATOMIC_SEQ_CST))
+    ((void) atomic_fetch_add_explicit(ptr, n, memory_order_seq_cst))
 #define qatomic_sub(ptr, n) \
-    ((void) __atomic_fetch_sub(ptr, n, __ATOMIC_SEQ_CST))
+    ((void) atomic_fetch_sub_explicit(ptr, n, memory_order_seq_cst))
 #define qatomic_and(ptr, n) \
-    ((void) __atomic_fetch_and(ptr, n, __ATOMIC_SEQ_CST))
+    ((void) atomic_fetch_and_explicit(ptr, n, memory_order_seq_cst))
 #define qatomic_or(ptr, n) \
-    ((void) __atomic_fetch_or(ptr, n, __ATOMIC_SEQ_CST))
+    ((void) atomic_fetch_or_explicit(ptr, n, memory_order_seq_cst))
 #define qatomic_xor(ptr, n) \
-    ((void) __atomic_fetch_xor(ptr, n, __ATOMIC_SEQ_CST))
+    ((void) atomic_fetch_xor_explicit(ptr, n, memory_order_seq_cst))
 
 #define smp_wmb()   smp_mb_release()
 #define smp_rmb()   smp_mb_acquire()
@@ -258,6 +257,8 @@
  */
 typedef int64_t aligned_int64_t __attribute__((aligned(8)));
 typedef uint64_t aligned_uint64_t __attribute__((aligned(8)));
+
+#define _MK_ATOMIC(p)       ((_Atomic(typeof(*(p))) *)(p))
 
 #ifdef CONFIG_ATOMIC64
 /* Use __nocheck because sizeof(void *) might be < sizeof(u64) */
