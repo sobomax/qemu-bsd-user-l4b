@@ -561,7 +561,7 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
     abi_long ret;
     struct freebsd11_dirent *dirp;
     struct dirent *adirp;
-    long basep;
+    off_t basep;
 
     dirp = lock_user(VERIFY_WRITE, arg2, nbytes, 0);
     if (dirp == NULL) {
@@ -644,7 +644,7 @@ static inline abi_long do_freebsd_getdirentries(abi_long arg1,
     abi_long ret;
     struct target_dirent *dirp;
     struct dirent *adirp;
-    long basep;
+    off_t basep;
 
     dirp = lock_user(VERIFY_WRITE, arg2, nbytes, 0);
     if (dirp == NULL) {
