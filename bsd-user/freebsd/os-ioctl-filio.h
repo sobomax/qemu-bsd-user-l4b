@@ -43,4 +43,33 @@ struct target_fiodgname_arg {
 #define TARGET_FIOSEEKDATA  TARGET_IOWR('f', 97, off_t)
 #define TARGET_FIOSEEKHOLE  TARGET_IOWR('f', 98, off_t)
 
+#if defined(__linux__)
+static abi_long do_ioctl_FIODTYPE(__unused const IOCTLEntry *ie,
+                                  __unused uint8_t *buf_temp,
+                                  int fd, __unused abi_long cmd,
+                                  abi_long arg)
+{
+        abi_int *argptr;
+        int target_size = sizeof(abi_int);
+        struct stat st;
+        int res = 0;
+
+        argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
+        if (!argptr) {
+                return -TARGET_EFAULT;
+        }
+        if (fstat(fd, &st) != 0) {
+                return -TARGET_EBADF;
+        }
+        if (S_ISCHR(st.st_mode) && isatty(fd)) {
+                res = TARGET_D_TTY;
+        } else if (S_ISBLK(st.st_mode)) {
+                res = TARGET_D_DISK;
+        }
+        *argptr = res;
+        unlock_user(argptr, arg, target_size);
+        return 0;
+}
+#endif
+
 #endif /* BSD_USER_FREEBSD_OS_IOCTL_FILIO_H */

@@ -121,4 +121,19 @@ static const bitmask_transtbl lflag_tbl[] = {
     { EXTPROC, EXTPROC, HOST_EXTPROC, HOST_EXTPROC},
 };
 
+struct IOCTLEntry;
+
+typedef abi_long do_ioctl_fn(const struct IOCTLEntry *ie, uint8_t *buf_temp,
+                int fd, abi_long cmd, abi_long arg);
+
+struct IOCTLEntry {
+    unsigned int target_cmd;
+    unsigned int host_cmd;
+    const char *name;
+    int access;
+    do_ioctl_fn *do_ioctl;
+    const argtype arg_type[5];
+};
+typedef struct IOCTLEntry IOCTLEntry;
+
 #endif /* BSD_IOCTL_H */

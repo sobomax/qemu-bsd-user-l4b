@@ -446,6 +446,14 @@ static const typeof(VTIME) HOST_VTIME = VTIME;
 #endif /* found in: sys/_termios.h */
 #undef VTIME
 #define VTIME		17	/* !ICANON */
+#if defined(TARGET_D_TTY)
+#undef TARGET_D_TTY
+#endif /* found in: sys/conf.h */
+#define TARGET_D_TTY	0x0004
+#if defined(TARGET_D_DISK)
+#undef TARGET_D_DISK
+#endif /* found in: sys/conf.h */
+#define TARGET_D_DISK	0x0002
 #if defined(TARGET_E2BIG)
 #undef TARGET_E2BIG
 #endif /* found in: sys/errno.h */
