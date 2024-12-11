@@ -722,7 +722,10 @@ static void
 vu_log_page(uint8_t *log_table, uint64_t page)
 {
     DPRINT("Logged dirty guest page: %"PRId64"\n", page);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Watomic-alignment"
     qatomic_or(&log_table[page / 8], 1 << (page % 8));
+#pragma GCC diagnostic pop
 }
 
 static void
