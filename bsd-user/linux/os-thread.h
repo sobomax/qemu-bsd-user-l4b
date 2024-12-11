@@ -147,7 +147,7 @@ static inline abi_long do_freebsd_thr_wake(abi_long tid)
 {
     static int ncalls;
     if (ncalls > 0)
-        qemu_log("do_freebsd_thr_wake(%ld): stub\n", tid);
+        qemu_log("do_freebsd_thr_wake(%lld): stub\n", (long long)tid);
     ncalls += 1;
 
     return get_errno(sched_yield());
