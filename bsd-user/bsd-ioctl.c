@@ -202,22 +202,6 @@ STRUCT_MAX
 #undef STRUCT
 #undef STRUCT_SPECIAL
 
-
-struct IOCTLEntry;
-
-typedef abi_long do_ioctl_fn(const struct IOCTLEntry *ie, uint8_t *buf_temp,
-                int fd, abi_long cmd, abi_long arg);
-
-struct IOCTLEntry {
-    unsigned int target_cmd;
-    unsigned int host_cmd;
-    const char *name;
-    int access;
-    do_ioctl_fn *do_ioctl;
-    const argtype arg_type[5];
-};
-typedef struct IOCTLEntry IOCTLEntry;
-
 #define MAX_STRUCT_SIZE 4096
 
 #if !defined(__linux__)
