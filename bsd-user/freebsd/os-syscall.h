@@ -12,9 +12,10 @@
  * FreeBSD uses a 64bits time_t except on i386 so we have to add a special case
  * here.
  */
-#if (!defined(TARGET_I386))
+#if !defined(TARGET_I386) || defined(TARGET_X86_64)
 typedef int64_t target_time_t;
 #else
+garbage
 typedef int32_t target_time_t;
 #endif
 
