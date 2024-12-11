@@ -126,7 +126,7 @@ abi_long target_to_host_semid_ds(struct semid_ds *host_sd,
     /* sem_base is not used by kernel for IPC_STAT/IPC_SET */
     /* host_sd->sem_base  = g2h_untagged(target_sd->sem_base); */
     host_sd->sem_nsems = tswap16(target_sd->sem_nsems);
-#if defined(TARGET_I386)
+#if defined(TARGET_I386) && !defined(TARGET_X86_64)
     host_sd->sem_otime = tswap32(target_sd->sem_otime);
     host_sd->sem_ctime = tswap32(target_sd->sem_ctime);
 #else
@@ -176,7 +176,7 @@ abi_long target_to_host_msqid_ds(struct msqid_ds *host_md,
     host_md->msg_qbytes = tswapal(target_md->msg_qbytes);
     host_md->msg_lspid = tswapal(target_md->msg_lspid);
     host_md->msg_lrpid = tswapal(target_md->msg_lrpid);
-#if defined(TARGET_I386)
+#if defined(TARGET_I386) && !defined(TARGET_X86_64)
     host_md->msg_stime = tswap32(target_md->msg_stime);
     host_md->msg_rtime = tswap32(target_md->msg_rtime);
     host_md->msg_ctime = tswap32(target_md->msg_ctime);
@@ -209,7 +209,7 @@ abi_long host_to_target_msqid_ds(abi_ulong target_addr,
     target_md->msg_qbytes = tswapal(host_md->msg_qbytes);
     target_md->msg_lspid = tswapal(host_md->msg_lspid);
     target_md->msg_lrpid = tswapal(host_md->msg_lrpid);
-#if defined(TARGET_I386)
+#if defined(TARGET_I386) && !defined(TARGET_X86_64)
     target_md->msg_stime = tswap32(host_md->msg_stime);
     target_md->msg_rtime = tswap32(host_md->msg_rtime);
     target_md->msg_ctime = tswap32(host_md->msg_ctime);
