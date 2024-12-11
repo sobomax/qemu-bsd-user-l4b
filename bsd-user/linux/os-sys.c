@@ -34,6 +34,8 @@
 #include <net/if.h>     /* For *_msghdr */
 #if !defined(__linux__)
 #include <net/if_dl.h>  /* For sockaddr_dl */
+#elif defined(HAVE_BSD_STRING_H)
+#include <bsd/string.h>
 #endif
 
 #include <string.h>
