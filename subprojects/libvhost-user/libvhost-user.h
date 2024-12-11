@@ -192,6 +192,9 @@ typedef struct VhostUserShared {
 # define VU_PACKED __attribute__((packed))
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunaligned-access"
+
 typedef struct VhostUserMsg {
     int request;
 
@@ -220,6 +223,8 @@ typedef struct VhostUserMsg {
     int fd_num;
     uint8_t *data;
 } VU_PACKED VhostUserMsg;
+
+#pragma GCC diagnostic pop
 
 typedef struct VuDevRegion {
     /* Guest Physical address. */
