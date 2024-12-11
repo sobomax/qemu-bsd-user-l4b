@@ -103,12 +103,12 @@ bool bsd_user_strict;                /* Abort for unimplemned things */
 const char *interp_prefix = CONFIG_QEMU_INTERP_PREFIX;
 const char *qemu_uname_release;
 
-unsigned long target_maxtsiz = TARGET_MAXTSIZ;   /* max text size */
-unsigned long target_dfldsiz = TARGET_DFLDSIZ;   /* initial data size limit */
-unsigned long target_maxdsiz = TARGET_MAXDSIZ;   /* max data size */
-unsigned long target_dflssiz = TARGET_DFLSSIZ;   /* initial data size limit */
-unsigned long target_maxssiz = TARGET_MAXSSIZ;   /* max stack size */
-unsigned long target_sgrowsiz = TARGET_SGROWSIZ; /* amount to grow stack */
+abi_ulong target_maxtsiz = TARGET_MAXTSIZ;   /* max text size */
+abi_ulong target_dfldsiz = TARGET_DFLDSIZ;   /* initial data size limit */
+abi_ulong target_maxdsiz = TARGET_MAXDSIZ;   /* max data size */
+abi_ulong target_dflssiz = TARGET_DFLSSIZ;   /* initial data size limit */
+abi_ulong target_maxssiz = TARGET_MAXSSIZ;   /* max stack size */
+abi_ulong target_sgrowsiz = TARGET_SGROWSIZ; /* amount to grow stack */
 
 const char *exec_path;
 static char real_exec_path[PATH_MAX];
@@ -388,13 +388,15 @@ int main(int argc, char **argv)
             }
         } else if (!strcmp(r, "s")) {
             r = argv[optind++];
-            rv = qemu_strtoul(r, &r, 0, &target_dflssiz);
-            if (rv < 0 || target_dflssiz <= 0) {
+            const char *ep = r;
+            rv = strtoull(r, (char **)&ep, 10);
+            if (rv < 0 || ep == r) {
                 usage();
             }
-            if (*r == 'M') {
+            target_dflssiz = rv;
+            if (*ep == 'M') {
                 target_dflssiz *= 1024 * 1024;
-            } else if (*r == 'k' || *r == 'K') {
+            } else if (*ep == 'k' || *ep == 'K') {
                 target_dflssiz *= 1024;
             }
             if (target_dflssiz > target_maxssiz) {
@@ -421,10 +423,13 @@ int main(int argc, char **argv)
                 exit(1);
             }
         } else if (!strcmp(r, "B")) {
-            rv = qemu_strtoul(argv[optind++], NULL, 0, &guest_base);
-            if (rv < 0) {
+            r = argv[optind++];
+            const char *ep = r;
+            rv = strtoull(r, (char **)&ep, 10);
+            if (rv < 0 || ep == r) {
                 usage();
             }
+            guest_base = rv;
             have_guest_base = true;
         } else if (!strcmp(r, "drop-ld-preload")) {
             (void) envlist_unsetenv(envlist, "LD_PRELOAD");

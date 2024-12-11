@@ -283,12 +283,12 @@ void TSA_NO_TSA mmap_fork_end(int child);
 
 /* main.c */
 extern char qemu_proc_pathname[];
-extern unsigned long target_maxtsiz;
-extern unsigned long target_dfldsiz;
-extern unsigned long target_maxdsiz;
-extern unsigned long target_dflssiz;
-extern unsigned long target_maxssiz;
-extern unsigned long target_sgrowsiz;
+extern abi_ulong target_maxtsiz;
+extern abi_ulong target_dfldsiz;
+extern abi_ulong target_maxdsiz;
+extern abi_ulong target_dflssiz;
+extern abi_ulong target_maxssiz;
+extern abi_ulong target_sgrowsiz;
 
 /* os-syscall.c */
 abi_long get_errno(abi_long ret);
