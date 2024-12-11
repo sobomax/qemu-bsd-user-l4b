@@ -536,7 +536,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
         if (flags & MAP_STACK) {
             qemu_log("MAP_STACK ");
         }
-        qemu_log("fd=%d offset=0x%lx\n", fd, offset);
+        qemu_log("fd=%d offset=0x%llx\n", fd, (long long)offset);
     }
 
     if ((flags & MAP_ANON) && fd != -1) {
