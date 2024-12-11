@@ -13,12 +13,20 @@
 
 static inline uintptr_t host_signal_pc(ucontext_t *uc)
 {
+#if !defined(__linux__)
     return uc->uc_mcontext.mc_gpregs.gp_lr;
+#else
+    abort();
+#endif
 }
 
 static inline void host_signal_set_pc(ucontext_t *uc, uintptr_t pc)
 {
+#if !defined(__linux__)
     uc->uc_mcontext.mc_gpregs.gp_lr = pc;
+#else
+    abort();
+#endif
 }
 
 static inline bool host_signal_write(siginfo_t *info, ucontext_t *uc)
