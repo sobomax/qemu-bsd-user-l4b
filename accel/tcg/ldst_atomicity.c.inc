@@ -9,6 +9,8 @@
  * See the COPYING file in the top-level directory.
  */
 
+#include <stdatomic.h>
+
 #include "host/load-extract-al16-al8.h.inc"
 #include "host/store-insert-al16.h.inc"
 
@@ -18,6 +20,8 @@
 # define HAVE_al8          false
 #endif
 #define HAVE_al8_fast      (ATOMIC_REG_SIZE >= 8)
+
+#define _MK_ATOMIC(p)      ((_Atomic(typeof(*(p))) *)(p))
 
 /**
  * required_atomicity:
@@ -672,8 +676,8 @@ static void store_atom_insert_al4(uint32_t *p, uint32_t val, uint32_t msk)
     old = qatomic_read(p);
     do {
         new = (old & ~msk) | val;
-    } while (!__atomic_compare_exchange_n(p, &old, new, true,
-                                          __ATOMIC_RELAXED, __ATOMIC_RELAXED));
+    } while (!atomic_compare_exchange_weak_explicit(_MK_ATOMIC(p), &old, new,
+                     memory_order_relaxed, memory_order_relaxed));
 }
 
 /**
@@ -693,8 +697,8 @@ static void store_atom_insert_al8(uint64_t *p, uint64_t val, uint64_t msk)
     old = qatomic_read__nocheck(p);
     do {
         new = (old & ~msk) | val;
-    } while (!__atomic_compare_exchange_n(p, &old, new, true,
-                                          __ATOMIC_RELAXED, __ATOMIC_RELAXED));
+    } while (!atomic_compare_exchange_weak_explicit(_MK_ATOMIC(p), &old, new,
+                     memory_order_relaxed, memory_order_relaxed));
 }
 
 /**
