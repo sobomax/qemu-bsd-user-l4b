@@ -41,6 +41,7 @@
 #undef SIGRTMIN
 #define SIGRTMIN __SIGRTMIN
 #define TARGET_STRERR_FILENO 2
+#define lwpid_t int32_t
 #define __lwpid_t int32_t
 #define __uintptr_t uintptr_t
 #define __LP64__ 1
