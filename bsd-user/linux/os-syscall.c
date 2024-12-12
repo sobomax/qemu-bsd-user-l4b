@@ -26,6 +26,8 @@
 #include <sys/mount.h>
 #if !defined(__linux__)
 #include <sys/sysctl.h>
+#else
+#include <sys/syscall.h>
 #endif
 #include <poll.h>
 
