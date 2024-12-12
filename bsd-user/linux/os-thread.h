@@ -172,10 +172,6 @@ static inline abi_long do_freebsd_thr_set_name(abi_long tid, abi_ulong target_na
 #endif
 }
 
-#if defined(__linux__)
-typedef abi_long lwpid_t;
-#endif
-
 static inline abi_long do_freebsd_rtprio_thread(int function, lwpid_t lwpid,
         abi_ulong target_addr)
 {
