@@ -89,9 +89,18 @@ safe_syscall6(int, kevent, int, kq, const struct kevent *, changelist,
 #include "os-misc.h"
 
 /* I/O */
-safe_syscall3(int, open, const char *, path, int, flags, mode_t, mode);
 safe_syscall4(int, openat, int, fd, const char *, path, int, flags, mode_t,
     mode);
+#if defined(__NR_open)
+safe_syscall3(int, open, const char *, path, int, flags, mode_t, mode);
+#else
+int
+safe_open(const char *path, int flags, mode_t mode)
+{
+
+    return safe_openat(AT_FDCWD, path, flags, mode);
+}
+#endif
 
 safe_syscall3(ssize_t, read, int, fd, void *, buf, size_t, nbytes);
 #if !defined(__linux__)
@@ -117,8 +126,6 @@ safe_syscall3(ssize_t, writev, int, fd, const struct iovec *, iov, int, iovcnt);
 safe_syscall4(ssize_t, pwritev, int, fd, const struct iovec *, iov, int, iovcnt,
     off_t, offset);
 
-safe_syscall5(int, select, int, nfds, fd_set *, readfs, fd_set *, writefds,
-    fd_set *, exceptfds, struct timeval *, timeout);
 #if !defined(__linux__)
 safe_syscall6(int, pselect, int, nfds, fd_set * restrict, readfs,
     fd_set * restrict, writefds, fd_set * restrict, exceptfds,
@@ -129,6 +136,33 @@ safe_syscall6(int, pselect6, int, nfds, fd_set * restrict, readfs,
     fd_set * restrict, writefds, fd_set * restrict, exceptfds,
     const struct timespec * restrict, timeout,
     const sigset_t * restrict, newsigmask);
+#endif
+
+#if defined(__NR_select)
+safe_syscall5(int, select, int, nfds, fd_set *, readfs, fd_set *, writefds,
+    fd_set *, exceptfds, struct timeval *, timeout);
+#else
+int
+safe_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
+{
+    struct timespec ts_timeout;
+
+    if (timeout) {
+        ts_timeout.tv_sec = timeout->tv_sec;
+        ts_timeout.tv_nsec = timeout->tv_usec * 1000; // Convert microseconds to nanoseconds
+    }
+
+    // pselect6 call with NULL for the sigmask parameter to ignore signal handling
+    int result = safe_pselect6(nfds, readfds, writefds, exceptfds, timeout ? &ts_timeout : NULL, NULL);
+
+    if (timeout) {
+        // Update the timeout structure if time remains, otherwise set to zero
+        timeout->tv_sec = ts_timeout.tv_sec;
+        timeout->tv_usec = ts_timeout.tv_nsec / 1000;
+    }
+
+    return result; // Return the number of ready descriptors
+}
 #endif
 
 safe_syscall6(ssize_t, recvfrom, int, fd, void *, buf, size_t, len, int, flags,
