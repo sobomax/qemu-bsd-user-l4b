@@ -22,7 +22,7 @@
 #include "cpu.h"
 
 /* Size of the signal trampolin code placed on the stack. */
-#define TARGET_SZSIGCODE    0
+#define TARGET_SZSIGCODE    32
 
 /* compare to  x86/include/_limits.h */
 #define TARGET_MINSIGSTKSZ  (512 * 4)               /* min sig stack size */
@@ -88,10 +88,10 @@ typedef struct target_mcontext {
 #include "target_os_ucontext.h"
 
 struct target_sigframe {
-    abi_ulong   sf_signum;
-    abi_ulong   sf_siginfo;    /* code or pointer to sf_si */
-    abi_ulong   sf_ucontext;   /* points to sf_uc */
-    abi_ulong   sf_addr;       /* undocumented 4th arg */
+    union {
+        abi_ulong sf_action;
+        abi_ulong sf_handler;
+    } sf_ahu;
     target_ucontext_t   sf_uc; /* = *sf_uncontext */
     target_siginfo_t    sf_si; /* = *sf_siginfo (SA_SIGINFO case)*/
     uint32_t    __spare__[2];

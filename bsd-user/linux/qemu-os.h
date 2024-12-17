@@ -47,6 +47,7 @@
 #define __LP64__ 1
 
 #include "target_os_defs.h"
+#include "errno_defs.h"
 
 struct freebsd11_stat;
 struct freebsd11_statfs;

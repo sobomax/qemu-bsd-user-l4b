@@ -113,7 +113,8 @@ static inline void target_cpu_init(CPUX86State *env,
 static inline void target_cpu_loop(CPUX86State *env)
 {
     CPUState *cs = env_cpu(env);
-    int trapnr;
+    int trapnr, syscnr;
+    abi_long ret;
     abi_ulong pc;
     /* target_siginfo_t info; */
 
@@ -126,21 +127,31 @@ static inline void target_cpu_loop(CPUX86State *env)
         switch (trapnr) {
         case EXCP_SYSCALL:
             /* syscall from syscall instruction */
-            env->regs[R_EAX] = do_freebsd_syscall(env,
-                                                  env->regs[R_EAX],
+            syscnr = env->regs[R_EAX];
+            ret = do_freebsd_syscall(env,
+                                                  syscnr,
                                                   env->regs[R_EDI],
                                                   env->regs[R_ESI],
                                                   env->regs[R_EDX],
                                                   env->regs[R_ECX],
                                                   env->regs[8],
                                                   env->regs[9], 0, 0);
+            if (ret == -TARGET_EJUSTRETURN) {
+                /* Don't clobber any registers when returning from the sigret() */
+                break;
+            }
             env->eip = env->exception_next_eip;
-            if (((abi_ulong)env->regs[R_EAX]) >= (abi_ulong)(-515)) {
-                env->regs[R_EAX] = -env->regs[R_EAX];
+            if (ret == -TARGET_ERESTART) {
+                env->eip -= 2; /* syscall instruction */
+                break;
+            }
+            if (((abi_ulong)ret) >= (abi_ulong)(-515)) {
                 env->eflags |= CC_C;
+                ret = -ret;
             } else {
                 env->eflags &= ~CC_C;
             }
+            env->regs[R_EAX] = ret;
             break;
 
         case EXCP_INTERRUPT:
