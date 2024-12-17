@@ -270,6 +270,13 @@ static abi_long do_bsd_openat(abi_long arg1, abi_long arg2,
 /* close(2) */
 static abi_long do_bsd_close(abi_long arg1)
 {
+    FILE *logfile = qemu_log_trylock();
+    if (logfile != NULL) {
+        int log_fd = fileno(logfile);
+        qemu_log_unlock(logfile);
+        if (log_fd == arg1)
+            return -TARGET_EBADF;
+    }
     return get_errno(close(arg1));
 }
 
