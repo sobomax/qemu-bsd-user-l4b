@@ -138,15 +138,29 @@
 #define TARGET_EAUTH            80              /* Authentication error */
 #define TARGET_ENEEDAUTH        81              /* Need authenticator */
 #define TARGET_EIPSEC           82              /* IPsec processing failure */
+#if !defined(TARGET_ENOATTR)
 #define TARGET_ENOATTR          83              /* Attribute not found */
+#endif
+#if !defined(TARGET_EILSEQ)
 #define TARGET_EILSEQ           84              /* Illegal byte sequence */
+#endif
 #define TARGET_ENOMEDIUM        85              /* No medium found */
 #define TARGET_EMEDIUMTYPE      86              /* Wrong Medium Type */
+#if !defined(TARGET_EOVERFLOW)
 #define TARGET_EOVERFLOW        87              /* Conversion overflow */
+#endif
+#if !defined(TARGET_ECANCELED)
 #define TARGET_ECANCELED        88              /* Operation canceled */
+#endif
+#if !defined(TARGET_EIDRM)
 #define TARGET_EIDRM            89              /* Identifier removed */
+#endif
+#if !defined(TARGET_ENOMSG)
 #define TARGET_ENOMSG           90              /* No message of desired type */
+#endif
+#if !defined(TARGET_ELAST)
 #define TARGET_ELAST            90              /* Must be equal largest errno */
+#endif
 
 /* Internal errors: */
 #define TARGET_EJUSTRETURN      254             /* Just return without modifying regs */

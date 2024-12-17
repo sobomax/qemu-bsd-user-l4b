@@ -38,6 +38,7 @@
 #include "user/syscall-trace.h"
 #include "truss_hdr.h"
 #include "systruss.h"
+#include "special-errno.h"
 
 static safe_syscall2(long, getcwd, char *, buf, size_t, size);
 
@@ -309,6 +310,7 @@ int host_to_target_errno(int err)
         case ETXTBSY: return TARGET_ETXTBSY;
         //case EUSERS: return TARGET_EUSERS;
         case EXDEV: return TARGET_EXDEV;
+        case QEMU_ERESTARTSYS: return TARGET_ERESTART;
     }
 
     abort();
