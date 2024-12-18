@@ -868,10 +868,10 @@ static abi_long do_bsd_fchownat(abi_long arg1, abi_long arg2,
     return ret;
 }
 
+#if !defined(__linux__)
 /* chflags(2) */
 static abi_long do_bsd_chflags(abi_long arg1, abi_long arg2)
 {
-#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -880,15 +880,11 @@ static abi_long do_bsd_chflags(abi_long arg1, abi_long arg2)
     UNLOCK_PATH(p, arg1);
 
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* lchflags(2) */
 static abi_long do_bsd_lchflags(abi_long arg1, abi_long arg2)
 {
-#if !defined(__linux__)
     abi_long ret;
     void *p;
 
@@ -897,20 +893,14 @@ static abi_long do_bsd_lchflags(abi_long arg1, abi_long arg2)
     UNLOCK_PATH(p, arg1);
 
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* fchflags(2) */
 static abi_long do_bsd_fchflags(abi_long arg1, abi_long arg2)
 {
-#if !defined(__linux__)
     return get_errno(fchflags(arg1, arg2));
-#else
-    abort();
-#endif
 }
+#endif
 
 /* chroot(2) */
 static abi_long do_bsd_chroot(abi_long arg1)
