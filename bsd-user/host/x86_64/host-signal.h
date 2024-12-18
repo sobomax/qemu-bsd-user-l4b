@@ -31,7 +31,7 @@ static inline void host_signal_set_pc(ucontext_t *uc, uintptr_t pc)
 #if !defined(__linux__)
     uc->uc_mcontext.mc_rip = pc;
 #else
-    abort();
+    uc->uc_mcontext.gregs[REG_RIP] = pc;
 #endif
 }
 
