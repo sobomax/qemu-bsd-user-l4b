@@ -719,14 +719,14 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         abi_ulong arg3)
 {
     abi_long ret;
-    int host_cmd;
+    struct host_fcntl_args host_cmd;
     struct flock fl;
     struct target_freebsd_flock *target_fl;
     const abi_long STUB = 0;
 
-    host_cmd = target_to_host_fcntl_cmd(arg2);
-    if (host_cmd < 0) {
-        return host_cmd;
+    host_cmd = target_to_host_fcntl_cmd(arg2, arg3);
+    if (host_cmd.cmd < 0) {
+        return host_cmd.cmd;
     }
     switch (arg2) {
     case TARGET_F_GETLK:
@@ -739,7 +739,7 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         __get_user(fl.l_len, &target_fl->l_len);
         __get_user(fl.l_pid, &target_fl->l_pid);
         unlock_user_struct(target_fl, arg3, 0);
-        ret = get_errno(safe_fcntl(arg1, host_cmd, &fl));
+        ret = get_errno(safe_fcntl(arg1, host_cmd.cmd, &fl));
         if (!is_error(ret)) {
             if (!lock_user_struct(VERIFY_WRITE, target_fl, arg3, 0)) {
                 return -TARGET_EFAULT;
@@ -765,7 +765,7 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         __get_user(fl.l_len, &target_fl->l_len);
         __get_user(fl.l_pid, &target_fl->l_pid);
         unlock_user_struct(target_fl, arg3, 0);
-        ret = get_errno(safe_fcntl(arg1, host_cmd, &fl));
+        ret = get_errno(safe_fcntl(arg1, host_cmd.cmd, &fl));
         break;
 
     case TARGET_F_DUPFD:
@@ -781,8 +781,11 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
     case TARGET_F_ADD_SEALS:
     case TARGET_F_GET_SEALS:
     default:
-        ret = get_errno(safe_fcntl(arg1, host_cmd, arg3));
+        ret = get_errno(safe_fcntl(arg1, host_cmd.cmd, host_cmd.arg));
         break;
+    }
+    if (arg2 == TARGET_F_GETFL && ret > 0) {
+        ret = host_to_target_bitmask(ret, fcntl_flags_tbl);
     }
     return ret;
 }

@@ -160,7 +160,13 @@ abi_long t2h_freebsd_fhandle(fhandle_t *host_fh, abi_ulong target_addr);
 abi_long h2t_freebsd_fhandle(abi_ulong target_addr, fhandle_t *host_fh);
 abi_long h2t_freebsd11_statfs(abi_ulong target_addr,
     struct freebsd11_statfs *host_statfs);
-abi_long target_to_host_fcntl_cmd(int cmd);
+
+struct host_fcntl_args {
+    int cmd;
+    int arg;
+};
+struct host_fcntl_args  target_to_host_fcntl_cmd(abi_long cmd, abi_long arg);
+
 abi_long h2t_freebsd_stat(abi_ulong target_addr,
         struct stat *host_st);
 abi_long h2t_freebsd_statfs(abi_ulong target_addr,

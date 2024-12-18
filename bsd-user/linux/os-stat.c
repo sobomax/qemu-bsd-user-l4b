@@ -273,25 +273,48 @@ abi_long h2t_freebsd_statfs(abi_ulong target_addr,
 /*
  * fcntl cmd conversion
  */
-abi_long target_to_host_fcntl_cmd(int cmd)
+struct host_fcntl_args target_to_host_fcntl_cmd(abi_long cmd, abi_long arg)
 {
-#if defined(__linux__)
+    struct host_fcntl_args ret = {.cmd = cmd, .arg = arg};
     switch (cmd) {
-        case TARGET_F_DUPFD: return HOST_F_DUPFD;
-        case TARGET_F_DUPFD_CLOEXEC: return HOST_F_DUPFD_CLOEXEC;
-        case TARGET_F_GETFD: return HOST_F_GETFD;
-        case TARGET_F_SETFD: return HOST_F_SETFD;
-        case TARGET_F_GETFL: return HOST_F_GETFL;
-        case TARGET_F_SETFL: return HOST_F_SETFL;
-        case TARGET_F_GETOWN: return HOST_F_GETOWN;
-        case TARGET_F_SETOWN: return HOST_F_SETOWN;
-        case TARGET_F_GETLK: return HOST_F_GETLK;
-        case TARGET_F_SETLK: return HOST_F_SETLK;
-        case TARGET_F_SETLKW: return HOST_F_SETLKW;
-        default:
-            return -TARGET_EINVAL;
+    case TARGET_F_DUPFD:
+        ret.cmd = HOST_F_DUPFD;
+	break;
+    case TARGET_F_DUPFD_CLOEXEC:
+        ret.cmd = HOST_F_DUPFD_CLOEXEC;
+        break;
+    case TARGET_F_GETFD:
+        ret.cmd = HOST_F_GETFD;
+        break;
+    case TARGET_F_SETFD:
+        ret.cmd = HOST_F_SETFD;
+        break;
+    case TARGET_F_GETFL:
+        ret.cmd = HOST_F_GETFL;
+        break;
+    case TARGET_F_SETFL:
+        ret.cmd = HOST_F_SETFL;
+        ret.arg = target_to_host_bitmask(arg, fcntl_flags_tbl);
+        break;
+    case TARGET_F_GETOWN:
+        ret.cmd = HOST_F_GETOWN;
+        break;
+    case TARGET_F_SETOWN:
+        ret.cmd = HOST_F_SETOWN;
+        break;
+    case TARGET_F_GETLK:
+        ret.cmd = HOST_F_GETLK;
+        break;
+    case TARGET_F_SETLK:
+        ret.cmd = HOST_F_SETLK;
+        break;
+    case TARGET_F_SETLKW:
+        ret.cmd = HOST_F_SETLKW;
+        break;
+    default:
+        ret.cmd = -TARGET_EINVAL;
+        break;
     }
-#endif
-    return cmd;
+    return ret;
 }
 
