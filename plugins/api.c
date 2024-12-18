@@ -54,7 +54,7 @@
 #include "hw/boards.h"
 #else
 #include "qemu.h"
-#ifdef CONFIG_LINUX
+#if defined(CONFIG_LINUX) && !defined(CONFIG_BSD_USER)
 #include "loader.h"
 #endif
 #endif
