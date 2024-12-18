@@ -9,451 +9,536 @@ struct umutex;
 struct _umtx_time;
 
 /* Defines: */
+#if defined(WNOHANG) && !defined(HOST_WNOHANG)
+static const typeof(WNOHANG) HOST_WNOHANG = WNOHANG;
+#endif /* found in: sys/wait.h */
+#undef WNOHANG
+#define WNOHANG		1	/* Don't hang in wait. */
+#if defined(WUNTRACED) && !defined(HOST_WUNTRACED)
+static const typeof(WUNTRACED) HOST_WUNTRACED = WUNTRACED;
+#endif /* found in: sys/wait.h */
+#undef WUNTRACED
+#define WUNTRACED	2	/* Tell about stopped, untraced children. */
+#if defined(WCONTINUED) && !defined(HOST_WCONTINUED)
+static const typeof(WCONTINUED) HOST_WCONTINUED = WCONTINUED;
+#endif /* found in: sys/wait.h */
+#undef WCONTINUED
+#define WCONTINUED	4	/* Report a job control continued process. */
+#if defined(WNOWAIT) && !defined(HOST_WNOWAIT)
+static const typeof(WNOWAIT) HOST_WNOWAIT = WNOWAIT;
+#endif /* found in: sys/wait.h */
+#undef WNOWAIT
+#define WNOWAIT		8	/* Poll only. Don't delete the proc entry. */
+#if defined(WEXITED) && !defined(HOST_WEXITED)
+static const typeof(WEXITED) HOST_WEXITED = WEXITED;
+#endif /* found in: sys/wait.h */
+#undef WEXITED
+#define WEXITED		16	/* Wait for exited processes. */
+#if defined(WTRAPPED) && !defined(HOST_WTRAPPED)
+static const typeof(WTRAPPED) HOST_WTRAPPED = WTRAPPED;
+#endif /* found in: sys/wait.h */
+#undef WTRAPPED
+#define WTRAPPED	32	/* Wait for a process to hit a trap or */
 #if defined(_SIG_WORDS) && !defined(HOST__SIG_WORDS)
 static const typeof(_SIG_WORDS) HOST__SIG_WORDS = _SIG_WORDS;
 #endif /* found in: sys/_sigset.h */
 #undef _SIG_WORDS
 #define _SIG_WORDS	4
-#if defined(BRKINT) && !defined(HOST_BRKINT)
-static const typeof(BRKINT) HOST_BRKINT = BRKINT;
-#endif /* found in: sys/_termios.h */
-#undef BRKINT
-#define BRKINT		0x00000002	/* map BREAK to SIGINTR */
-#if defined(ICRNL) && !defined(HOST_ICRNL)
-static const typeof(ICRNL) HOST_ICRNL = ICRNL;
-#endif /* found in: sys/_termios.h */
-#undef ICRNL
-#define ICRNL		0x00000100	/* map CR to NL (ala CRMOD) */
-#if defined(IGNBRK) && !defined(HOST_IGNBRK)
-static const typeof(IGNBRK) HOST_IGNBRK = IGNBRK;
-#endif /* found in: sys/_termios.h */
-#undef IGNBRK
-#define IGNBRK		0x00000001	/* ignore BREAK condition */
-#if defined(IGNCR) && !defined(HOST_IGNCR)
-static const typeof(IGNCR) HOST_IGNCR = IGNCR;
-#endif /* found in: sys/_termios.h */
-#undef IGNCR
-#define IGNCR		0x00000080	/* ignore CR */
-#if defined(IGNPAR) && !defined(HOST_IGNPAR)
-static const typeof(IGNPAR) HOST_IGNPAR = IGNPAR;
-#endif /* found in: sys/_termios.h */
-#undef IGNPAR
-#define IGNPAR		0x00000004	/* ignore (discard) parity errors */
-#if defined(IMAXBEL) && !defined(HOST_IMAXBEL)
-static const typeof(IMAXBEL) HOST_IMAXBEL = IMAXBEL;
-#endif /* found in: sys/_termios.h */
-#undef IMAXBEL
-#define IMAXBEL		0x00002000	/* ring bell on input queue full */
-#if defined(INLCR) && !defined(HOST_INLCR)
-static const typeof(INLCR) HOST_INLCR = INLCR;
-#endif /* found in: sys/_termios.h */
-#undef INLCR
-#define INLCR		0x00000040	/* map NL into CR */
-#if defined(INPCK) && !defined(HOST_INPCK)
-static const typeof(INPCK) HOST_INPCK = INPCK;
-#endif /* found in: sys/_termios.h */
-#undef INPCK
-#define INPCK		0x00000010	/* enable checking of parity errors */
-#if defined(ISTRIP) && !defined(HOST_ISTRIP)
-static const typeof(ISTRIP) HOST_ISTRIP = ISTRIP;
-#endif /* found in: sys/_termios.h */
-#undef ISTRIP
-#define ISTRIP		0x00000020	/* strip 8th bit off chars */
-#if defined(IUTF8) && !defined(HOST_IUTF8)
-static const typeof(IUTF8) HOST_IUTF8 = IUTF8;
-#endif /* found in: sys/_termios.h */
-#undef IUTF8
-#define IUTF8		0x00004000	/* assume input is utf-8 encoded */
-#if defined(IXANY) && !defined(HOST_IXANY)
-static const typeof(IXANY) HOST_IXANY = IXANY;
-#endif /* found in: sys/_termios.h */
-#undef IXANY
-#define IXANY		0x00000800	/* any char will restart after stop */
-#if defined(IXOFF) && !defined(HOST_IXOFF)
-static const typeof(IXOFF) HOST_IXOFF = IXOFF;
-#endif /* found in: sys/_termios.h */
-#undef IXOFF
-#define IXOFF		0x00000400	/* enable input flow control */
-#if defined(IXON) && !defined(HOST_IXON)
-static const typeof(IXON) HOST_IXON = IXON;
-#endif /* found in: sys/_termios.h */
-#undef IXON
-#define IXON		0x00000200	/* enable output flow control */
-#if defined(OCRNL) && !defined(HOST_OCRNL)
-static const typeof(OCRNL) HOST_OCRNL = OCRNL;
-#endif /* found in: sys/_termios.h */
-#undef OCRNL
-#define OCRNL		0x00000010	/* map CR to NL on output */
-#if defined(ONLCR) && !defined(HOST_ONLCR)
-static const typeof(ONLCR) HOST_ONLCR = ONLCR;
-#endif /* found in: sys/_termios.h */
-#undef ONLCR
-#define ONLCR		0x00000002	/* map NL to CR-NL (ala CRMOD) */
-#if defined(ONLRET) && !defined(HOST_ONLRET)
-static const typeof(ONLRET) HOST_ONLRET = ONLRET;
-#endif /* found in: sys/_termios.h */
-#undef ONLRET
-#define ONLRET		0x00000040	/* NL performs CR function */
-#if defined(ONOCR) && !defined(HOST_ONOCR)
-static const typeof(ONOCR) HOST_ONOCR = ONOCR;
-#endif /* found in: sys/_termios.h */
-#undef ONOCR
-#define ONOCR		0x00000020	/* no CR output at column 0 */
-#if defined(OPOST) && !defined(HOST_OPOST)
-static const typeof(OPOST) HOST_OPOST = OPOST;
-#endif /* found in: sys/_termios.h */
-#undef OPOST
-#define OPOST		0x00000001	/* enable following output processing */
-#if defined(PARMRK) && !defined(HOST_PARMRK)
-static const typeof(PARMRK) HOST_PARMRK = PARMRK;
-#endif /* found in: sys/_termios.h */
-#undef PARMRK
-#define PARMRK		0x00000008	/* mark parity and framing errors */
-#if defined(TAB0) && !defined(HOST_TAB0)
-static const typeof(TAB0) HOST_TAB0 = TAB0;
-#endif /* found in: sys/_termios.h */
-#undef TAB0
-#define TAB0	    0x00000000	    /* no tab delay and expansion */
-#if defined(TAB3) && !defined(HOST_TAB3)
-static const typeof(TAB3) HOST_TAB3 = TAB3;
-#endif /* found in: sys/_termios.h */
-#undef TAB3
-#define TAB3	    0x00000004	    /* expand tabs to spaces */
-#if defined(TABDLY) && !defined(HOST_TABDLY)
-static const typeof(TABDLY) HOST_TABDLY = TABDLY;
-#endif /* found in: sys/_termios.h */
-#undef TABDLY
-#define TABDLY		0x00000004	/* tab delay mask */
-#if defined(B0) && !defined(HOST_B0)
-static const typeof(B0) HOST_B0 = B0;
-#endif /* found in: sys/_termios.h */
-#undef B0
-#define B0	0
-#if defined(B50) && !defined(HOST_B50)
-static const typeof(B50) HOST_B50 = B50;
-#endif /* found in: sys/_termios.h */
-#undef B50
-#define B50	50
-#if defined(B75) && !defined(HOST_B75)
-static const typeof(B75) HOST_B75 = B75;
-#endif /* found in: sys/_termios.h */
-#undef B75
-#define B75	75
-#if defined(B110) && !defined(HOST_B110)
-static const typeof(B110) HOST_B110 = B110;
-#endif /* found in: sys/_termios.h */
-#undef B110
-#define B110	110
-#if defined(B134) && !defined(HOST_B134)
-static const typeof(B134) HOST_B134 = B134;
-#endif /* found in: sys/_termios.h */
-#undef B134
-#define B134	134
-#if defined(B150) && !defined(HOST_B150)
-static const typeof(B150) HOST_B150 = B150;
-#endif /* found in: sys/_termios.h */
-#undef B150
-#define B150	150
-#if defined(B200) && !defined(HOST_B200)
-static const typeof(B200) HOST_B200 = B200;
-#endif /* found in: sys/_termios.h */
-#undef B200
-#define B200	200
-#if defined(B300) && !defined(HOST_B300)
-static const typeof(B300) HOST_B300 = B300;
-#endif /* found in: sys/_termios.h */
-#undef B300
-#define B300	300
-#if defined(B600) && !defined(HOST_B600)
-static const typeof(B600) HOST_B600 = B600;
-#endif /* found in: sys/_termios.h */
-#undef B600
-#define B600	600
-#if defined(B1200) && !defined(HOST_B1200)
-static const typeof(B1200) HOST_B1200 = B1200;
-#endif /* found in: sys/_termios.h */
-#undef B1200
-#define B1200	1200
-#if defined(B1800) && !defined(HOST_B1800)
-static const typeof(B1800) HOST_B1800 = B1800;
-#endif /* found in: sys/_termios.h */
-#undef B1800
-#define B1800	1800
-#if defined(B2400) && !defined(HOST_B2400)
-static const typeof(B2400) HOST_B2400 = B2400;
-#endif /* found in: sys/_termios.h */
-#undef B2400
-#define B2400	2400
-#if defined(B4800) && !defined(HOST_B4800)
-static const typeof(B4800) HOST_B4800 = B4800;
-#endif /* found in: sys/_termios.h */
-#undef B4800
-#define B4800	4800
-#if defined(B9600) && !defined(HOST_B9600)
-static const typeof(B9600) HOST_B9600 = B9600;
-#endif /* found in: sys/_termios.h */
-#undef B9600
-#define B9600	9600
-#if defined(B19200) && !defined(HOST_B19200)
-static const typeof(B19200) HOST_B19200 = B19200;
-#endif /* found in: sys/_termios.h */
-#undef B19200
-#define B19200	19200
-#if defined(B38400) && !defined(HOST_B38400)
-static const typeof(B38400) HOST_B38400 = B38400;
-#endif /* found in: sys/_termios.h */
-#undef B38400
-#define B38400	38400
-#if defined(B57600) && !defined(HOST_B57600)
-static const typeof(B57600) HOST_B57600 = B57600;
-#endif /* found in: sys/_termios.h */
-#undef B57600
-#define B57600	57600
-#if defined(B115200) && !defined(HOST_B115200)
-static const typeof(B115200) HOST_B115200 = B115200;
-#endif /* found in: sys/_termios.h */
-#undef B115200
-#define B115200	115200
-#if defined(B230400) && !defined(HOST_B230400)
-static const typeof(B230400) HOST_B230400 = B230400;
-#endif /* found in: sys/_termios.h */
-#undef B230400
-#define B230400	230400
-#if defined(B460800) && !defined(HOST_B460800)
-static const typeof(B460800) HOST_B460800 = B460800;
-#endif /* found in: sys/_termios.h */
-#undef B460800
-#define B460800	460800
-#if defined(CSIZE) && !defined(HOST_CSIZE)
-static const typeof(CSIZE) HOST_CSIZE = CSIZE;
-#endif /* found in: sys/_termios.h */
-#undef CSIZE
-#define CSIZE		0x00000300	/* character size mask */
-#if defined(CS5) && !defined(HOST_CS5)
-static const typeof(CS5) HOST_CS5 = CS5;
-#endif /* found in: sys/_termios.h */
-#undef CS5
-#define CS5		    0x00000000	    /* 5 bits (pseudo) */
-#if defined(CS6) && !defined(HOST_CS6)
-static const typeof(CS6) HOST_CS6 = CS6;
-#endif /* found in: sys/_termios.h */
-#undef CS6
-#define CS6		    0x00000100	    /* 6 bits */
-#if defined(CS7) && !defined(HOST_CS7)
-static const typeof(CS7) HOST_CS7 = CS7;
-#endif /* found in: sys/_termios.h */
-#undef CS7
-#define CS7		    0x00000200	    /* 7 bits */
-#if defined(CS8) && !defined(HOST_CS8)
-static const typeof(CS8) HOST_CS8 = CS8;
-#endif /* found in: sys/_termios.h */
-#undef CS8
-#define CS8		    0x00000300	    /* 8 bits */
-#if defined(CSTOPB) && !defined(HOST_CSTOPB)
-static const typeof(CSTOPB) HOST_CSTOPB = CSTOPB;
-#endif /* found in: sys/_termios.h */
-#undef CSTOPB
-#define CSTOPB		0x00000400	/* send 2 stop bits */
-#if defined(CREAD) && !defined(HOST_CREAD)
-static const typeof(CREAD) HOST_CREAD = CREAD;
-#endif /* found in: sys/_termios.h */
-#undef CREAD
-#define CREAD		0x00000800	/* enable receiver */
-#if defined(PARENB) && !defined(HOST_PARENB)
-static const typeof(PARENB) HOST_PARENB = PARENB;
-#endif /* found in: sys/_termios.h */
-#undef PARENB
-#define PARENB		0x00001000	/* parity enable */
-#if defined(PARODD) && !defined(HOST_PARODD)
-static const typeof(PARODD) HOST_PARODD = PARODD;
-#endif /* found in: sys/_termios.h */
-#undef PARODD
-#define PARODD		0x00002000	/* odd parity, else even */
-#if defined(HUPCL) && !defined(HOST_HUPCL)
-static const typeof(HUPCL) HOST_HUPCL = HUPCL;
-#endif /* found in: sys/_termios.h */
-#undef HUPCL
-#define HUPCL		0x00004000	/* hang up on last close */
-#if defined(CLOCAL) && !defined(HOST_CLOCAL)
-static const typeof(CLOCAL) HOST_CLOCAL = CLOCAL;
-#endif /* found in: sys/_termios.h */
-#undef CLOCAL
-#define CLOCAL		0x00008000	/* ignore modem status lines */
-#undef CRTSCTS /* found in: sys/_termios.h */
-#define CRTSCTS		(CCTS_OFLOW | CRTS_IFLOW)
-#if defined(ISIG) && !defined(HOST_ISIG)
-static const typeof(ISIG) HOST_ISIG = ISIG;
-#endif /* found in: sys/_termios.h */
-#undef ISIG
-#define ISIG		0x00000080	/* enable signals INTR, QUIT, [D]SUSP */
-#if defined(ICANON) && !defined(HOST_ICANON)
-static const typeof(ICANON) HOST_ICANON = ICANON;
-#endif /* found in: sys/_termios.h */
-#undef ICANON
-#define ICANON		0x00000100	/* canonicalize input lines */
-#if defined(ECHO) && !defined(HOST_ECHO)
-static const typeof(ECHO) HOST_ECHO = ECHO;
-#endif /* found in: sys/_termios.h */
-#undef ECHO
-#define ECHO		0x00000008	/* enable echoing */
-#if defined(ECHOE) && !defined(HOST_ECHOE)
-static const typeof(ECHOE) HOST_ECHOE = ECHOE;
-#endif /* found in: sys/_termios.h */
-#undef ECHOE
-#define ECHOE		0x00000002	/* visually erase chars */
-#if defined(ECHOK) && !defined(HOST_ECHOK)
-static const typeof(ECHOK) HOST_ECHOK = ECHOK;
-#endif /* found in: sys/_termios.h */
-#undef ECHOK
-#define ECHOK		0x00000004	/* echo NL after line kill */
-#if defined(ECHONL) && !defined(HOST_ECHONL)
-static const typeof(ECHONL) HOST_ECHONL = ECHONL;
-#endif /* found in: sys/_termios.h */
-#undef ECHONL
-#define ECHONL		0x00000010	/* echo NL even if ECHO is off */
-#if defined(NOFLSH) && !defined(HOST_NOFLSH)
-static const typeof(NOFLSH) HOST_NOFLSH = NOFLSH;
-#endif /* found in: sys/_termios.h */
-#undef NOFLSH
-#define NOFLSH		0x80000000	/* don't flush after interrupt */
-#if defined(TOSTOP) && !defined(HOST_TOSTOP)
-static const typeof(TOSTOP) HOST_TOSTOP = TOSTOP;
-#endif /* found in: sys/_termios.h */
-#undef TOSTOP
-#define TOSTOP		0x00400000	/* stop background jobs from output */
-#if defined(ECHOCTL) && !defined(HOST_ECHOCTL)
-static const typeof(ECHOCTL) HOST_ECHOCTL = ECHOCTL;
-#endif /* found in: sys/_termios.h */
-#undef ECHOCTL
-#define ECHOCTL  	0x00000040	/* echo control chars as ^(Char) */
-#if defined(ECHOPRT) && !defined(HOST_ECHOPRT)
-static const typeof(ECHOPRT) HOST_ECHOPRT = ECHOPRT;
-#endif /* found in: sys/_termios.h */
-#undef ECHOPRT
-#define ECHOPRT		0x00000020	/* visual erase mode for hardcopy */
-#if defined(ECHOKE) && !defined(HOST_ECHOKE)
-static const typeof(ECHOKE) HOST_ECHOKE = ECHOKE;
-#endif /* found in: sys/_termios.h */
-#undef ECHOKE
-#define ECHOKE		0x00000001	/* visual erase for line kill */
-#if defined(FLUSHO) && !defined(HOST_FLUSHO)
-static const typeof(FLUSHO) HOST_FLUSHO = FLUSHO;
-#endif /* found in: sys/_termios.h */
-#undef FLUSHO
-#define FLUSHO		0x00800000	/* output being flushed (state) */
-#if defined(PENDIN) && !defined(HOST_PENDIN)
-static const typeof(PENDIN) HOST_PENDIN = PENDIN;
-#endif /* found in: sys/_termios.h */
-#undef PENDIN
-#define PENDIN		0x20000000	/* XXX retype pending input (state) */
-#if defined(IEXTEN) && !defined(HOST_IEXTEN)
-static const typeof(IEXTEN) HOST_IEXTEN = IEXTEN;
-#endif /* found in: sys/_termios.h */
-#undef IEXTEN
-#define IEXTEN		0x00000400	/* enable DISCARD and LNEXT */
-#if defined(EXTPROC) && !defined(HOST_EXTPROC)
-static const typeof(EXTPROC) HOST_EXTPROC = EXTPROC;
-#endif /* found in: sys/_termios.h */
-#undef EXTPROC
-#define EXTPROC         0x00000800      /* external processing */
-#if defined(CCTS_OFLOW) && !defined(HOST_CCTS_OFLOW)
-static const typeof(CCTS_OFLOW) HOST_CCTS_OFLOW = CCTS_OFLOW;
-#endif /* found in: sys/_termios.h */
-#undef CCTS_OFLOW
-#define CCTS_OFLOW	0x00010000	/* CTS flow control of output */
-#if defined(CRTS_IFLOW) && !defined(HOST_CRTS_IFLOW)
-static const typeof(CRTS_IFLOW) HOST_CRTS_IFLOW = CRTS_IFLOW;
-#endif /* found in: sys/_termios.h */
-#undef CRTS_IFLOW
-#define CRTS_IFLOW	0x00020000	/* RTS flow control of input */
-#if defined(VEOF) && !defined(HOST_VEOF)
-static const typeof(VEOF) HOST_VEOF = VEOF;
-#endif /* found in: sys/_termios.h */
-#undef VEOF
-#define VEOF		0	/* ICANON */
-#if defined(VEOL) && !defined(HOST_VEOL)
-static const typeof(VEOL) HOST_VEOL = VEOL;
-#endif /* found in: sys/_termios.h */
-#undef VEOL
-#define VEOL		1	/* ICANON */
-#if defined(VEOL2) && !defined(HOST_VEOL2)
-static const typeof(VEOL2) HOST_VEOL2 = VEOL2;
-#endif /* found in: sys/_termios.h */
-#undef VEOL2
-#define VEOL2		2	/* ICANON together with IEXTEN */
-#if defined(VERASE) && !defined(HOST_VERASE)
-static const typeof(VERASE) HOST_VERASE = VERASE;
-#endif /* found in: sys/_termios.h */
-#undef VERASE
-#define VERASE		3	/* ICANON */
-#if defined(VWERASE) && !defined(HOST_VWERASE)
-static const typeof(VWERASE) HOST_VWERASE = VWERASE;
-#endif /* found in: sys/_termios.h */
-#undef VWERASE
-#define VWERASE 	4	/* ICANON together with IEXTEN */
-#if defined(VKILL) && !defined(HOST_VKILL)
-static const typeof(VKILL) HOST_VKILL = VKILL;
-#endif /* found in: sys/_termios.h */
-#undef VKILL
-#define VKILL		5	/* ICANON */
-#if defined(VREPRINT) && !defined(HOST_VREPRINT)
-static const typeof(VREPRINT) HOST_VREPRINT = VREPRINT;
-#endif /* found in: sys/_termios.h */
-#undef VREPRINT
-#define VREPRINT 	6	/* ICANON together with IEXTEN */
-#if defined(VINTR) && !defined(HOST_VINTR)
-static const typeof(VINTR) HOST_VINTR = VINTR;
-#endif /* found in: sys/_termios.h */
-#undef VINTR
-#define VINTR		8	/* ISIG */
-#if defined(VQUIT) && !defined(HOST_VQUIT)
-static const typeof(VQUIT) HOST_VQUIT = VQUIT;
-#endif /* found in: sys/_termios.h */
-#undef VQUIT
-#define VQUIT		9	/* ISIG */
-#if defined(VSUSP) && !defined(HOST_VSUSP)
-static const typeof(VSUSP) HOST_VSUSP = VSUSP;
-#endif /* found in: sys/_termios.h */
-#undef VSUSP
-#define VSUSP		10	/* ISIG */
-#if defined(VSTART) && !defined(HOST_VSTART)
-static const typeof(VSTART) HOST_VSTART = VSTART;
-#endif /* found in: sys/_termios.h */
-#undef VSTART
-#define VSTART		12	/* IXON, IXOFF */
-#if defined(VSTOP) && !defined(HOST_VSTOP)
-static const typeof(VSTOP) HOST_VSTOP = VSTOP;
-#endif /* found in: sys/_termios.h */
-#undef VSTOP
-#define VSTOP		13	/* IXON, IXOFF */
-#if defined(VLNEXT) && !defined(HOST_VLNEXT)
-static const typeof(VLNEXT) HOST_VLNEXT = VLNEXT;
-#endif /* found in: sys/_termios.h */
-#undef VLNEXT
-#define VLNEXT		14	/* IEXTEN */
-#if defined(VDISCARD) && !defined(HOST_VDISCARD)
-static const typeof(VDISCARD) HOST_VDISCARD = VDISCARD;
-#endif /* found in: sys/_termios.h */
-#undef VDISCARD
-#define VDISCARD	15	/* IEXTEN */
-#if defined(VMIN) && !defined(HOST_VMIN)
-static const typeof(VMIN) HOST_VMIN = VMIN;
-#endif /* found in: sys/_termios.h */
-#undef VMIN
-#define VMIN		16	/* !ICANON */
-#if defined(VTIME) && !defined(HOST_VTIME)
-static const typeof(VTIME) HOST_VTIME = VTIME;
-#endif /* found in: sys/_termios.h */
-#undef VTIME
-#define VTIME		17	/* !ICANON */
-#if defined(TARGET_D_TTY)
-#undef TARGET_D_TTY
-#endif /* found in: sys/conf.h */
-#define TARGET_D_TTY	0x0004
-#if defined(TARGET_D_DISK)
-#undef TARGET_D_DISK
-#endif /* found in: sys/conf.h */
-#define TARGET_D_DISK	0x0002
+#if defined(STATFS_VERSION) && !defined(HOST_STATFS_VERSION)
+static const typeof(STATFS_VERSION) HOST_STATFS_VERSION = STATFS_VERSION;
+#endif /* found in: sys/mount.h */
+#undef STATFS_VERSION
+#define STATFS_VERSION	0x20140518	/* current version number */
+#if defined(MNAMELEN) && !defined(HOST_MNAMELEN)
+static const typeof(MNAMELEN) HOST_MNAMELEN = MNAMELEN;
+#endif /* found in: sys/mount.h */
+#undef MNAMELEN
+#define MNAMELEN	1024		/* size of on/from name bufs */
+#if defined(TARGET_CLOCK_REALTIME)
+#undef TARGET_CLOCK_REALTIME
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_REALTIME		0
+#if defined(TARGET_CLOCK_MONOTONIC)
+#undef TARGET_CLOCK_MONOTONIC
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_MONOTONIC		4
+#if defined(TARGET_CLOCK_UPTIME)
+#undef TARGET_CLOCK_UPTIME
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_UPTIME		5
+#if defined(TARGET_CLOCK_SECOND)
+#undef TARGET_CLOCK_SECOND
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_SECOND		13
+#if defined(TARGET_CLOCK_MONOTONIC_FAST)
+#undef TARGET_CLOCK_MONOTONIC_FAST
+#endif /* found in: sys/_clock_id.h */
+#define TARGET_CLOCK_MONOTONIC_FAST	12
+#if defined(SO_NOSIGPIPE) && !defined(HOST_SO_NOSIGPIPE)
+static const typeof(SO_NOSIGPIPE) HOST_SO_NOSIGPIPE = SO_NOSIGPIPE;
+#endif /* found in: sys/socket.h */
+#undef SO_NOSIGPIPE
+#define SO_NOSIGPIPE	0x00000800	/* no SIGPIPE from EPIPE */
+#if defined(SO_BINTIME) && !defined(HOST_SO_BINTIME)
+static const typeof(SO_BINTIME) HOST_SO_BINTIME = SO_BINTIME;
+#endif /* found in: sys/socket.h */
+#undef SO_BINTIME
+#define SO_BINTIME	0x00002000	/* timestamp received dgram traffic */
+#if defined(SO_LISTENINCQLEN) && !defined(HOST_SO_LISTENINCQLEN)
+static const typeof(SO_LISTENINCQLEN) HOST_SO_LISTENINCQLEN = SO_LISTENINCQLEN;
+#endif /* found in: sys/socket.h */
+#undef SO_LISTENINCQLEN
+#define SO_LISTENINCQLEN	0x1013	/* socket's incomplete queue length */
+#if defined(NET_RT_IFLISTL) && !defined(HOST_NET_RT_IFLISTL)
+static const typeof(NET_RT_IFLISTL) HOST_NET_RT_IFLISTL = NET_RT_IFLISTL;
+#endif /* found in: sys/socket.h */
+#undef NET_RT_IFLISTL
+#define NET_RT_IFLISTL	5		/* Survey interface list, using 'l'en */
+#if defined(TARGET_SOCK_CLOEXEC)
+#undef TARGET_SOCK_CLOEXEC
+#endif /* found in: sys/socket.h */
+#define TARGET_SOCK_CLOEXEC	0x10000000
+#if defined(TARGET_SOCK_NONBLOCK)
+#undef TARGET_SOCK_NONBLOCK
+#endif /* found in: sys/socket.h */
+#define TARGET_SOCK_NONBLOCK	0x20000000
+#if defined(IOCPARM_SHIFT) && !defined(HOST_IOCPARM_SHIFT)
+static const typeof(IOCPARM_SHIFT) HOST_IOCPARM_SHIFT = IOCPARM_SHIFT;
+#endif /* found in: sys/ioccom.h */
+#undef IOCPARM_SHIFT
+#define IOCPARM_SHIFT	13		/* number of bits for ioctl size */
+#undef IOCPARM_MASK /* found in: sys/ioccom.h */
+#define IOCPARM_MASK	((1 << IOCPARM_SHIFT) - 1) /* parameter length mask */
+#undef IOCPARM_LEN /* found in: sys/ioccom.h */
+#define IOCPARM_LEN(x)	(((x) >> 16) & IOCPARM_MASK)
+#undef IOCBASECMD /* found in: sys/ioccom.h */
+#define IOCBASECMD(x)	((x) & ~(IOCPARM_MASK << 16))
+#undef IOCGROUP /* found in: sys/ioccom.h */
+#define IOCGROUP(x)	(((x) >> 8) & 0xff)
+#undef IOCPARM_MAX /* found in: sys/ioccom.h */
+#define IOCPARM_MAX	(1 << IOCPARM_SHIFT) /* max size of ioctl */
+#undef IOC_VOID /* found in: sys/ioccom.h */
+#define IOC_VOID	0x20000000UL	/* no parameters */
+#undef IOC_OUT /* found in: sys/ioccom.h */
+#define IOC_OUT		0x40000000UL	/* copy out parameters */
+#undef IOC_IN /* found in: sys/ioccom.h */
+#define IOC_IN		0x80000000UL	/* copy in parameters */
+#undef IOC_INOUT /* found in: sys/ioccom.h */
+#define IOC_INOUT	(IOC_IN|IOC_OUT)/* copy parameters in and out */
+#undef IOC_DIRMASK /* found in: sys/ioccom.h */
+#define IOC_DIRMASK	(IOC_VOID|IOC_OUT|IOC_IN)/* mask for IN/OUT/VOID */
+#undef _IOC /* found in: sys/ioccom.h */
+#define _IOC(inout,group,num,len)	((unsigned long) \
+	((inout) | (((len) & IOCPARM_MASK) << 16) | ((group) << 8) | (num)))
+#undef _IO /* found in: sys/ioccom.h */
+#define _IO(g,n)	_IOC(IOC_VOID,	(g), (n), 0)
+#undef _IOWINT /* found in: sys/ioccom.h */
+#define _IOWINT(g,n)	_IOC(IOC_VOID,	(g), (n), sizeof(int))
+#undef _IOR /* found in: sys/ioccom.h */
+#define _IOR(g,n,t)	_IOC(IOC_OUT,	(g), (n), sizeof(t))
+#undef _IOW /* found in: sys/ioccom.h */
+#define _IOW(g,n,t)	_IOC(IOC_IN,	(g), (n), sizeof(t))
+#undef _IOWR /* found in: sys/ioccom.h */
+#define _IOWR(g,n,t)	_IOC(IOC_INOUT,	(g), (n), sizeof(t))
+#if defined(MAP_GUARD) && !defined(HOST_MAP_GUARD)
+static const typeof(MAP_GUARD) HOST_MAP_GUARD = MAP_GUARD;
+#endif /* found in: sys/mman.h */
+#undef MAP_GUARD
+#define MAP_GUARD	 0x00002000 /* reserve but don't map address range */
+#if defined(MAP_FIXED) && !defined(HOST_MAP_FIXED)
+static const typeof(MAP_FIXED) HOST_MAP_FIXED = MAP_FIXED;
+#endif /* found in: sys/mman.h */
+#undef MAP_FIXED
+#define MAP_FIXED	 0x0010	/* map addr must be exactly as requested */
+#if defined(MAP_ANON) && !defined(HOST_MAP_ANON)
+static const typeof(MAP_ANON) HOST_MAP_ANON = MAP_ANON;
+#endif /* found in: sys/mman.h */
+#undef MAP_ANON
+#define MAP_ANON	 0x1000	/* allocated from memory, swap space */
+#if defined(MAP_EXCL) && !defined(HOST_MAP_EXCL)
+static const typeof(MAP_EXCL) HOST_MAP_EXCL = MAP_EXCL;
+#endif /* found in: sys/mman.h */
+#undef MAP_EXCL
+#define MAP_EXCL	 0x00004000 /* for MAP_FIXED, fail if address is used */
+#if defined(MAP_PRIVATE) && !defined(HOST_MAP_PRIVATE)
+static const typeof(MAP_PRIVATE) HOST_MAP_PRIVATE = MAP_PRIVATE;
+#endif /* found in: sys/mman.h */
+#undef MAP_PRIVATE
+#define MAP_PRIVATE	0x0002		/* changes are private */
+#if defined(MAP_SHARED) && !defined(HOST_MAP_SHARED)
+static const typeof(MAP_SHARED) HOST_MAP_SHARED = MAP_SHARED;
+#endif /* found in: sys/mman.h */
+#undef MAP_SHARED
+#define MAP_SHARED	0x0001		/* share changes */
+#if defined(MAP_NOCORE) && !defined(HOST_MAP_NOCORE)
+static const typeof(MAP_NOCORE) HOST_MAP_NOCORE = MAP_NOCORE;
+#endif /* found in: sys/mman.h */
+#undef MAP_NOCORE
+#define MAP_NOCORE	 0x00020000 /* dont include these pages in a coredump */
+#if defined(MAP_STACK) && !defined(HOST_MAP_STACK)
+static const typeof(MAP_STACK) HOST_MAP_STACK = MAP_STACK;
+#endif /* found in: sys/mman.h */
+#undef MAP_STACK
+#define MAP_STACK	 0x0400	/* region grows down, like a stack */
+#if defined(MAP_PREFAULT_READ) && !defined(HOST_MAP_PREFAULT_READ)
+static const typeof(MAP_PREFAULT_READ) HOST_MAP_PREFAULT_READ = MAP_PREFAULT_READ;
+#endif /* found in: sys/mman.h */
+#undef MAP_PREFAULT_READ
+#define MAP_PREFAULT_READ 0x00040000 /* prefault mapping for reading */
+#if defined(MAP_ALIGNMENT_SHIFT) && !defined(HOST_MAP_ALIGNMENT_SHIFT)
+static const typeof(MAP_ALIGNMENT_SHIFT) HOST_MAP_ALIGNMENT_SHIFT = MAP_ALIGNMENT_SHIFT;
+#endif /* found in: sys/mman.h */
+#undef MAP_ALIGNMENT_SHIFT
+#define MAP_ALIGNMENT_SHIFT	24
+#undef MAP_ALIGNED /* found in: sys/mman.h */
+#define MAP_ALIGNED(n)	 ((n) << MAP_ALIGNMENT_SHIFT)
+#undef MAP_ALIGNMENT_MASK /* found in: sys/mman.h */
+#define MAP_ALIGNMENT_MASK	MAP_ALIGNED(0xff)
+#undef SHM_ANON /* found in: sys/mman.h */
+#define SHM_ANON		((char *)1)
+#if defined(DT_UNKNOWN) && !defined(HOST_DT_UNKNOWN)
+static const typeof(DT_UNKNOWN) HOST_DT_UNKNOWN = DT_UNKNOWN;
+#endif /* found in: sys/dirent.h */
+#undef DT_UNKNOWN
+#define DT_UNKNOWN	 0
+#if defined(DT_FIFO) && !defined(HOST_DT_FIFO)
+static const typeof(DT_FIFO) HOST_DT_FIFO = DT_FIFO;
+#endif /* found in: sys/dirent.h */
+#undef DT_FIFO
+#define DT_FIFO		 1
+#if defined(DT_CHR) && !defined(HOST_DT_CHR)
+static const typeof(DT_CHR) HOST_DT_CHR = DT_CHR;
+#endif /* found in: sys/dirent.h */
+#undef DT_CHR
+#define DT_CHR		 2
+#if defined(DT_DIR) && !defined(HOST_DT_DIR)
+static const typeof(DT_DIR) HOST_DT_DIR = DT_DIR;
+#endif /* found in: sys/dirent.h */
+#undef DT_DIR
+#define DT_DIR		 4
+#if defined(DT_BLK) && !defined(HOST_DT_BLK)
+static const typeof(DT_BLK) HOST_DT_BLK = DT_BLK;
+#endif /* found in: sys/dirent.h */
+#undef DT_BLK
+#define DT_BLK		 6
+#if defined(DT_REG) && !defined(HOST_DT_REG)
+static const typeof(DT_REG) HOST_DT_REG = DT_REG;
+#endif /* found in: sys/dirent.h */
+#undef DT_REG
+#define DT_REG		 8
+#if defined(DT_LNK) && !defined(HOST_DT_LNK)
+static const typeof(DT_LNK) HOST_DT_LNK = DT_LNK;
+#endif /* found in: sys/dirent.h */
+#undef DT_LNK
+#define DT_LNK		10
+#if defined(DT_SOCK) && !defined(HOST_DT_SOCK)
+static const typeof(DT_SOCK) HOST_DT_SOCK = DT_SOCK;
+#endif /* found in: sys/dirent.h */
+#undef DT_SOCK
+#define DT_SOCK		12
+#if defined(DT_WHT) && !defined(HOST_DT_WHT)
+static const typeof(DT_WHT) HOST_DT_WHT = DT_WHT;
+#endif /* found in: sys/dirent.h */
+#undef DT_WHT
+#define DT_WHT		14
+#undef IFTODT /* found in: sys/dirent.h */
+#define IFTODT(mode)	(((mode) & 0170000) >> 12)
+#undef DTTOIF /* found in: sys/dirent.h */
+#define DTTOIF(dirtype)	((dirtype) << 12)
+#if defined(TARGET_MAXNAMLEN)
+#undef TARGET_MAXNAMLEN
+#endif /* found in: sys/dirent.h */
+#define TARGET_MAXNAMLEN	255
+#if defined(UMTX_OP_SHM) && !defined(HOST_UMTX_OP_SHM)
+static const typeof(UMTX_OP_SHM) HOST_UMTX_OP_SHM = UMTX_OP_SHM;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_SHM
+#define UMTX_OP_SHM		25
+#if defined(UMTX_OP_WAIT_UINT) && !defined(HOST_UMTX_OP_WAIT_UINT)
+static const typeof(UMTX_OP_WAIT_UINT) HOST_UMTX_OP_WAIT_UINT = UMTX_OP_WAIT_UINT;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_WAIT_UINT
+#define UMTX_OP_WAIT_UINT	11
+#if defined(UMTX_OP_WAIT_UINT_PRIVATE) && !defined(HOST_UMTX_OP_WAIT_UINT_PRIVATE)
+static const typeof(UMTX_OP_WAIT_UINT_PRIVATE) HOST_UMTX_OP_WAIT_UINT_PRIVATE = UMTX_OP_WAIT_UINT_PRIVATE;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_WAIT_UINT_PRIVATE
+#define UMTX_OP_WAIT_UINT_PRIVATE	15
+#if defined(UMTX_OP_WAIT) && !defined(HOST_UMTX_OP_WAIT)
+static const typeof(UMTX_OP_WAIT) HOST_UMTX_OP_WAIT = UMTX_OP_WAIT;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_WAIT
+#define UMTX_OP_WAIT		2
+#if defined(UMTX_OP_WAKE) && !defined(HOST_UMTX_OP_WAKE)
+static const typeof(UMTX_OP_WAKE) HOST_UMTX_OP_WAKE = UMTX_OP_WAKE;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_WAKE
+#define UMTX_OP_WAKE		3
+#if defined(UMTX_OP_MUTEX_TRYLOCK) && !defined(HOST_UMTX_OP_MUTEX_TRYLOCK)
+static const typeof(UMTX_OP_MUTEX_TRYLOCK) HOST_UMTX_OP_MUTEX_TRYLOCK = UMTX_OP_MUTEX_TRYLOCK;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_MUTEX_TRYLOCK
+#define UMTX_OP_MUTEX_TRYLOCK	4
+#if defined(UMTX_OP_MUTEX_LOCK) && !defined(HOST_UMTX_OP_MUTEX_LOCK)
+static const typeof(UMTX_OP_MUTEX_LOCK) HOST_UMTX_OP_MUTEX_LOCK = UMTX_OP_MUTEX_LOCK;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_MUTEX_LOCK
+#define UMTX_OP_MUTEX_LOCK	5
+#if defined(UMTX_OP_MUTEX_UNLOCK) && !defined(HOST_UMTX_OP_MUTEX_UNLOCK)
+static const typeof(UMTX_OP_MUTEX_UNLOCK) HOST_UMTX_OP_MUTEX_UNLOCK = UMTX_OP_MUTEX_UNLOCK;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_MUTEX_UNLOCK
+#define UMTX_OP_MUTEX_UNLOCK	6
+#if defined(UMTX_OP_CV_WAIT) && !defined(HOST_UMTX_OP_CV_WAIT)
+static const typeof(UMTX_OP_CV_WAIT) HOST_UMTX_OP_CV_WAIT = UMTX_OP_CV_WAIT;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_CV_WAIT
+#define UMTX_OP_CV_WAIT		8
+#if defined(UMTX_OP_CV_SIGNAL) && !defined(HOST_UMTX_OP_CV_SIGNAL)
+static const typeof(UMTX_OP_CV_SIGNAL) HOST_UMTX_OP_CV_SIGNAL = UMTX_OP_CV_SIGNAL;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_CV_SIGNAL
+#define UMTX_OP_CV_SIGNAL	9
+#if defined(UMTX_OP_CV_BROADCAST) && !defined(HOST_UMTX_OP_CV_BROADCAST)
+static const typeof(UMTX_OP_CV_BROADCAST) HOST_UMTX_OP_CV_BROADCAST = UMTX_OP_CV_BROADCAST;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_CV_BROADCAST
+#define UMTX_OP_CV_BROADCAST	10
+#if defined(UMTX_OP_RW_RDLOCK) && !defined(HOST_UMTX_OP_RW_RDLOCK)
+static const typeof(UMTX_OP_RW_RDLOCK) HOST_UMTX_OP_RW_RDLOCK = UMTX_OP_RW_RDLOCK;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_RW_RDLOCK
+#define UMTX_OP_RW_RDLOCK	12
+#if defined(UMTX_OP_RW_WRLOCK) && !defined(HOST_UMTX_OP_RW_WRLOCK)
+static const typeof(UMTX_OP_RW_WRLOCK) HOST_UMTX_OP_RW_WRLOCK = UMTX_OP_RW_WRLOCK;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_RW_WRLOCK
+#define UMTX_OP_RW_WRLOCK	13
+#if defined(UMTX_OP_RW_UNLOCK) && !defined(HOST_UMTX_OP_RW_UNLOCK)
+static const typeof(UMTX_OP_RW_UNLOCK) HOST_UMTX_OP_RW_UNLOCK = UMTX_OP_RW_UNLOCK;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_RW_UNLOCK
+#define UMTX_OP_RW_UNLOCK	14
+#if defined(UMTX_OP_WAKE_PRIVATE) && !defined(HOST_UMTX_OP_WAKE_PRIVATE)
+static const typeof(UMTX_OP_WAKE_PRIVATE) HOST_UMTX_OP_WAKE_PRIVATE = UMTX_OP_WAKE_PRIVATE;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_WAKE_PRIVATE
+#define UMTX_OP_WAKE_PRIVATE	16
+#if defined(UMTX_OP_SEM2_WAIT) && !defined(HOST_UMTX_OP_SEM2_WAIT)
+static const typeof(UMTX_OP_SEM2_WAIT) HOST_UMTX_OP_SEM2_WAIT = UMTX_OP_SEM2_WAIT;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_SEM2_WAIT
+#define UMTX_OP_SEM2_WAIT	23
+#if defined(UMTX_OP_SEM2_WAKE) && !defined(HOST_UMTX_OP_SEM2_WAKE)
+static const typeof(UMTX_OP_SEM2_WAKE) HOST_UMTX_OP_SEM2_WAKE = UMTX_OP_SEM2_WAKE;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_SEM2_WAKE
+#define UMTX_OP_SEM2_WAKE	24
+#if defined(UMTX_OP_ROBUST_LISTS) && !defined(HOST_UMTX_OP_ROBUST_LISTS)
+static const typeof(UMTX_OP_ROBUST_LISTS) HOST_UMTX_OP_ROBUST_LISTS = UMTX_OP_ROBUST_LISTS;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_ROBUST_LISTS
+#define UMTX_OP_ROBUST_LISTS	26
+#if defined(UMTX_OP_MUTEX_WAIT) && !defined(HOST_UMTX_OP_MUTEX_WAIT)
+static const typeof(UMTX_OP_MUTEX_WAIT) HOST_UMTX_OP_MUTEX_WAIT = UMTX_OP_MUTEX_WAIT;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_MUTEX_WAIT
+#define UMTX_OP_MUTEX_WAIT	17
+#if defined(UMTX_OP_MUTEX_WAKE) && !defined(HOST_UMTX_OP_MUTEX_WAKE)
+static const typeof(UMTX_OP_MUTEX_WAKE) HOST_UMTX_OP_MUTEX_WAKE = UMTX_OP_MUTEX_WAKE;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_MUTEX_WAKE
+#define UMTX_OP_MUTEX_WAKE	18	/* deprecated */
+#if defined(UMTX_OP_SEM_WAIT) && !defined(HOST_UMTX_OP_SEM_WAIT)
+static const typeof(UMTX_OP_SEM_WAIT) HOST_UMTX_OP_SEM_WAIT = UMTX_OP_SEM_WAIT;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_SEM_WAIT
+#define UMTX_OP_SEM_WAIT	19	/* deprecated */
+#if defined(UMTX_OP_SEM_WAKE) && !defined(HOST_UMTX_OP_SEM_WAKE)
+static const typeof(UMTX_OP_SEM_WAKE) HOST_UMTX_OP_SEM_WAKE = UMTX_OP_SEM_WAKE;
+#endif /* found in: sys/umtx.h */
+#undef UMTX_OP_SEM_WAKE
+#define UMTX_OP_SEM_WAKE	20	/* deprecated */
+#if defined(TARGET_CPU_LEVEL_WHICH)
+#undef TARGET_CPU_LEVEL_WHICH
+#endif /* found in: sys/cpuset.h */
+#define TARGET_CPU_LEVEL_WHICH		3	/* Actual mask/id for which. */
+#if defined(TARGET_CPU_WHICH_TID)
+#undef TARGET_CPU_WHICH_TID
+#endif /* found in: sys/cpuset.h */
+#define TARGET_CPU_WHICH_TID		1	/* Specifies a thread id. */
+#if defined(TARGET_GET_MC_CLEAR_RET)
+#undef TARGET_GET_MC_CLEAR_RET
+#endif /* found in: sys/ucontext.h */
+#define TARGET_GET_MC_CLEAR_RET	1
+#undef FIODGNAME /* found in: sys/filio.h */
+#define FIODGNAME	_IOW('f', 120, struct fiodgname_arg) /* get dev. name */
+#undef FIODTYPE /* found in: sys/filio.h */
+#define FIODTYPE	_IOR('f', 122, int)	/* get d_flags type part */
+#undef FIOGETLBA /* found in: sys/filio.h */
+#define FIOGETLBA	_IOR('f', 121, int)	/* get start blk # */
+#undef FIONSPACE /* found in: sys/filio.h */
+#define FIONSPACE	_IOR('f', 118, int)	/* get space in send queue */
+#undef FIONWRITE /* found in: sys/filio.h */
+#define FIONWRITE	_IOR('f', 119, int)	/* get # bytes (yet) to write */
+#undef FIOSEEKDATA /* found in: sys/filio.h */
+#define FIOSEEKDATA	_IOWR('f', 97, off_t)	/* SEEK_DATA */
+#undef FIOSEEKHOLE /* found in: sys/filio.h */
+#define FIOSEEKHOLE	_IOWR('f', 98, off_t)	/* SEEK_HOLE */
+#if defined(FIOCLEX) && !defined(HOST_FIOCLEX)
+static const typeof(FIOCLEX) HOST_FIOCLEX = FIOCLEX;
+#endif /* found in: sys/filio.h */
+#undef FIOCLEX
+#define FIOCLEX		 _IO('f', 1)		/* set close on exec on fd */
+#if defined(FIONCLEX) && !defined(HOST_FIONCLEX)
+static const typeof(FIONCLEX) HOST_FIONCLEX = FIONCLEX;
+#endif /* found in: sys/filio.h */
+#undef FIONCLEX
+#define FIONCLEX	 _IO('f', 2)		/* remove close on exec */
+#if defined(FIONREAD) && !defined(HOST_FIONREAD)
+static const typeof(FIONREAD) HOST_FIONREAD = FIONREAD;
+#endif /* found in: sys/filio.h */
+#undef FIONREAD
+#define FIONREAD	_IOR('f', 127, int)	/* get # bytes to read */
+#if defined(FIONBIO) && !defined(HOST_FIONBIO)
+static const typeof(FIONBIO) HOST_FIONBIO = FIONBIO;
+#endif /* found in: sys/filio.h */
+#undef FIONBIO
+#define FIONBIO		_IOW('f', 126, int)	/* set/clear non-blocking i/o */
+#if defined(FIOASYNC) && !defined(HOST_FIOASYNC)
+static const typeof(FIOASYNC) HOST_FIOASYNC = FIOASYNC;
+#endif /* found in: sys/filio.h */
+#undef FIOASYNC
+#define FIOASYNC	_IOW('f', 125, int)	/* set/clear async i/o */
+#if defined(FIOSETOWN) && !defined(HOST_FIOSETOWN)
+static const typeof(FIOSETOWN) HOST_FIOSETOWN = FIOSETOWN;
+#endif /* found in: sys/filio.h */
+#undef FIOSETOWN
+#define FIOSETOWN	_IOW('f', 124, int)	/* set owner */
+#if defined(FIOGETOWN) && !defined(HOST_FIOGETOWN)
+static const typeof(FIOGETOWN) HOST_FIOGETOWN = FIOGETOWN;
+#endif /* found in: sys/filio.h */
+#undef FIOGETOWN
+#define FIOGETOWN	_IOR('f', 123, int)	/* get owner */
+#undef DIOCGSECTORSIZE /* found in: sys/disk.h */
+#define DIOCGSECTORSIZE	_IOR('d', 128, u_int)
+#undef DIOCGMEDIASIZE /* found in: sys/disk.h */
+#define DIOCGMEDIASIZE	_IOR('d', 129, off_t)	/* Get media size in bytes */
+#undef SIOCGIFMAC /* found in: sys/sockio.h */
+#define SIOCGIFMAC	_IOWR('i', 38, struct ifreq)	/* get IF MAC label */
+#undef SIOCGIFFIB /* found in: sys/sockio.h */
+#define SIOCGIFFIB	_IOWR('i', 92, struct ifreq)	/* get IF fib */
+#undef SIOCGIFCAP /* found in: sys/sockio.h */
+#define SIOCGIFCAP	_IOWR('i', 31, struct ifreq)	/* get IF features */
+#undef SIOCGIFPSRCADDR /* found in: sys/sockio.h */
+#define SIOCGIFPSRCADDR	_IOWR('i', 71, struct ifreq)	/* get gif psrc addr */
+#undef SIOCGIFGENERIC /* found in: sys/sockio.h */
+#define SIOCGIFGENERIC	_IOWR('i', 58, struct ifreq)	/* generic IF get op */
+#undef SIOCGIFDESCR /* found in: sys/sockio.h */
+#define SIOCGIFDESCR	_IOWR('i', 42, struct ifreq)	/* get ifnet descr */ 
+#undef SIOCGDRVSPEC /* found in: sys/sockio.h */
+#define SIOCGDRVSPEC	_IOWR('i', 123, struct ifdrv)	/* get driver-specific */
+#undef SIOCGIFGROUP /* found in: sys/sockio.h */
+#define SIOCGIFGROUP	_IOWR('i', 136, struct ifgroupreq) /* get ifgroups */
+#undef SIOCGIFMEDIA /* found in: sys/sockio.h */
+#define SIOCGIFMEDIA	_IOWR('i', 56, struct ifmediareq) /* get net media */
+#undef SIOCGIFSTATUS /* found in: sys/sockio.h */
+#define SIOCGIFSTATUS	_IOWR('i', 59, struct ifstat)	/* get IF status */
+#if defined(SIOCGIFCONF) && !defined(HOST_SIOCGIFCONF)
+static const typeof(SIOCGIFCONF) HOST_SIOCGIFCONF = SIOCGIFCONF;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFCONF
+#define SIOCGIFCONF	_IOWR('i', 36, struct ifconf)	/* get ifnet list */
+#if defined(SIOCGIFFLAGS) && !defined(HOST_SIOCGIFFLAGS)
+static const typeof(SIOCGIFFLAGS) HOST_SIOCGIFFLAGS = SIOCGIFFLAGS;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFFLAGS
+#define SIOCGIFFLAGS	_IOWR('i', 17, struct ifreq)	/* get ifnet flags */
+#if defined(SIOCSIFFLAGS) && !defined(HOST_SIOCSIFFLAGS)
+static const typeof(SIOCSIFFLAGS) HOST_SIOCSIFFLAGS = SIOCSIFFLAGS;
+#endif /* found in: sys/sockio.h */
+#undef SIOCSIFFLAGS
+#define SIOCSIFFLAGS	 _IOW('i', 16, struct ifreq)	/* set ifnet flags */
+#if defined(SIOCGIFMETRIC) && !defined(HOST_SIOCGIFMETRIC)
+static const typeof(SIOCGIFMETRIC) HOST_SIOCGIFMETRIC = SIOCGIFMETRIC;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFMETRIC
+#define SIOCGIFMETRIC	_IOWR('i', 23, struct ifreq)	/* get IF metric */
+#if defined(SIOCSIFMETRIC) && !defined(HOST_SIOCSIFMETRIC)
+static const typeof(SIOCSIFMETRIC) HOST_SIOCSIFMETRIC = SIOCSIFMETRIC;
+#endif /* found in: sys/sockio.h */
+#undef SIOCSIFMETRIC
+#define SIOCSIFMETRIC	 _IOW('i', 24, struct ifreq)	/* set IF metric */
+#if defined(SIOCGIFMTU) && !defined(HOST_SIOCGIFMTU)
+static const typeof(SIOCGIFMTU) HOST_SIOCGIFMTU = SIOCGIFMTU;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFMTU
+#define SIOCGIFMTU	_IOWR('i', 51, struct ifreq)	/* get IF mtu */
+#if defined(SIOCSIFMTU) && !defined(HOST_SIOCSIFMTU)
+static const typeof(SIOCSIFMTU) HOST_SIOCSIFMTU = SIOCSIFMTU;
+#endif /* found in: sys/sockio.h */
+#undef SIOCSIFMTU
+#define SIOCSIFMTU	 _IOW('i', 52, struct ifreq)	/* set IF mtu */
+#if defined(SIOCGIFINDEX) && !defined(HOST_SIOCGIFINDEX)
+static const typeof(SIOCGIFINDEX) HOST_SIOCGIFINDEX = SIOCGIFINDEX;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFINDEX
+#define SIOCGIFINDEX	_IOWR('i', 32, struct ifreq)	/* get IF index */
+#if defined(SIOCGIFADDR) && !defined(HOST_SIOCGIFADDR)
+static const typeof(SIOCGIFADDR) HOST_SIOCGIFADDR = SIOCGIFADDR;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFADDR
+#define SIOCGIFADDR	_IOWR('i', 33, struct ifreq)	/* get ifnet address */
+#if defined(SIOCSIFADDR) && !defined(HOST_SIOCSIFADDR)
+static const typeof(SIOCSIFADDR) HOST_SIOCSIFADDR = SIOCSIFADDR;
+#endif /* found in: sys/sockio.h */
+#undef SIOCSIFADDR
+#define SIOCSIFADDR	 _IOW('i', 12, struct ifreq)	/* set ifnet address */
+#if defined(SIOCGIFBRDADDR) && !defined(HOST_SIOCGIFBRDADDR)
+static const typeof(SIOCGIFBRDADDR) HOST_SIOCGIFBRDADDR = SIOCGIFBRDADDR;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFBRDADDR
+#define SIOCGIFBRDADDR	_IOWR('i', 35, struct ifreq)	/* get broadcast addr */
+#if defined(SIOCSIFBRDADDR) && !defined(HOST_SIOCSIFBRDADDR)
+static const typeof(SIOCSIFBRDADDR) HOST_SIOCSIFBRDADDR = SIOCSIFBRDADDR;
+#endif /* found in: sys/sockio.h */
+#undef SIOCSIFBRDADDR
+#define SIOCSIFBRDADDR	 _IOW('i', 19, struct ifreq)	/* set broadcast addr */
+#if defined(SIOCGIFDSTADDR) && !defined(HOST_SIOCGIFDSTADDR)
+static const typeof(SIOCGIFDSTADDR) HOST_SIOCGIFDSTADDR = SIOCGIFDSTADDR;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFDSTADDR
+#define SIOCGIFDSTADDR	_IOWR('i', 34, struct ifreq)	/* get p-p address */
+#if defined(SIOCSIFDSTADDR) && !defined(HOST_SIOCSIFDSTADDR)
+static const typeof(SIOCSIFDSTADDR) HOST_SIOCSIFDSTADDR = SIOCSIFDSTADDR;
+#endif /* found in: sys/sockio.h */
+#undef SIOCSIFDSTADDR
+#define SIOCSIFDSTADDR	 _IOW('i', 14, struct ifreq)	/* set p-p address */
+#if defined(SIOCGIFNETMASK) && !defined(HOST_SIOCGIFNETMASK)
+static const typeof(SIOCGIFNETMASK) HOST_SIOCGIFNETMASK = SIOCGIFNETMASK;
+#endif /* found in: sys/sockio.h */
+#undef SIOCGIFNETMASK
+#define SIOCGIFNETMASK	_IOWR('i', 37, struct ifreq)	/* get net addr mask */
+#if defined(SIOCSIFNETMASK) && !defined(HOST_SIOCSIFNETMASK)
+static const typeof(SIOCSIFNETMASK) HOST_SIOCSIFNETMASK = SIOCSIFNETMASK;
+#endif /* found in: sys/sockio.h */
+#undef SIOCSIFNETMASK
+#define SIOCSIFNETMASK	 _IOW('i', 22, struct ifreq)	/* set net addr mask */
+#if defined(SIOCADDMULTI) && !defined(HOST_SIOCADDMULTI)
+static const typeof(SIOCADDMULTI) HOST_SIOCADDMULTI = SIOCADDMULTI;
+#endif /* found in: sys/sockio.h */
+#undef SIOCADDMULTI
+#define SIOCADDMULTI	 _IOW('i', 49, struct ifreq)	/* add m'cast addr */
+#if defined(SIOCDELMULTI) && !defined(HOST_SIOCDELMULTI)
+static const typeof(SIOCDELMULTI) HOST_SIOCDELMULTI = SIOCDELMULTI;
+#endif /* found in: sys/sockio.h */
+#undef SIOCDELMULTI
+#define SIOCDELMULTI	 _IOW('i', 50, struct ifreq)	/* del m'cast addr */
+#if defined(INFTIM) && !defined(HOST_INFTIM)
+static const typeof(INFTIM) HOST_INFTIM = INFTIM;
+#endif /* found in: sys/poll.h */
+#undef INFTIM
+#define INFTIM		(-1)
 #if defined(TARGET_E2BIG)
 #undef TARGET_E2BIG
 #endif /* found in: sys/errno.h */
@@ -610,10 +695,6 @@ static const typeof(VTIME) HOST_VTIME = VTIME;
 #undef TARGET_EISDIR
 #endif /* found in: sys/errno.h */
 #define TARGET_EISDIR		21		/* Is a directory */
-#if defined(TARGET_EJUSTRETURN)
-#undef TARGET_EJUSTRETURN
-#endif /* found in: sys/errno.h */
-#define TARGET_EJUSTRETURN	(-2)		/* don't modify regs, just return */
 #if defined(TARGET_ELAST)
 #undef TARGET_ELAST
 #endif /* found in: sys/errno.h */
@@ -818,10 +899,6 @@ static const typeof(VTIME) HOST_VTIME = VTIME;
 #undef TARGET_EREMOTE
 #endif /* found in: sys/errno.h */
 #define TARGET_EREMOTE		71		/* Too many levels of remote in path */
-#if defined(TARGET_ERESTART)
-#undef TARGET_ERESTART
-#endif /* found in: sys/errno.h */
-#define TARGET_ERESTART	(-1)		/* restart syscall */
 #if defined(TARGET_EROFS)
 #undef TARGET_EROFS
 #endif /* found in: sys/errno.h */
@@ -874,343 +951,171 @@ static const typeof(VTIME) HOST_VTIME = VTIME;
 #undef TARGET_EXDEV
 #endif /* found in: sys/errno.h */
 #define TARGET_EXDEV		18		/* Cross-device link */
-#if defined(TARGET_CPU_LEVEL_WHICH)
-#undef TARGET_CPU_LEVEL_WHICH
-#endif /* found in: sys/cpuset.h */
-#define TARGET_CPU_LEVEL_WHICH		3	/* Actual mask/id for which. */
-#if defined(TARGET_CPU_WHICH_TID)
-#undef TARGET_CPU_WHICH_TID
-#endif /* found in: sys/cpuset.h */
-#define TARGET_CPU_WHICH_TID		1	/* Specifies a thread id. */
-#if defined(DT_UNKNOWN) && !defined(HOST_DT_UNKNOWN)
-static const typeof(DT_UNKNOWN) HOST_DT_UNKNOWN = DT_UNKNOWN;
-#endif /* found in: sys/dirent.h */
-#undef DT_UNKNOWN
-#define DT_UNKNOWN	 0
-#if defined(DT_FIFO) && !defined(HOST_DT_FIFO)
-static const typeof(DT_FIFO) HOST_DT_FIFO = DT_FIFO;
-#endif /* found in: sys/dirent.h */
-#undef DT_FIFO
-#define DT_FIFO		 1
-#if defined(DT_CHR) && !defined(HOST_DT_CHR)
-static const typeof(DT_CHR) HOST_DT_CHR = DT_CHR;
-#endif /* found in: sys/dirent.h */
-#undef DT_CHR
-#define DT_CHR		 2
-#if defined(DT_DIR) && !defined(HOST_DT_DIR)
-static const typeof(DT_DIR) HOST_DT_DIR = DT_DIR;
-#endif /* found in: sys/dirent.h */
-#undef DT_DIR
-#define DT_DIR		 4
-#if defined(DT_BLK) && !defined(HOST_DT_BLK)
-static const typeof(DT_BLK) HOST_DT_BLK = DT_BLK;
-#endif /* found in: sys/dirent.h */
-#undef DT_BLK
-#define DT_BLK		 6
-#if defined(DT_REG) && !defined(HOST_DT_REG)
-static const typeof(DT_REG) HOST_DT_REG = DT_REG;
-#endif /* found in: sys/dirent.h */
-#undef DT_REG
-#define DT_REG		 8
-#if defined(DT_LNK) && !defined(HOST_DT_LNK)
-static const typeof(DT_LNK) HOST_DT_LNK = DT_LNK;
-#endif /* found in: sys/dirent.h */
-#undef DT_LNK
-#define DT_LNK		10
-#if defined(DT_SOCK) && !defined(HOST_DT_SOCK)
-static const typeof(DT_SOCK) HOST_DT_SOCK = DT_SOCK;
-#endif /* found in: sys/dirent.h */
-#undef DT_SOCK
-#define DT_SOCK		12
-#if defined(DT_WHT) && !defined(HOST_DT_WHT)
-static const typeof(DT_WHT) HOST_DT_WHT = DT_WHT;
-#endif /* found in: sys/dirent.h */
-#undef DT_WHT
-#define DT_WHT		14
-#undef IFTODT /* found in: sys/dirent.h */
-#define IFTODT(mode)	(((mode) & 0170000) >> 12)
-#undef DTTOIF /* found in: sys/dirent.h */
-#define DTTOIF(dirtype)	((dirtype) << 12)
-#if defined(TARGET_MAXNAMLEN)
-#undef TARGET_MAXNAMLEN
-#endif /* found in: sys/dirent.h */
-#define TARGET_MAXNAMLEN	255
-#undef DIOCGSECTORSIZE /* found in: sys/disk.h */
-#define DIOCGSECTORSIZE	_IOR('d', 128, u_int)
-#undef DIOCGMEDIASIZE /* found in: sys/disk.h */
-#define DIOCGMEDIASIZE	_IOR('d', 129, off_t)	/* Get media size in bytes */
-#if defined(O_ACCMODE) && !defined(HOST_O_ACCMODE)
-static const typeof(O_ACCMODE) HOST_O_ACCMODE = O_ACCMODE;
-#endif /* found in: sys/fcntl.h */
-#undef O_ACCMODE
-#define O_ACCMODE	0x0003		/* mask for above modes */
-#if defined(O_WRONLY) && !defined(HOST_O_WRONLY)
-static const typeof(O_WRONLY) HOST_O_WRONLY = O_WRONLY;
-#endif /* found in: sys/fcntl.h */
-#undef O_WRONLY
-#define O_WRONLY	0x0001		/* open for writing only */
-#if defined(O_RDWR) && !defined(HOST_O_RDWR)
-static const typeof(O_RDWR) HOST_O_RDWR = O_RDWR;
-#endif /* found in: sys/fcntl.h */
-#undef O_RDWR
-#define O_RDWR		0x0002		/* open for reading and writing */
-#if defined(O_CREAT) && !defined(HOST_O_CREAT)
-static const typeof(O_CREAT) HOST_O_CREAT = O_CREAT;
-#endif /* found in: sys/fcntl.h */
-#undef O_CREAT
-#define O_CREAT		0x0200		/* create if nonexistent */
-#if defined(O_EXCL) && !defined(HOST_O_EXCL)
-static const typeof(O_EXCL) HOST_O_EXCL = O_EXCL;
-#endif /* found in: sys/fcntl.h */
-#undef O_EXCL
-#define O_EXCL		0x0800		/* error if already exists */
-#if defined(O_NOCTTY) && !defined(HOST_O_NOCTTY)
-static const typeof(O_NOCTTY) HOST_O_NOCTTY = O_NOCTTY;
-#endif /* found in: sys/fcntl.h */
-#undef O_NOCTTY
-#define O_NOCTTY	0x8000		/* don't assign controlling terminal */
-#if defined(O_TRUNC) && !defined(HOST_O_TRUNC)
-static const typeof(O_TRUNC) HOST_O_TRUNC = O_TRUNC;
-#endif /* found in: sys/fcntl.h */
-#undef O_TRUNC
-#define O_TRUNC		0x0400		/* truncate to zero length */
-#if defined(O_APPEND) && !defined(HOST_O_APPEND)
-static const typeof(O_APPEND) HOST_O_APPEND = O_APPEND;
-#endif /* found in: sys/fcntl.h */
-#undef O_APPEND
-#define O_APPEND	0x0008		/* set append mode */
-#if defined(O_NONBLOCK) && !defined(HOST_O_NONBLOCK)
-static const typeof(O_NONBLOCK) HOST_O_NONBLOCK = O_NONBLOCK;
-#endif /* found in: sys/fcntl.h */
-#undef O_NONBLOCK
-#define O_NONBLOCK	0x0004		/* no delay */
-#if defined(O_SYNC) && !defined(HOST_O_SYNC)
-static const typeof(O_SYNC) HOST_O_SYNC = O_SYNC;
-#endif /* found in: sys/fcntl.h */
-#undef O_SYNC
-#define O_SYNC		0x0080		/* POSIX synonym for O_FSYNC */
-#if defined(O_DIRECTORY) && !defined(HOST_O_DIRECTORY)
-static const typeof(O_DIRECTORY) HOST_O_DIRECTORY = O_DIRECTORY;
-#endif /* found in: sys/fcntl.h */
-#undef O_DIRECTORY
-#define O_DIRECTORY	0x00020000	/* Fail if not directory */
-#if defined(O_NOFOLLOW) && !defined(HOST_O_NOFOLLOW)
-static const typeof(O_NOFOLLOW) HOST_O_NOFOLLOW = O_NOFOLLOW;
-#endif /* found in: sys/fcntl.h */
-#undef O_NOFOLLOW
-#define O_NOFOLLOW	0x0100		/* don't follow symlinks */
-#if defined(O_DIRECT) && !defined(HOST_O_DIRECT)
-static const typeof(O_DIRECT) HOST_O_DIRECT = O_DIRECT;
-#endif /* found in: sys/fcntl.h */
-#undef O_DIRECT
-#define O_DIRECT	0x00010000
-#if defined(O_CLOEXEC) && !defined(HOST_O_CLOEXEC)
-static const typeof(O_CLOEXEC) HOST_O_CLOEXEC = O_CLOEXEC;
-#endif /* found in: sys/fcntl.h */
-#undef O_CLOEXEC
-#define O_CLOEXEC	0x00100000
-#if defined(O_PATH) && !defined(HOST_O_PATH)
-static const typeof(O_PATH) HOST_O_PATH = O_PATH;
-#endif /* found in: sys/fcntl.h */
-#undef O_PATH
-#define O_PATH		0x00400000	/* fd is only a path */
-#if defined(O_DSYNC) && !defined(HOST_O_DSYNC)
-static const typeof(O_DSYNC) HOST_O_DSYNC = O_DSYNC;
-#endif /* found in: sys/fcntl.h */
-#undef O_DSYNC
-#define O_DSYNC		0x01000000	/* POSIX data sync */
-#if defined(AT_FDCWD) && !defined(HOST_AT_FDCWD)
-static const typeof(AT_FDCWD) HOST_AT_FDCWD = AT_FDCWD;
-#endif /* found in: sys/fcntl.h */
-#undef AT_FDCWD
-#define AT_FDCWD		-100
-#if defined(AT_EACCESS) && !defined(HOST_AT_EACCESS)
-static const typeof(AT_EACCESS) HOST_AT_EACCESS = AT_EACCESS;
-#endif /* found in: sys/fcntl.h */
-#undef AT_EACCESS
-#define AT_EACCESS		0x0100	/* Check access using effective user */
-#if defined(AT_SYMLINK_NOFOLLOW) && !defined(HOST_AT_SYMLINK_NOFOLLOW)
-static const typeof(AT_SYMLINK_NOFOLLOW) HOST_AT_SYMLINK_NOFOLLOW = AT_SYMLINK_NOFOLLOW;
-#endif /* found in: sys/fcntl.h */
-#undef AT_SYMLINK_NOFOLLOW
-#define AT_SYMLINK_NOFOLLOW	0x0200	/* Do not follow symbolic links */
-#if defined(AT_SYMLINK_FOLLOW) && !defined(HOST_AT_SYMLINK_FOLLOW)
-static const typeof(AT_SYMLINK_FOLLOW) HOST_AT_SYMLINK_FOLLOW = AT_SYMLINK_FOLLOW;
-#endif /* found in: sys/fcntl.h */
-#undef AT_SYMLINK_FOLLOW
-#define AT_SYMLINK_FOLLOW	0x0400	/* Follow symbolic link */
-#if defined(AT_REMOVEDIR) && !defined(HOST_AT_REMOVEDIR)
-static const typeof(AT_REMOVEDIR) HOST_AT_REMOVEDIR = AT_REMOVEDIR;
-#endif /* found in: sys/fcntl.h */
-#undef AT_REMOVEDIR
-#define AT_REMOVEDIR		0x0800	/* Remove directory instead of file */
-#if defined(AT_RESOLVE_BENEATH) && !defined(HOST_AT_RESOLVE_BENEATH)
-static const typeof(AT_RESOLVE_BENEATH) HOST_AT_RESOLVE_BENEATH = AT_RESOLVE_BENEATH;
-#endif /* found in: sys/fcntl.h */
-#undef AT_RESOLVE_BENEATH
-#define AT_RESOLVE_BENEATH	0x2000	/* Do not allow name resolution */
-#if defined(AT_EMPTY_PATH) && !defined(HOST_AT_EMPTY_PATH)
-static const typeof(AT_EMPTY_PATH) HOST_AT_EMPTY_PATH = AT_EMPTY_PATH;
-#endif /* found in: sys/fcntl.h */
-#undef AT_EMPTY_PATH
-#define AT_EMPTY_PATH		0x4000	/* Operate on dirfd if path is empty */
-#if defined(F_DUPFD) && !defined(HOST_F_DUPFD)
-static const typeof(F_DUPFD) HOST_F_DUPFD = F_DUPFD;
-#endif /* found in: sys/fcntl.h */
-#undef F_DUPFD
-#define F_DUPFD		0		/* duplicate file descriptor */
-#if defined(F_DUPFD_CLOEXEC) && !defined(HOST_F_DUPFD_CLOEXEC)
-static const typeof(F_DUPFD_CLOEXEC) HOST_F_DUPFD_CLOEXEC = F_DUPFD_CLOEXEC;
-#endif /* found in: sys/fcntl.h */
-#undef F_DUPFD_CLOEXEC
-#define F_DUPFD_CLOEXEC	17		/* Like F_DUPFD, but FD_CLOEXEC is set */
-#if defined(F_DUP2FD) && !defined(HOST_F_DUP2FD)
-static const typeof(F_DUP2FD) HOST_F_DUP2FD = F_DUP2FD;
-#endif /* found in: sys/fcntl.h */
-#undef F_DUP2FD
-#define F_DUP2FD	10		/* duplicate file descriptor to arg */
-#if defined(F_DUP2FD_CLOEXEC) && !defined(HOST_F_DUP2FD_CLOEXEC)
-static const typeof(F_DUP2FD_CLOEXEC) HOST_F_DUP2FD_CLOEXEC = F_DUP2FD_CLOEXEC;
-#endif /* found in: sys/fcntl.h */
-#undef F_DUP2FD_CLOEXEC
-#define F_DUP2FD_CLOEXEC 18		/* Like F_DUP2FD, but FD_CLOEXEC is set */
-#if defined(F_GETFD) && !defined(HOST_F_GETFD)
-static const typeof(F_GETFD) HOST_F_GETFD = F_GETFD;
-#endif /* found in: sys/fcntl.h */
-#undef F_GETFD
-#define F_GETFD		1		/* get file descriptor flags */
-#if defined(F_SETFD) && !defined(HOST_F_SETFD)
-static const typeof(F_SETFD) HOST_F_SETFD = F_SETFD;
-#endif /* found in: sys/fcntl.h */
-#undef F_SETFD
-#define F_SETFD		2		/* set file descriptor flags */
-#if defined(F_GETFL) && !defined(HOST_F_GETFL)
-static const typeof(F_GETFL) HOST_F_GETFL = F_GETFL;
-#endif /* found in: sys/fcntl.h */
-#undef F_GETFL
-#define F_GETFL		3		/* get file status flags */
-#if defined(F_SETFL) && !defined(HOST_F_SETFL)
-static const typeof(F_SETFL) HOST_F_SETFL = F_SETFL;
-#endif /* found in: sys/fcntl.h */
-#undef F_SETFL
-#define F_SETFL		4		/* set file status flags */
-#if defined(F_GETOWN) && !defined(HOST_F_GETOWN)
-static const typeof(F_GETOWN) HOST_F_GETOWN = F_GETOWN;
-#endif /* found in: sys/fcntl.h */
-#undef F_GETOWN
-#define F_GETOWN	5		/* get SIGIO/SIGURG proc/pgrp */
-#if defined(F_SETOWN) && !defined(HOST_F_SETOWN)
-static const typeof(F_SETOWN) HOST_F_SETOWN = F_SETOWN;
-#endif /* found in: sys/fcntl.h */
-#undef F_SETOWN
-#define F_SETOWN	6		/* set SIGIO/SIGURG proc/pgrp */
-#if defined(F_GETLK) && !defined(HOST_F_GETLK)
-static const typeof(F_GETLK) HOST_F_GETLK = F_GETLK;
-#endif /* found in: sys/fcntl.h */
-#undef F_GETLK
-#define F_GETLK		11		/* get record locking information */
-#if defined(F_SETLK) && !defined(HOST_F_SETLK)
-static const typeof(F_SETLK) HOST_F_SETLK = F_SETLK;
-#endif /* found in: sys/fcntl.h */
-#undef F_SETLK
-#define F_SETLK		12		/* set record locking information */
-#if defined(F_SETLKW) && !defined(HOST_F_SETLKW)
-static const typeof(F_SETLKW) HOST_F_SETLKW = F_SETLKW;
-#endif /* found in: sys/fcntl.h */
-#undef F_SETLKW
-#define F_SETLKW	13		/* F_SETLK; wait if blocked */
-#undef FIODGNAME /* found in: sys/filio.h */
-#define FIODGNAME	_IOW('f', 120, struct fiodgname_arg) /* get dev. name */
-#undef FIODTYPE /* found in: sys/filio.h */
-#define FIODTYPE	_IOR('f', 122, int)	/* get d_flags type part */
-#undef FIOGETLBA /* found in: sys/filio.h */
-#define FIOGETLBA	_IOR('f', 121, int)	/* get start blk # */
-#undef FIONSPACE /* found in: sys/filio.h */
-#define FIONSPACE	_IOR('f', 118, int)	/* get space in send queue */
-#undef FIONWRITE /* found in: sys/filio.h */
-#define FIONWRITE	_IOR('f', 119, int)	/* get # bytes (yet) to write */
-#undef FIOSEEKDATA /* found in: sys/filio.h */
-#define FIOSEEKDATA	_IOWR('f', 97, off_t)	/* SEEK_DATA */
-#undef FIOSEEKHOLE /* found in: sys/filio.h */
-#define FIOSEEKHOLE	_IOWR('f', 98, off_t)	/* SEEK_HOLE */
-#if defined(FIOCLEX) && !defined(HOST_FIOCLEX)
-static const typeof(FIOCLEX) HOST_FIOCLEX = FIOCLEX;
-#endif /* found in: sys/filio.h */
-#undef FIOCLEX
-#define FIOCLEX		 _IO('f', 1)		/* set close on exec on fd */
-#if defined(FIONCLEX) && !defined(HOST_FIONCLEX)
-static const typeof(FIONCLEX) HOST_FIONCLEX = FIONCLEX;
-#endif /* found in: sys/filio.h */
-#undef FIONCLEX
-#define FIONCLEX	 _IO('f', 2)		/* remove close on exec */
-#if defined(FIONREAD) && !defined(HOST_FIONREAD)
-static const typeof(FIONREAD) HOST_FIONREAD = FIONREAD;
-#endif /* found in: sys/filio.h */
-#undef FIONREAD
-#define FIONREAD	_IOR('f', 127, int)	/* get # bytes to read */
-#if defined(FIONBIO) && !defined(HOST_FIONBIO)
-static const typeof(FIONBIO) HOST_FIONBIO = FIONBIO;
-#endif /* found in: sys/filio.h */
-#undef FIONBIO
-#define FIONBIO		_IOW('f', 126, int)	/* set/clear non-blocking i/o */
-#if defined(FIOASYNC) && !defined(HOST_FIOASYNC)
-static const typeof(FIOASYNC) HOST_FIOASYNC = FIOASYNC;
-#endif /* found in: sys/filio.h */
-#undef FIOASYNC
-#define FIOASYNC	_IOW('f', 125, int)	/* set/clear async i/o */
-#if defined(FIOSETOWN) && !defined(HOST_FIOSETOWN)
-static const typeof(FIOSETOWN) HOST_FIOSETOWN = FIOSETOWN;
-#endif /* found in: sys/filio.h */
-#undef FIOSETOWN
-#define FIOSETOWN	_IOW('f', 124, int)	/* set owner */
-#if defined(FIOGETOWN) && !defined(HOST_FIOGETOWN)
-static const typeof(FIOGETOWN) HOST_FIOGETOWN = FIOGETOWN;
-#endif /* found in: sys/filio.h */
-#undef FIOGETOWN
-#define FIOGETOWN	_IOR('f', 123, int)	/* get owner */
+#if defined(__FreeBSD_version) && !defined(HOST___FreeBSD_version)
+static const typeof(__FreeBSD_version) HOST___FreeBSD_version = __FreeBSD_version;
+#endif /* found in: sys/param.h */
+#undef __FreeBSD_version
+#define __FreeBSD_version 1401000
+#if defined(P_OSREL_MAP_GUARD) && !defined(HOST_P_OSREL_MAP_GUARD)
+static const typeof(P_OSREL_MAP_GUARD) HOST_P_OSREL_MAP_GUARD = P_OSREL_MAP_GUARD;
+#endif /* found in: sys/param.h */
+#undef P_OSREL_MAP_GUARD
+#define P_OSREL_MAP_GUARD		1200035
+#if defined(TIOCSETD) && !defined(HOST_TIOCSETD)
+static const typeof(TIOCSETD) HOST_TIOCSETD = TIOCSETD;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSETD
+#define TIOCSETD	_IOW('t', 27, int)	/* set line discipline */
+#if defined(TIOCGETD) && !defined(HOST_TIOCGETD)
+static const typeof(TIOCGETD) HOST_TIOCGETD = TIOCGETD;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCGETD
+#define TIOCGETD	_IOR('t', 26, int)	/* get line discipline */
+#if defined(TIOCSBRK) && !defined(HOST_TIOCSBRK)
+static const typeof(TIOCSBRK) HOST_TIOCSBRK = TIOCSBRK;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSBRK
+#define TIOCSBRK	 _IO('t', 123)		/* set break bit */
+#if defined(TIOCCBRK) && !defined(HOST_TIOCCBRK)
+static const typeof(TIOCCBRK) HOST_TIOCCBRK = TIOCCBRK;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCCBRK
+#define TIOCCBRK	 _IO('t', 122)		/* clear break bit */
+#if defined(TIOCSDTR) && !defined(HOST_TIOCSDTR)
+static const typeof(TIOCSDTR) HOST_TIOCSDTR = TIOCSDTR;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSDTR
+#define TIOCSDTR	 _IO('t', 121)		/* set data terminal ready */
+#if defined(TIOCCDTR) && !defined(HOST_TIOCCDTR)
+static const typeof(TIOCCDTR) HOST_TIOCCDTR = TIOCCDTR;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCCDTR
+#define TIOCCDTR	 _IO('t', 120)		/* clear data terminal ready */
+#if defined(TIOCGPGRP) && !defined(HOST_TIOCGPGRP)
+static const typeof(TIOCGPGRP) HOST_TIOCGPGRP = TIOCGPGRP;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCGPGRP
+#define TIOCGPGRP	_IOR('t', 119, int)	/* get pgrp of tty */
+#if defined(TIOCSPGRP) && !defined(HOST_TIOCSPGRP)
+static const typeof(TIOCSPGRP) HOST_TIOCSPGRP = TIOCSPGRP;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSPGRP
+#define TIOCSPGRP	_IOW('t', 118, int)	/* set pgrp of tty */
+#if defined(TIOCGETA) && !defined(HOST_TIOCGETA)
+static const typeof(TIOCGETA) HOST_TIOCGETA = TIOCGETA;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCGETA
+#define TIOCGETA	_IOR('t', 19, struct termios) /* get termios struct */
+#if defined(TIOCSETA) && !defined(HOST_TIOCSETA)
+static const typeof(TIOCSETA) HOST_TIOCSETA = TIOCSETA;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSETA
+#define TIOCSETA	_IOW('t', 20, struct termios) /* set termios struct */
+#if defined(TIOCSETAW) && !defined(HOST_TIOCSETAW)
+static const typeof(TIOCSETAW) HOST_TIOCSETAW = TIOCSETAW;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSETAW
+#define TIOCSETAW	_IOW('t', 21, struct termios) /* drain output, set */
+#if defined(TIOCSETAF) && !defined(HOST_TIOCSETAF)
+static const typeof(TIOCSETAF) HOST_TIOCSETAF = TIOCSETAF;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSETAF
+#define TIOCSETAF	_IOW('t', 22, struct termios) /* drn out, fls in, set */
+#if defined(TIOCPTMASTER) && !defined(HOST_TIOCPTMASTER)
+static const typeof(TIOCPTMASTER) HOST_TIOCPTMASTER = TIOCPTMASTER;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCPTMASTER
+#define TIOCPTMASTER	 _IO('t', 28)		/* pts master validation */
+#if defined(TIOCOUTQ) && !defined(HOST_TIOCOUTQ)
+static const typeof(TIOCOUTQ) HOST_TIOCOUTQ = TIOCOUTQ;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCOUTQ
+#define TIOCOUTQ	_IOR('t', 115, int)	/* output queue size */
+#if defined(TIOCSTI) && !defined(HOST_TIOCSTI)
+static const typeof(TIOCSTI) HOST_TIOCSTI = TIOCSTI;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSTI
+#define TIOCSTI		_IOW('t', 114, char)	/* simulate terminal input */
+#if defined(TIOCNOTTY) && !defined(HOST_TIOCNOTTY)
+static const typeof(TIOCNOTTY) HOST_TIOCNOTTY = TIOCNOTTY;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCNOTTY
+#define TIOCNOTTY	 _IO('t', 113)		/* void tty association */
+#if defined(TIOCSTOP) && !defined(HOST_TIOCSTOP)
+static const typeof(TIOCSTOP) HOST_TIOCSTOP = TIOCSTOP;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSTOP
+#define TIOCSTOP	 _IO('t', 111)		/* stop output, like ^S */
+#if defined(TIOCSTART) && !defined(HOST_TIOCSTART)
+static const typeof(TIOCSTART) HOST_TIOCSTART = TIOCSTART;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSTART
+#define TIOCSTART	 _IO('t', 110)		/* start output, like ^Q */
+#if defined(TIOCPKT) && !defined(HOST_TIOCPKT)
+static const typeof(TIOCPKT) HOST_TIOCPKT = TIOCPKT;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCPKT
+#define TIOCPKT		_IOW('t', 112, int)	/* pty: set/clear packet mode */
+#if defined(TIOCSCTTY) && !defined(HOST_TIOCSCTTY)
+static const typeof(TIOCSCTTY) HOST_TIOCSCTTY = TIOCSCTTY;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSCTTY
+#define TIOCSCTTY	 _IO('t', 97)		/* become controlling tty */
+#if defined(TIOCDRAIN) && !defined(HOST_TIOCDRAIN)
+static const typeof(TIOCDRAIN) HOST_TIOCDRAIN = TIOCDRAIN;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCDRAIN
+#define TIOCDRAIN	 _IO('t', 94)		/* wait till output drained */
+#if defined(TIOCEXCL) && !defined(HOST_TIOCEXCL)
+static const typeof(TIOCEXCL) HOST_TIOCEXCL = TIOCEXCL;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCEXCL
+#define TIOCEXCL	 _IO('t', 13)		/* set exclusive use of tty */
+#if defined(TIOCNXCL) && !defined(HOST_TIOCNXCL)
+static const typeof(TIOCNXCL) HOST_TIOCNXCL = TIOCNXCL;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCNXCL
+#define TIOCNXCL	 _IO('t', 14)		/* reset exclusive use of tty */
+#if defined(TIOCGWINSZ) && !defined(HOST_TIOCGWINSZ)
+static const typeof(TIOCGWINSZ) HOST_TIOCGWINSZ = TIOCGWINSZ;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCGWINSZ
+#define TIOCGWINSZ	_IOR('t', 104, struct winsize)	/* get window size */
+#if defined(TIOCSWINSZ) && !defined(HOST_TIOCSWINSZ)
+static const typeof(TIOCSWINSZ) HOST_TIOCSWINSZ = TIOCSWINSZ;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCSWINSZ
+#define TIOCSWINSZ	_IOW('t', 103, struct winsize)	/* set window size */
+#if defined(TIOCCONS) && !defined(HOST_TIOCCONS)
+static const typeof(TIOCCONS) HOST_TIOCCONS = TIOCCONS;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCCONS
+#define TIOCCONS	_IOW('t', 98, int)	/* become virtual console */
+#if defined(TIOCMSET) && !defined(HOST_TIOCMSET)
+static const typeof(TIOCMSET) HOST_TIOCMSET = TIOCMSET;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCMSET
+#define TIOCMSET	_IOW('t', 109, int)	/* set all modem bits */
+#if defined(TIOCMGET) && !defined(HOST_TIOCMGET)
+static const typeof(TIOCMGET) HOST_TIOCMGET = TIOCMGET;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCMGET
+#define TIOCMGET	_IOR('t', 106, int)	/* get all modem bits */
+#if defined(TIOCMBIS) && !defined(HOST_TIOCMBIS)
+static const typeof(TIOCMBIS) HOST_TIOCMBIS = TIOCMBIS;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCMBIS
+#define TIOCMBIS	_IOW('t', 108, int)	/* bis modem bits */
+#if defined(TIOCMBIC) && !defined(HOST_TIOCMBIC)
+static const typeof(TIOCMBIC) HOST_TIOCMBIC = TIOCMBIC;
+#endif /* found in: sys/ttycom.h */
+#undef TIOCMBIC
+#define TIOCMBIC	_IOW('t', 107, int)	/* bic modem bits */
 #if defined(FREEBSD_ABI_VENDOR) && !defined(HOST_FREEBSD_ABI_VENDOR)
 static const typeof(FREEBSD_ABI_VENDOR) HOST_FREEBSD_ABI_VENDOR = FREEBSD_ABI_VENDOR;
 #endif /* found in: sys/imgact_elf.h */
 #undef FREEBSD_ABI_VENDOR
 #define FREEBSD_ABI_VENDOR	"FreeBSD"
-#if defined(IOCPARM_SHIFT) && !defined(HOST_IOCPARM_SHIFT)
-static const typeof(IOCPARM_SHIFT) HOST_IOCPARM_SHIFT = IOCPARM_SHIFT;
-#endif /* found in: sys/ioccom.h */
-#undef IOCPARM_SHIFT
-#define IOCPARM_SHIFT	13		/* number of bits for ioctl size */
-#undef IOCPARM_MASK /* found in: sys/ioccom.h */
-#define IOCPARM_MASK	((1 << IOCPARM_SHIFT) - 1) /* parameter length mask */
-#undef IOCPARM_LEN /* found in: sys/ioccom.h */
-#define IOCPARM_LEN(x)	(((x) >> 16) & IOCPARM_MASK)
-#undef IOCBASECMD /* found in: sys/ioccom.h */
-#define IOCBASECMD(x)	((x) & ~(IOCPARM_MASK << 16))
-#undef IOCGROUP /* found in: sys/ioccom.h */
-#define IOCGROUP(x)	(((x) >> 8) & 0xff)
-#undef IOCPARM_MAX /* found in: sys/ioccom.h */
-#define IOCPARM_MAX	(1 << IOCPARM_SHIFT) /* max size of ioctl */
-#undef IOC_VOID /* found in: sys/ioccom.h */
-#define IOC_VOID	0x20000000UL	/* no parameters */
-#undef IOC_OUT /* found in: sys/ioccom.h */
-#define IOC_OUT		0x40000000UL	/* copy out parameters */
-#undef IOC_IN /* found in: sys/ioccom.h */
-#define IOC_IN		0x80000000UL	/* copy in parameters */
-#undef IOC_INOUT /* found in: sys/ioccom.h */
-#define IOC_INOUT	(IOC_IN|IOC_OUT)/* copy parameters in and out */
-#undef IOC_DIRMASK /* found in: sys/ioccom.h */
-#define IOC_DIRMASK	(IOC_VOID|IOC_OUT|IOC_IN)/* mask for IN/OUT/VOID */
-#undef _IOC /* found in: sys/ioccom.h */
-#define _IOC(inout,group,num,len)	((unsigned long) \
-	((inout) | (((len) & IOCPARM_MASK) << 16) | ((group) << 8) | (num)))
-#undef _IO /* found in: sys/ioccom.h */
-#define _IO(g,n)	_IOC(IOC_VOID,	(g), (n), 0)
-#undef _IOWINT /* found in: sys/ioccom.h */
-#define _IOWINT(g,n)	_IOC(IOC_VOID,	(g), (n), sizeof(int))
-#undef _IOR /* found in: sys/ioccom.h */
-#define _IOR(g,n,t)	_IOC(IOC_OUT,	(g), (n), sizeof(t))
-#undef _IOW /* found in: sys/ioccom.h */
-#define _IOW(g,n,t)	_IOC(IOC_IN,	(g), (n), sizeof(t))
-#undef _IOWR /* found in: sys/ioccom.h */
-#define _IOWR(g,n,t)	_IOC(IOC_INOUT,	(g), (n), sizeof(t))
 #if defined(BS0) && !defined(HOST_BS0)
 static const typeof(BS0) HOST_BS0 = BS0;
 #endif /* found in: sys/ioctl_compat.h */
@@ -1261,6 +1166,11 @@ static const typeof(NL1) HOST_NL1 = NL1;
 #endif /* found in: sys/ioctl_compat.h */
 #undef NL1
 #define NL1	0x00000100	/* tty 37 */
+#if defined(TAB0) && !defined(HOST_TAB0)
+static const typeof(TAB0) HOST_TAB0 = TAB0;
+#endif /* found in: sys/ioctl_compat.h */
+#undef TAB0
+#define TAB0	0x00000000
 #if defined(TAB1) && !defined(HOST_TAB1)
 static const typeof(TAB1) HOST_TAB1 = TAB1;
 #endif /* found in: sys/ioctl_compat.h */
@@ -1271,114 +1181,433 @@ static const typeof(TAB2) HOST_TAB2 = TAB2;
 #endif /* found in: sys/ioctl_compat.h */
 #undef TAB2
 #define TAB2	0x00000800
-#if defined(KENV_GET) && !defined(HOST_KENV_GET)
-static const typeof(KENV_GET) HOST_KENV_GET = KENV_GET;
-#endif /* found in: sys/kenv.h */
-#undef KENV_GET
-#define KENV_GET		0
-#if defined(MAP_GUARD) && !defined(HOST_MAP_GUARD)
-static const typeof(MAP_GUARD) HOST_MAP_GUARD = MAP_GUARD;
-#endif /* found in: sys/mman.h */
-#undef MAP_GUARD
-#define MAP_GUARD	 0x00002000 /* reserve but don't map address range */
-#if defined(MAP_FIXED) && !defined(HOST_MAP_FIXED)
-static const typeof(MAP_FIXED) HOST_MAP_FIXED = MAP_FIXED;
-#endif /* found in: sys/mman.h */
-#undef MAP_FIXED
-#define MAP_FIXED	 0x0010	/* map addr must be exactly as requested */
-#if defined(MAP_ANON) && !defined(HOST_MAP_ANON)
-static const typeof(MAP_ANON) HOST_MAP_ANON = MAP_ANON;
-#endif /* found in: sys/mman.h */
-#undef MAP_ANON
-#define MAP_ANON	 0x1000	/* allocated from memory, swap space */
-#if defined(MAP_EXCL) && !defined(HOST_MAP_EXCL)
-static const typeof(MAP_EXCL) HOST_MAP_EXCL = MAP_EXCL;
-#endif /* found in: sys/mman.h */
-#undef MAP_EXCL
-#define MAP_EXCL	 0x00004000 /* for MAP_FIXED, fail if address is used */
-#if defined(MAP_PRIVATE) && !defined(HOST_MAP_PRIVATE)
-static const typeof(MAP_PRIVATE) HOST_MAP_PRIVATE = MAP_PRIVATE;
-#endif /* found in: sys/mman.h */
-#undef MAP_PRIVATE
-#define MAP_PRIVATE	0x0002		/* changes are private */
-#if defined(MAP_SHARED) && !defined(HOST_MAP_SHARED)
-static const typeof(MAP_SHARED) HOST_MAP_SHARED = MAP_SHARED;
-#endif /* found in: sys/mman.h */
-#undef MAP_SHARED
-#define MAP_SHARED	0x0001		/* share changes */
-#if defined(MAP_NOCORE) && !defined(HOST_MAP_NOCORE)
-static const typeof(MAP_NOCORE) HOST_MAP_NOCORE = MAP_NOCORE;
-#endif /* found in: sys/mman.h */
-#undef MAP_NOCORE
-#define MAP_NOCORE	 0x00020000 /* dont include these pages in a coredump */
-#if defined(MAP_STACK) && !defined(HOST_MAP_STACK)
-static const typeof(MAP_STACK) HOST_MAP_STACK = MAP_STACK;
-#endif /* found in: sys/mman.h */
-#undef MAP_STACK
-#define MAP_STACK	 0x0400	/* region grows down, like a stack */
-#if defined(MAP_PREFAULT_READ) && !defined(HOST_MAP_PREFAULT_READ)
-static const typeof(MAP_PREFAULT_READ) HOST_MAP_PREFAULT_READ = MAP_PREFAULT_READ;
-#endif /* found in: sys/mman.h */
-#undef MAP_PREFAULT_READ
-#define MAP_PREFAULT_READ 0x00040000 /* prefault mapping for reading */
-#if defined(MAP_ALIGNMENT_SHIFT) && !defined(HOST_MAP_ALIGNMENT_SHIFT)
-static const typeof(MAP_ALIGNMENT_SHIFT) HOST_MAP_ALIGNMENT_SHIFT = MAP_ALIGNMENT_SHIFT;
-#endif /* found in: sys/mman.h */
-#undef MAP_ALIGNMENT_SHIFT
-#define MAP_ALIGNMENT_SHIFT	24
-#undef MAP_ALIGNED /* found in: sys/mman.h */
-#define MAP_ALIGNED(n)	 ((n) << MAP_ALIGNMENT_SHIFT)
-#undef MAP_ALIGNMENT_MASK /* found in: sys/mman.h */
-#define MAP_ALIGNMENT_MASK	MAP_ALIGNED(0xff)
-#undef SHM_ANON /* found in: sys/mman.h */
-#define SHM_ANON		((char *)1)
-#if defined(STATFS_VERSION) && !defined(HOST_STATFS_VERSION)
-static const typeof(STATFS_VERSION) HOST_STATFS_VERSION = STATFS_VERSION;
-#endif /* found in: sys/mount.h */
-#undef STATFS_VERSION
-#define STATFS_VERSION	0x20140518	/* current version number */
-#if defined(MNAMELEN) && !defined(HOST_MNAMELEN)
-static const typeof(MNAMELEN) HOST_MNAMELEN = MNAMELEN;
-#endif /* found in: sys/mount.h */
-#undef MNAMELEN
-#define MNAMELEN	1024		/* size of on/from name bufs */
-#if defined(__FreeBSD_version) && !defined(HOST___FreeBSD_version)
-static const typeof(__FreeBSD_version) HOST___FreeBSD_version = __FreeBSD_version;
-#endif /* found in: sys/param.h */
-#undef __FreeBSD_version
-#define __FreeBSD_version 1401000
-#if defined(P_OSREL_MAP_GUARD) && !defined(HOST_P_OSREL_MAP_GUARD)
-static const typeof(P_OSREL_MAP_GUARD) HOST_P_OSREL_MAP_GUARD = P_OSREL_MAP_GUARD;
-#endif /* found in: sys/param.h */
-#undef P_OSREL_MAP_GUARD
-#define P_OSREL_MAP_GUARD		1200035
-#if defined(INFTIM) && !defined(HOST_INFTIM)
-static const typeof(INFTIM) HOST_INFTIM = INFTIM;
-#endif /* found in: sys/poll.h */
-#undef INFTIM
-#define INFTIM		(-1)
-#if defined(PRI_TIMESHARE) && !defined(HOST_PRI_TIMESHARE)
-static const typeof(PRI_TIMESHARE) HOST_PRI_TIMESHARE = PRI_TIMESHARE;
-#endif /* found in: sys/priority.h */
-#undef PRI_TIMESHARE
-#define PRI_TIMESHARE		3	/* Time sharing process. */
-#if defined(PRI_REALTIME) && !defined(HOST_PRI_REALTIME)
-static const typeof(PRI_REALTIME) HOST_PRI_REALTIME = PRI_REALTIME;
-#endif /* found in: sys/priority.h */
-#undef PRI_REALTIME
-#define PRI_REALTIME		2	/* Real time process. */
-#if defined(PRI_IDLE) && !defined(HOST_PRI_IDLE)
-static const typeof(PRI_IDLE) HOST_PRI_IDLE = PRI_IDLE;
-#endif /* found in: sys/priority.h */
-#undef PRI_IDLE
-#define PRI_IDLE		4	/* Idle process. */
-#undef PRI_FIFO /* found in: sys/priority.h */
-#define PRI_FIFO		(PRI_FIFO_BIT | PRI_REALTIME)
-#if defined(PRI_FIFO_BIT) && !defined(HOST_PRI_FIFO_BIT)
-static const typeof(PRI_FIFO_BIT) HOST_PRI_FIFO_BIT = PRI_FIFO_BIT;
-#endif /* found in: sys/priority.h */
-#undef PRI_FIFO_BIT
-#define PRI_FIFO_BIT		8
+#if defined(ECHO) && !defined(HOST_ECHO)
+static const typeof(ECHO) HOST_ECHO = ECHO;
+#endif /* found in: sys/ioctl_compat.h */
+#undef ECHO
+#define ECHO		0x00000008	/* echo input */
+#if defined(NOFLSH) && !defined(HOST_NOFLSH)
+static const typeof(NOFLSH) HOST_NOFLSH = NOFLSH;
+#endif /* found in: sys/ioctl_compat.h */
+#undef NOFLSH
+#define NOFLSH		0x80000000	/* no output flush on signal */
+#if defined(TOSTOP) && !defined(HOST_TOSTOP)
+static const typeof(TOSTOP) HOST_TOSTOP = TOSTOP;
+#endif /* found in: sys/ioctl_compat.h */
+#undef TOSTOP
+#define TOSTOP		0x00400000	/*SIGSTOP on background output*/
+#if defined(FLUSHO) && !defined(HOST_FLUSHO)
+static const typeof(FLUSHO) HOST_FLUSHO = FLUSHO;
+#endif /* found in: sys/ioctl_compat.h */
+#undef FLUSHO
+#define FLUSHO		0x00800000	/* flush output to terminal */
+#if defined(PENDIN) && !defined(HOST_PENDIN)
+static const typeof(PENDIN) HOST_PENDIN = PENDIN;
+#endif /* found in: sys/ioctl_compat.h */
+#undef PENDIN
+#define PENDIN		0x20000000	/* tp->t_rawq needs reread */
+#if defined(BRKINT) && !defined(HOST_BRKINT)
+static const typeof(BRKINT) HOST_BRKINT = BRKINT;
+#endif /* found in: sys/_termios.h */
+#undef BRKINT
+#define BRKINT		0x00000002	/* map BREAK to SIGINTR */
+#if defined(ICRNL) && !defined(HOST_ICRNL)
+static const typeof(ICRNL) HOST_ICRNL = ICRNL;
+#endif /* found in: sys/_termios.h */
+#undef ICRNL
+#define ICRNL		0x00000100	/* map CR to NL (ala CRMOD) */
+#if defined(IGNBRK) && !defined(HOST_IGNBRK)
+static const typeof(IGNBRK) HOST_IGNBRK = IGNBRK;
+#endif /* found in: sys/_termios.h */
+#undef IGNBRK
+#define IGNBRK		0x00000001	/* ignore BREAK condition */
+#if defined(IGNCR) && !defined(HOST_IGNCR)
+static const typeof(IGNCR) HOST_IGNCR = IGNCR;
+#endif /* found in: sys/_termios.h */
+#undef IGNCR
+#define IGNCR		0x00000080	/* ignore CR */
+#if defined(IGNPAR) && !defined(HOST_IGNPAR)
+static const typeof(IGNPAR) HOST_IGNPAR = IGNPAR;
+#endif /* found in: sys/_termios.h */
+#undef IGNPAR
+#define IGNPAR		0x00000004	/* ignore (discard) parity errors */
+#if defined(IMAXBEL) && !defined(HOST_IMAXBEL)
+static const typeof(IMAXBEL) HOST_IMAXBEL = IMAXBEL;
+#endif /* found in: sys/_termios.h */
+#undef IMAXBEL
+#define IMAXBEL		0x00002000	/* ring bell on input queue full */
+#if defined(INLCR) && !defined(HOST_INLCR)
+static const typeof(INLCR) HOST_INLCR = INLCR;
+#endif /* found in: sys/_termios.h */
+#undef INLCR
+#define INLCR		0x00000040	/* map NL into CR */
+#if defined(INPCK) && !defined(HOST_INPCK)
+static const typeof(INPCK) HOST_INPCK = INPCK;
+#endif /* found in: sys/_termios.h */
+#undef INPCK
+#define INPCK		0x00000010	/* enable checking of parity errors */
+#if defined(ISTRIP) && !defined(HOST_ISTRIP)
+static const typeof(ISTRIP) HOST_ISTRIP = ISTRIP;
+#endif /* found in: sys/_termios.h */
+#undef ISTRIP
+#define ISTRIP		0x00000020	/* strip 8th bit off chars */
+#if defined(IUTF8) && !defined(HOST_IUTF8)
+static const typeof(IUTF8) HOST_IUTF8 = IUTF8;
+#endif /* found in: sys/_termios.h */
+#undef IUTF8
+#define IUTF8		0x00004000	/* assume input is utf-8 encoded */
+#if defined(IXANY) && !defined(HOST_IXANY)
+static const typeof(IXANY) HOST_IXANY = IXANY;
+#endif /* found in: sys/_termios.h */
+#undef IXANY
+#define IXANY		0x00000800	/* any char will restart after stop */
+#if defined(IXOFF) && !defined(HOST_IXOFF)
+static const typeof(IXOFF) HOST_IXOFF = IXOFF;
+#endif /* found in: sys/_termios.h */
+#undef IXOFF
+#define IXOFF		0x00000400	/* enable input flow control */
+#if defined(IXON) && !defined(HOST_IXON)
+static const typeof(IXON) HOST_IXON = IXON;
+#endif /* found in: sys/_termios.h */
+#undef IXON
+#define IXON		0x00000200	/* enable output flow control */
+#if defined(OCRNL) && !defined(HOST_OCRNL)
+static const typeof(OCRNL) HOST_OCRNL = OCRNL;
+#endif /* found in: sys/_termios.h */
+#undef OCRNL
+#define OCRNL		0x00000010	/* map CR to NL on output */
+#if defined(ONLCR) && !defined(HOST_ONLCR)
+static const typeof(ONLCR) HOST_ONLCR = ONLCR;
+#endif /* found in: sys/_termios.h */
+#undef ONLCR
+#define ONLCR		0x00000002	/* map NL to CR-NL (ala CRMOD) */
+#if defined(ONLRET) && !defined(HOST_ONLRET)
+static const typeof(ONLRET) HOST_ONLRET = ONLRET;
+#endif /* found in: sys/_termios.h */
+#undef ONLRET
+#define ONLRET		0x00000040	/* NL performs CR function */
+#if defined(ONOCR) && !defined(HOST_ONOCR)
+static const typeof(ONOCR) HOST_ONOCR = ONOCR;
+#endif /* found in: sys/_termios.h */
+#undef ONOCR
+#define ONOCR		0x00000020	/* no CR output at column 0 */
+#if defined(OPOST) && !defined(HOST_OPOST)
+static const typeof(OPOST) HOST_OPOST = OPOST;
+#endif /* found in: sys/_termios.h */
+#undef OPOST
+#define OPOST		0x00000001	/* enable following output processing */
+#if defined(PARMRK) && !defined(HOST_PARMRK)
+static const typeof(PARMRK) HOST_PARMRK = PARMRK;
+#endif /* found in: sys/_termios.h */
+#undef PARMRK
+#define PARMRK		0x00000008	/* mark parity and framing errors */
+#if defined(TAB3) && !defined(HOST_TAB3)
+static const typeof(TAB3) HOST_TAB3 = TAB3;
+#endif /* found in: sys/_termios.h */
+#undef TAB3
+#define TAB3	    0x00000004	    /* expand tabs to spaces */
+#if defined(TABDLY) && !defined(HOST_TABDLY)
+static const typeof(TABDLY) HOST_TABDLY = TABDLY;
+#endif /* found in: sys/_termios.h */
+#undef TABDLY
+#define TABDLY		0x00000004	/* tab delay mask */
+#if defined(B0) && !defined(HOST_B0)
+static const typeof(B0) HOST_B0 = B0;
+#endif /* found in: sys/_termios.h */
+#undef B0
+#define B0	0
+#if defined(B50) && !defined(HOST_B50)
+static const typeof(B50) HOST_B50 = B50;
+#endif /* found in: sys/_termios.h */
+#undef B50
+#define B50	50
+#if defined(B75) && !defined(HOST_B75)
+static const typeof(B75) HOST_B75 = B75;
+#endif /* found in: sys/_termios.h */
+#undef B75
+#define B75	75
+#if defined(B110) && !defined(HOST_B110)
+static const typeof(B110) HOST_B110 = B110;
+#endif /* found in: sys/_termios.h */
+#undef B110
+#define B110	110
+#if defined(B134) && !defined(HOST_B134)
+static const typeof(B134) HOST_B134 = B134;
+#endif /* found in: sys/_termios.h */
+#undef B134
+#define B134	134
+#if defined(B150) && !defined(HOST_B150)
+static const typeof(B150) HOST_B150 = B150;
+#endif /* found in: sys/_termios.h */
+#undef B150
+#define B150	150
+#if defined(B200) && !defined(HOST_B200)
+static const typeof(B200) HOST_B200 = B200;
+#endif /* found in: sys/_termios.h */
+#undef B200
+#define B200	200
+#if defined(B300) && !defined(HOST_B300)
+static const typeof(B300) HOST_B300 = B300;
+#endif /* found in: sys/_termios.h */
+#undef B300
+#define B300	300
+#if defined(B600) && !defined(HOST_B600)
+static const typeof(B600) HOST_B600 = B600;
+#endif /* found in: sys/_termios.h */
+#undef B600
+#define B600	600
+#if defined(B1200) && !defined(HOST_B1200)
+static const typeof(B1200) HOST_B1200 = B1200;
+#endif /* found in: sys/_termios.h */
+#undef B1200
+#define B1200	1200
+#if defined(B1800) && !defined(HOST_B1800)
+static const typeof(B1800) HOST_B1800 = B1800;
+#endif /* found in: sys/_termios.h */
+#undef B1800
+#define B1800	1800
+#if defined(B2400) && !defined(HOST_B2400)
+static const typeof(B2400) HOST_B2400 = B2400;
+#endif /* found in: sys/_termios.h */
+#undef B2400
+#define B2400	2400
+#if defined(B4800) && !defined(HOST_B4800)
+static const typeof(B4800) HOST_B4800 = B4800;
+#endif /* found in: sys/_termios.h */
+#undef B4800
+#define B4800	4800
+#if defined(B9600) && !defined(HOST_B9600)
+static const typeof(B9600) HOST_B9600 = B9600;
+#endif /* found in: sys/_termios.h */
+#undef B9600
+#define B9600	9600
+#if defined(B19200) && !defined(HOST_B19200)
+static const typeof(B19200) HOST_B19200 = B19200;
+#endif /* found in: sys/_termios.h */
+#undef B19200
+#define B19200	19200
+#if defined(B38400) && !defined(HOST_B38400)
+static const typeof(B38400) HOST_B38400 = B38400;
+#endif /* found in: sys/_termios.h */
+#undef B38400
+#define B38400	38400
+#if defined(B57600) && !defined(HOST_B57600)
+static const typeof(B57600) HOST_B57600 = B57600;
+#endif /* found in: sys/_termios.h */
+#undef B57600
+#define B57600	57600
+#if defined(B115200) && !defined(HOST_B115200)
+static const typeof(B115200) HOST_B115200 = B115200;
+#endif /* found in: sys/_termios.h */
+#undef B115200
+#define B115200	115200
+#if defined(B230400) && !defined(HOST_B230400)
+static const typeof(B230400) HOST_B230400 = B230400;
+#endif /* found in: sys/_termios.h */
+#undef B230400
+#define B230400	230400
+#if defined(B460800) && !defined(HOST_B460800)
+static const typeof(B460800) HOST_B460800 = B460800;
+#endif /* found in: sys/_termios.h */
+#undef B460800
+#define B460800	460800
+#if defined(CSIZE) && !defined(HOST_CSIZE)
+static const typeof(CSIZE) HOST_CSIZE = CSIZE;
+#endif /* found in: sys/_termios.h */
+#undef CSIZE
+#define CSIZE		0x00000300	/* character size mask */
+#if defined(CS5) && !defined(HOST_CS5)
+static const typeof(CS5) HOST_CS5 = CS5;
+#endif /* found in: sys/_termios.h */
+#undef CS5
+#define CS5		    0x00000000	    /* 5 bits (pseudo) */
+#if defined(CS6) && !defined(HOST_CS6)
+static const typeof(CS6) HOST_CS6 = CS6;
+#endif /* found in: sys/_termios.h */
+#undef CS6
+#define CS6		    0x00000100	    /* 6 bits */
+#if defined(CS7) && !defined(HOST_CS7)
+static const typeof(CS7) HOST_CS7 = CS7;
+#endif /* found in: sys/_termios.h */
+#undef CS7
+#define CS7		    0x00000200	    /* 7 bits */
+#if defined(CS8) && !defined(HOST_CS8)
+static const typeof(CS8) HOST_CS8 = CS8;
+#endif /* found in: sys/_termios.h */
+#undef CS8
+#define CS8		    0x00000300	    /* 8 bits */
+#if defined(CSTOPB) && !defined(HOST_CSTOPB)
+static const typeof(CSTOPB) HOST_CSTOPB = CSTOPB;
+#endif /* found in: sys/_termios.h */
+#undef CSTOPB
+#define CSTOPB		0x00000400	/* send 2 stop bits */
+#if defined(CREAD) && !defined(HOST_CREAD)
+static const typeof(CREAD) HOST_CREAD = CREAD;
+#endif /* found in: sys/_termios.h */
+#undef CREAD
+#define CREAD		0x00000800	/* enable receiver */
+#if defined(PARENB) && !defined(HOST_PARENB)
+static const typeof(PARENB) HOST_PARENB = PARENB;
+#endif /* found in: sys/_termios.h */
+#undef PARENB
+#define PARENB		0x00001000	/* parity enable */
+#if defined(PARODD) && !defined(HOST_PARODD)
+static const typeof(PARODD) HOST_PARODD = PARODD;
+#endif /* found in: sys/_termios.h */
+#undef PARODD
+#define PARODD		0x00002000	/* odd parity, else even */
+#if defined(HUPCL) && !defined(HOST_HUPCL)
+static const typeof(HUPCL) HOST_HUPCL = HUPCL;
+#endif /* found in: sys/_termios.h */
+#undef HUPCL
+#define HUPCL		0x00004000	/* hang up on last close */
+#if defined(CLOCAL) && !defined(HOST_CLOCAL)
+static const typeof(CLOCAL) HOST_CLOCAL = CLOCAL;
+#endif /* found in: sys/_termios.h */
+#undef CLOCAL
+#define CLOCAL		0x00008000	/* ignore modem status lines */
+#undef CRTSCTS /* found in: sys/_termios.h */
+#define CRTSCTS		(CCTS_OFLOW | CRTS_IFLOW)
+#if defined(ISIG) && !defined(HOST_ISIG)
+static const typeof(ISIG) HOST_ISIG = ISIG;
+#endif /* found in: sys/_termios.h */
+#undef ISIG
+#define ISIG		0x00000080	/* enable signals INTR, QUIT, [D]SUSP */
+#if defined(ICANON) && !defined(HOST_ICANON)
+static const typeof(ICANON) HOST_ICANON = ICANON;
+#endif /* found in: sys/_termios.h */
+#undef ICANON
+#define ICANON		0x00000100	/* canonicalize input lines */
+#if defined(ECHOE) && !defined(HOST_ECHOE)
+static const typeof(ECHOE) HOST_ECHOE = ECHOE;
+#endif /* found in: sys/_termios.h */
+#undef ECHOE
+#define ECHOE		0x00000002	/* visually erase chars */
+#if defined(ECHOK) && !defined(HOST_ECHOK)
+static const typeof(ECHOK) HOST_ECHOK = ECHOK;
+#endif /* found in: sys/_termios.h */
+#undef ECHOK
+#define ECHOK		0x00000004	/* echo NL after line kill */
+#if defined(ECHONL) && !defined(HOST_ECHONL)
+static const typeof(ECHONL) HOST_ECHONL = ECHONL;
+#endif /* found in: sys/_termios.h */
+#undef ECHONL
+#define ECHONL		0x00000010	/* echo NL even if ECHO is off */
+#if defined(ECHOCTL) && !defined(HOST_ECHOCTL)
+static const typeof(ECHOCTL) HOST_ECHOCTL = ECHOCTL;
+#endif /* found in: sys/_termios.h */
+#undef ECHOCTL
+#define ECHOCTL  	0x00000040	/* echo control chars as ^(Char) */
+#if defined(ECHOPRT) && !defined(HOST_ECHOPRT)
+static const typeof(ECHOPRT) HOST_ECHOPRT = ECHOPRT;
+#endif /* found in: sys/_termios.h */
+#undef ECHOPRT
+#define ECHOPRT		0x00000020	/* visual erase mode for hardcopy */
+#if defined(ECHOKE) && !defined(HOST_ECHOKE)
+static const typeof(ECHOKE) HOST_ECHOKE = ECHOKE;
+#endif /* found in: sys/_termios.h */
+#undef ECHOKE
+#define ECHOKE		0x00000001	/* visual erase for line kill */
+#if defined(IEXTEN) && !defined(HOST_IEXTEN)
+static const typeof(IEXTEN) HOST_IEXTEN = IEXTEN;
+#endif /* found in: sys/_termios.h */
+#undef IEXTEN
+#define IEXTEN		0x00000400	/* enable DISCARD and LNEXT */
+#if defined(EXTPROC) && !defined(HOST_EXTPROC)
+static const typeof(EXTPROC) HOST_EXTPROC = EXTPROC;
+#endif /* found in: sys/_termios.h */
+#undef EXTPROC
+#define EXTPROC         0x00000800      /* external processing */
+#if defined(CCTS_OFLOW) && !defined(HOST_CCTS_OFLOW)
+static const typeof(CCTS_OFLOW) HOST_CCTS_OFLOW = CCTS_OFLOW;
+#endif /* found in: sys/_termios.h */
+#undef CCTS_OFLOW
+#define CCTS_OFLOW	0x00010000	/* CTS flow control of output */
+#if defined(CRTS_IFLOW) && !defined(HOST_CRTS_IFLOW)
+static const typeof(CRTS_IFLOW) HOST_CRTS_IFLOW = CRTS_IFLOW;
+#endif /* found in: sys/_termios.h */
+#undef CRTS_IFLOW
+#define CRTS_IFLOW	0x00020000	/* RTS flow control of input */
+#if defined(VEOF) && !defined(HOST_VEOF)
+static const typeof(VEOF) HOST_VEOF = VEOF;
+#endif /* found in: sys/_termios.h */
+#undef VEOF
+#define VEOF		0	/* ICANON */
+#if defined(VEOL) && !defined(HOST_VEOL)
+static const typeof(VEOL) HOST_VEOL = VEOL;
+#endif /* found in: sys/_termios.h */
+#undef VEOL
+#define VEOL		1	/* ICANON */
+#if defined(VEOL2) && !defined(HOST_VEOL2)
+static const typeof(VEOL2) HOST_VEOL2 = VEOL2;
+#endif /* found in: sys/_termios.h */
+#undef VEOL2
+#define VEOL2		2	/* ICANON together with IEXTEN */
+#if defined(VERASE) && !defined(HOST_VERASE)
+static const typeof(VERASE) HOST_VERASE = VERASE;
+#endif /* found in: sys/_termios.h */
+#undef VERASE
+#define VERASE		3	/* ICANON */
+#if defined(VWERASE) && !defined(HOST_VWERASE)
+static const typeof(VWERASE) HOST_VWERASE = VWERASE;
+#endif /* found in: sys/_termios.h */
+#undef VWERASE
+#define VWERASE 	4	/* ICANON together with IEXTEN */
+#if defined(VKILL) && !defined(HOST_VKILL)
+static const typeof(VKILL) HOST_VKILL = VKILL;
+#endif /* found in: sys/_termios.h */
+#undef VKILL
+#define VKILL		5	/* ICANON */
+#if defined(VREPRINT) && !defined(HOST_VREPRINT)
+static const typeof(VREPRINT) HOST_VREPRINT = VREPRINT;
+#endif /* found in: sys/_termios.h */
+#undef VREPRINT
+#define VREPRINT 	6	/* ICANON together with IEXTEN */
+#if defined(VINTR) && !defined(HOST_VINTR)
+static const typeof(VINTR) HOST_VINTR = VINTR;
+#endif /* found in: sys/_termios.h */
+#undef VINTR
+#define VINTR		8	/* ISIG */
+#if defined(VQUIT) && !defined(HOST_VQUIT)
+static const typeof(VQUIT) HOST_VQUIT = VQUIT;
+#endif /* found in: sys/_termios.h */
+#undef VQUIT
+#define VQUIT		9	/* ISIG */
+#if defined(VSUSP) && !defined(HOST_VSUSP)
+static const typeof(VSUSP) HOST_VSUSP = VSUSP;
+#endif /* found in: sys/_termios.h */
+#undef VSUSP
+#define VSUSP		10	/* ISIG */
+#if defined(VSTART) && !defined(HOST_VSTART)
+static const typeof(VSTART) HOST_VSTART = VSTART;
+#endif /* found in: sys/_termios.h */
+#undef VSTART
+#define VSTART		12	/* IXON, IXOFF */
+#if defined(VSTOP) && !defined(HOST_VSTOP)
+static const typeof(VSTOP) HOST_VSTOP = VSTOP;
+#endif /* found in: sys/_termios.h */
+#undef VSTOP
+#define VSTOP		13	/* IXON, IXOFF */
+#if defined(VLNEXT) && !defined(HOST_VLNEXT)
+static const typeof(VLNEXT) HOST_VLNEXT = VLNEXT;
+#endif /* found in: sys/_termios.h */
+#undef VLNEXT
+#define VLNEXT		14	/* IEXTEN */
+#if defined(VDISCARD) && !defined(HOST_VDISCARD)
+static const typeof(VDISCARD) HOST_VDISCARD = VDISCARD;
+#endif /* found in: sys/_termios.h */
+#undef VDISCARD
+#define VDISCARD	15	/* IEXTEN */
+#if defined(VMIN) && !defined(HOST_VMIN)
+static const typeof(VMIN) HOST_VMIN = VMIN;
+#endif /* found in: sys/_termios.h */
+#undef VMIN
+#define VMIN		16	/* !ICANON */
+#if defined(VTIME) && !defined(HOST_VTIME)
+static const typeof(VTIME) HOST_VTIME = VTIME;
+#endif /* found in: sys/_termios.h */
+#undef VTIME
+#define VTIME		17	/* !ICANON */
 #if defined(TARGET_RTP_PRIO_REALTIME)
 #undef TARGET_RTP_PRIO_REALTIME
 #endif /* found in: sys/rtprio.h */
@@ -1476,152 +1705,274 @@ static const typeof(NSIG) HOST_NSIG = NSIG;
 #endif /* found in: sys/signal.h */
 #undef NSIG
 #define NSIG		32	/* number of old signals (counting 0) */
-#if defined(SO_NOSIGPIPE) && !defined(HOST_SO_NOSIGPIPE)
-static const typeof(SO_NOSIGPIPE) HOST_SO_NOSIGPIPE = SO_NOSIGPIPE;
-#endif /* found in: sys/socket.h */
-#undef SO_NOSIGPIPE
-#define SO_NOSIGPIPE	0x00000800	/* no SIGPIPE from EPIPE */
-#if defined(SO_BINTIME) && !defined(HOST_SO_BINTIME)
-static const typeof(SO_BINTIME) HOST_SO_BINTIME = SO_BINTIME;
-#endif /* found in: sys/socket.h */
-#undef SO_BINTIME
-#define SO_BINTIME	0x00002000	/* timestamp received dgram traffic */
-#if defined(SO_LISTENINCQLEN) && !defined(HOST_SO_LISTENINCQLEN)
-static const typeof(SO_LISTENINCQLEN) HOST_SO_LISTENINCQLEN = SO_LISTENINCQLEN;
-#endif /* found in: sys/socket.h */
-#undef SO_LISTENINCQLEN
-#define SO_LISTENINCQLEN	0x1013	/* socket's incomplete queue length */
-#if defined(NET_RT_IFLISTL) && !defined(HOST_NET_RT_IFLISTL)
-static const typeof(NET_RT_IFLISTL) HOST_NET_RT_IFLISTL = NET_RT_IFLISTL;
-#endif /* found in: sys/socket.h */
-#undef NET_RT_IFLISTL
-#define NET_RT_IFLISTL	5		/* Survey interface list, using 'l'en */
-#if defined(TARGET_SOCK_CLOEXEC)
-#undef TARGET_SOCK_CLOEXEC
-#endif /* found in: sys/socket.h */
-#define TARGET_SOCK_CLOEXEC	0x10000000
-#if defined(TARGET_SOCK_NONBLOCK)
-#undef TARGET_SOCK_NONBLOCK
-#endif /* found in: sys/socket.h */
-#define TARGET_SOCK_NONBLOCK	0x20000000
-#undef SIOCGIFMAC /* found in: sys/sockio.h */
-#define SIOCGIFMAC	_IOWR('i', 38, struct ifreq)	/* get IF MAC label */
-#undef SIOCGIFFIB /* found in: sys/sockio.h */
-#define SIOCGIFFIB	_IOWR('i', 92, struct ifreq)	/* get IF fib */
-#undef SIOCGIFCAP /* found in: sys/sockio.h */
-#define SIOCGIFCAP	_IOWR('i', 31, struct ifreq)	/* get IF features */
-#undef SIOCGIFPSRCADDR /* found in: sys/sockio.h */
-#define SIOCGIFPSRCADDR	_IOWR('i', 71, struct ifreq)	/* get gif psrc addr */
-#undef SIOCGIFGENERIC /* found in: sys/sockio.h */
-#define SIOCGIFGENERIC	_IOWR('i', 58, struct ifreq)	/* generic IF get op */
-#undef SIOCGIFDESCR /* found in: sys/sockio.h */
-#define SIOCGIFDESCR	_IOWR('i', 42, struct ifreq)	/* get ifnet descr */ 
-#undef SIOCGDRVSPEC /* found in: sys/sockio.h */
-#define SIOCGDRVSPEC	_IOWR('i', 123, struct ifdrv)	/* get driver-specific */
-#undef SIOCGIFGROUP /* found in: sys/sockio.h */
-#define SIOCGIFGROUP	_IOWR('i', 136, struct ifgroupreq) /* get ifgroups */
-#undef SIOCGIFMEDIA /* found in: sys/sockio.h */
-#define SIOCGIFMEDIA	_IOWR('i', 56, struct ifmediareq) /* get net media */
-#undef SIOCGIFSTATUS /* found in: sys/sockio.h */
-#define SIOCGIFSTATUS	_IOWR('i', 59, struct ifstat)	/* get IF status */
-#if defined(SIOCGIFCONF) && !defined(HOST_SIOCGIFCONF)
-static const typeof(SIOCGIFCONF) HOST_SIOCGIFCONF = SIOCGIFCONF;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFCONF
-#define SIOCGIFCONF	_IOWR('i', 36, struct ifconf)	/* get ifnet list */
-#if defined(SIOCGIFFLAGS) && !defined(HOST_SIOCGIFFLAGS)
-static const typeof(SIOCGIFFLAGS) HOST_SIOCGIFFLAGS = SIOCGIFFLAGS;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFFLAGS
-#define SIOCGIFFLAGS	_IOWR('i', 17, struct ifreq)	/* get ifnet flags */
-#if defined(SIOCSIFFLAGS) && !defined(HOST_SIOCSIFFLAGS)
-static const typeof(SIOCSIFFLAGS) HOST_SIOCSIFFLAGS = SIOCSIFFLAGS;
-#endif /* found in: sys/sockio.h */
-#undef SIOCSIFFLAGS
-#define SIOCSIFFLAGS	 _IOW('i', 16, struct ifreq)	/* set ifnet flags */
-#if defined(SIOCGIFMETRIC) && !defined(HOST_SIOCGIFMETRIC)
-static const typeof(SIOCGIFMETRIC) HOST_SIOCGIFMETRIC = SIOCGIFMETRIC;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFMETRIC
-#define SIOCGIFMETRIC	_IOWR('i', 23, struct ifreq)	/* get IF metric */
-#if defined(SIOCSIFMETRIC) && !defined(HOST_SIOCSIFMETRIC)
-static const typeof(SIOCSIFMETRIC) HOST_SIOCSIFMETRIC = SIOCSIFMETRIC;
-#endif /* found in: sys/sockio.h */
-#undef SIOCSIFMETRIC
-#define SIOCSIFMETRIC	 _IOW('i', 24, struct ifreq)	/* set IF metric */
-#if defined(SIOCGIFMTU) && !defined(HOST_SIOCGIFMTU)
-static const typeof(SIOCGIFMTU) HOST_SIOCGIFMTU = SIOCGIFMTU;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFMTU
-#define SIOCGIFMTU	_IOWR('i', 51, struct ifreq)	/* get IF mtu */
-#if defined(SIOCSIFMTU) && !defined(HOST_SIOCSIFMTU)
-static const typeof(SIOCSIFMTU) HOST_SIOCSIFMTU = SIOCSIFMTU;
-#endif /* found in: sys/sockio.h */
-#undef SIOCSIFMTU
-#define SIOCSIFMTU	 _IOW('i', 52, struct ifreq)	/* set IF mtu */
-#if defined(SIOCGIFINDEX) && !defined(HOST_SIOCGIFINDEX)
-static const typeof(SIOCGIFINDEX) HOST_SIOCGIFINDEX = SIOCGIFINDEX;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFINDEX
-#define SIOCGIFINDEX	_IOWR('i', 32, struct ifreq)	/* get IF index */
-#if defined(SIOCGIFADDR) && !defined(HOST_SIOCGIFADDR)
-static const typeof(SIOCGIFADDR) HOST_SIOCGIFADDR = SIOCGIFADDR;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFADDR
-#define SIOCGIFADDR	_IOWR('i', 33, struct ifreq)	/* get ifnet address */
-#if defined(SIOCSIFADDR) && !defined(HOST_SIOCSIFADDR)
-static const typeof(SIOCSIFADDR) HOST_SIOCSIFADDR = SIOCSIFADDR;
-#endif /* found in: sys/sockio.h */
-#undef SIOCSIFADDR
-#define SIOCSIFADDR	 _IOW('i', 12, struct ifreq)	/* set ifnet address */
-#if defined(SIOCGIFBRDADDR) && !defined(HOST_SIOCGIFBRDADDR)
-static const typeof(SIOCGIFBRDADDR) HOST_SIOCGIFBRDADDR = SIOCGIFBRDADDR;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFBRDADDR
-#define SIOCGIFBRDADDR	_IOWR('i', 35, struct ifreq)	/* get broadcast addr */
-#if defined(SIOCSIFBRDADDR) && !defined(HOST_SIOCSIFBRDADDR)
-static const typeof(SIOCSIFBRDADDR) HOST_SIOCSIFBRDADDR = SIOCSIFBRDADDR;
-#endif /* found in: sys/sockio.h */
-#undef SIOCSIFBRDADDR
-#define SIOCSIFBRDADDR	 _IOW('i', 19, struct ifreq)	/* set broadcast addr */
-#if defined(SIOCGIFDSTADDR) && !defined(HOST_SIOCGIFDSTADDR)
-static const typeof(SIOCGIFDSTADDR) HOST_SIOCGIFDSTADDR = SIOCGIFDSTADDR;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFDSTADDR
-#define SIOCGIFDSTADDR	_IOWR('i', 34, struct ifreq)	/* get p-p address */
-#if defined(SIOCSIFDSTADDR) && !defined(HOST_SIOCSIFDSTADDR)
-static const typeof(SIOCSIFDSTADDR) HOST_SIOCSIFDSTADDR = SIOCSIFDSTADDR;
-#endif /* found in: sys/sockio.h */
-#undef SIOCSIFDSTADDR
-#define SIOCSIFDSTADDR	 _IOW('i', 14, struct ifreq)	/* set p-p address */
-#if defined(SIOCGIFNETMASK) && !defined(HOST_SIOCGIFNETMASK)
-static const typeof(SIOCGIFNETMASK) HOST_SIOCGIFNETMASK = SIOCGIFNETMASK;
-#endif /* found in: sys/sockio.h */
-#undef SIOCGIFNETMASK
-#define SIOCGIFNETMASK	_IOWR('i', 37, struct ifreq)	/* get net addr mask */
-#if defined(SIOCSIFNETMASK) && !defined(HOST_SIOCSIFNETMASK)
-static const typeof(SIOCSIFNETMASK) HOST_SIOCSIFNETMASK = SIOCSIFNETMASK;
-#endif /* found in: sys/sockio.h */
-#undef SIOCSIFNETMASK
-#define SIOCSIFNETMASK	 _IOW('i', 22, struct ifreq)	/* set net addr mask */
-#if defined(SIOCADDMULTI) && !defined(HOST_SIOCADDMULTI)
-static const typeof(SIOCADDMULTI) HOST_SIOCADDMULTI = SIOCADDMULTI;
-#endif /* found in: sys/sockio.h */
-#undef SIOCADDMULTI
-#define SIOCADDMULTI	 _IOW('i', 49, struct ifreq)	/* add m'cast addr */
-#if defined(SIOCDELMULTI) && !defined(HOST_SIOCDELMULTI)
-static const typeof(SIOCDELMULTI) HOST_SIOCDELMULTI = SIOCDELMULTI;
-#endif /* found in: sys/sockio.h */
-#undef SIOCDELMULTI
-#define SIOCDELMULTI	 _IOW('i', 50, struct ifreq)	/* del m'cast addr */
-#if defined(TARGET_UTIME_NOW)
-#undef TARGET_UTIME_NOW
-#endif /* found in: sys/stat.h */
-#define TARGET_UTIME_NOW	-1
-#if defined(TARGET_UTIME_OMIT)
-#undef TARGET_UTIME_OMIT
-#endif /* found in: sys/stat.h */
-#define TARGET_UTIME_OMIT	-2
+#if defined(KENV_GET) && !defined(HOST_KENV_GET)
+static const typeof(KENV_GET) HOST_KENV_GET = KENV_GET;
+#endif /* found in: sys/kenv.h */
+#undef KENV_GET
+#define KENV_GET		0
+#if defined(CTLTYPE) && !defined(HOST_CTLTYPE)
+static const typeof(CTLTYPE) HOST_CTLTYPE = CTLTYPE;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE
+#define CTLTYPE		0xf	/* mask for the type */
+#if defined(CTLTYPE_INT) && !defined(HOST_CTLTYPE_INT)
+static const typeof(CTLTYPE_INT) HOST_CTLTYPE_INT = CTLTYPE_INT;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_INT
+#define CTLTYPE_INT	2	/* name describes an integer */
+#if defined(CTLTYPE_UINT) && !defined(HOST_CTLTYPE_UINT)
+static const typeof(CTLTYPE_UINT) HOST_CTLTYPE_UINT = CTLTYPE_UINT;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_UINT
+#define CTLTYPE_UINT	6	/* name describes an unsigned integer */
+#if defined(CTLTYPE_LONG) && !defined(HOST_CTLTYPE_LONG)
+static const typeof(CTLTYPE_LONG) HOST_CTLTYPE_LONG = CTLTYPE_LONG;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_LONG
+#define CTLTYPE_LONG	7	/* name describes a long */
+#if defined(CTLTYPE_ULONG) && !defined(HOST_CTLTYPE_ULONG)
+static const typeof(CTLTYPE_ULONG) HOST_CTLTYPE_ULONG = CTLTYPE_ULONG;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_ULONG
+#define CTLTYPE_ULONG	8	/* name describes an unsigned long */
+#if defined(CTLTYPE_S8) && !defined(HOST_CTLTYPE_S8)
+static const typeof(CTLTYPE_S8) HOST_CTLTYPE_S8 = CTLTYPE_S8;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_S8
+#define CTLTYPE_S8	0xc	/* name describes a signed 8-bit number */
+#if defined(CTLTYPE_S16) && !defined(HOST_CTLTYPE_S16)
+static const typeof(CTLTYPE_S16) HOST_CTLTYPE_S16 = CTLTYPE_S16;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_S16
+#define CTLTYPE_S16	0xd	/* name describes a signed 16-bit number */
+#if defined(CTLTYPE_S32) && !defined(HOST_CTLTYPE_S32)
+static const typeof(CTLTYPE_S32) HOST_CTLTYPE_S32 = CTLTYPE_S32;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_S32
+#define CTLTYPE_S32	0xe	/* name describes a signed 32-bit number */
+#if defined(CTLTYPE_S64) && !defined(HOST_CTLTYPE_S64)
+static const typeof(CTLTYPE_S64) HOST_CTLTYPE_S64 = CTLTYPE_S64;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_S64
+#define CTLTYPE_S64	4	/* name describes a signed 64-bit number */
+#if defined(CTLTYPE_U8) && !defined(HOST_CTLTYPE_U8)
+static const typeof(CTLTYPE_U8) HOST_CTLTYPE_U8 = CTLTYPE_U8;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_U8
+#define CTLTYPE_U8	0xa	/* name describes an unsigned 8-bit number */
+#if defined(CTLTYPE_U16) && !defined(HOST_CTLTYPE_U16)
+static const typeof(CTLTYPE_U16) HOST_CTLTYPE_U16 = CTLTYPE_U16;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_U16
+#define CTLTYPE_U16	0xb	/* name describes an unsigned 16-bit number */
+#if defined(CTLTYPE_U32) && !defined(HOST_CTLTYPE_U32)
+static const typeof(CTLTYPE_U32) HOST_CTLTYPE_U32 = CTLTYPE_U32;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_U32
+#define CTLTYPE_U32	0xf	/* name describes an unsigned 32-bit number */
+#if defined(CTLTYPE_U64) && !defined(HOST_CTLTYPE_U64)
+static const typeof(CTLTYPE_U64) HOST_CTLTYPE_U64 = CTLTYPE_U64;
+#endif /* found in: sys/sysctl.h */
+#undef CTLTYPE_U64
+#define CTLTYPE_U64	9	/* name describes an unsigned 64-bit number */
+#if defined(CTL_MAXNAME) && !defined(HOST_CTL_MAXNAME)
+static const typeof(CTL_MAXNAME) HOST_CTL_MAXNAME = CTL_MAXNAME;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_MAXNAME
+#define CTL_MAXNAME	24	/* largest number of components supported */
+#if defined(CTL_KERN) && !defined(HOST_CTL_KERN)
+static const typeof(CTL_KERN) HOST_CTL_KERN = CTL_KERN;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_KERN
+#define CTL_KERN	1		/* "high kernel": proc, limits */
+#if defined(CTL_NET) && !defined(HOST_CTL_NET)
+static const typeof(CTL_NET) HOST_CTL_NET = CTL_NET;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_NET
+#define CTL_NET		4		/* network, see socket.h */
+#if defined(CTL_HW) && !defined(HOST_CTL_HW)
+static const typeof(CTL_HW) HOST_CTL_HW = CTL_HW;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_HW
+#define CTL_HW		6		/* generic cpu/io */
+#if defined(CTL_VFS) && !defined(HOST_CTL_VFS)
+static const typeof(CTL_VFS) HOST_CTL_VFS = CTL_VFS;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_VFS
+#define CTL_VFS		3		/* filesystem, mount type is next */
+#if defined(HW_NCPU) && !defined(HOST_HW_NCPU)
+static const typeof(HW_NCPU) HOST_HW_NCPU = HW_NCPU;
+#endif /* found in: sys/sysctl.h */
+#undef HW_NCPU
+#define HW_NCPU		 3		/* int: number of cpus */
+#if defined(HW_MACHINE) && !defined(HOST_HW_MACHINE)
+static const typeof(HW_MACHINE) HOST_HW_MACHINE = HW_MACHINE;
+#endif /* found in: sys/sysctl.h */
+#undef HW_MACHINE
+#define HW_MACHINE	 1		/* string: machine class */
+#if defined(HW_MACHINE_ARCH) && !defined(HOST_HW_MACHINE_ARCH)
+static const typeof(HW_MACHINE_ARCH) HOST_HW_MACHINE_ARCH = HW_MACHINE_ARCH;
+#endif /* found in: sys/sysctl.h */
+#undef HW_MACHINE_ARCH
+#define HW_MACHINE_ARCH	11		/* string: machine architecture */
+#if defined(KERN_PROC) && !defined(HOST_KERN_PROC)
+static const typeof(KERN_PROC) HOST_KERN_PROC = KERN_PROC;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC
+#define KERN_PROC		14	/* struct: process entries */
+#if defined(KERN_PROC_ALL) && !defined(HOST_KERN_PROC_ALL)
+static const typeof(KERN_PROC_ALL) HOST_KERN_PROC_ALL = KERN_PROC_ALL;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_ALL
+#define KERN_PROC_ALL		0	/* everything */
+#if defined(KERN_PROC_PROC) && !defined(HOST_KERN_PROC_PROC)
+static const typeof(KERN_PROC_PROC) HOST_KERN_PROC_PROC = KERN_PROC_PROC;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_PROC
+#define KERN_PROC_PROC		8	/* only return procs */
+#if defined(KERN_PROC_PID) && !defined(HOST_KERN_PROC_PID)
+static const typeof(KERN_PROC_PID) HOST_KERN_PROC_PID = KERN_PROC_PID;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_PID
+#define KERN_PROC_PID		1	/* by process id */
+#if defined(KERN_PROC_PGRP) && !defined(HOST_KERN_PROC_PGRP)
+static const typeof(KERN_PROC_PGRP) HOST_KERN_PROC_PGRP = KERN_PROC_PGRP;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_PGRP
+#define KERN_PROC_PGRP		2	/* by process group id */
+#if defined(KERN_PROC_INC_THREAD) && !defined(HOST_KERN_PROC_INC_THREAD)
+static const typeof(KERN_PROC_INC_THREAD) HOST_KERN_PROC_INC_THREAD = KERN_PROC_INC_THREAD;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_INC_THREAD
+#define KERN_PROC_INC_THREAD	0x10	/* */
+#if defined(KERN_PROC_PATHNAME) && !defined(HOST_KERN_PROC_PATHNAME)
+static const typeof(KERN_PROC_PATHNAME) HOST_KERN_PROC_PATHNAME = KERN_PROC_PATHNAME;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_PATHNAME
+#define KERN_PROC_PATHNAME	12	/* path to executable */
+#if defined(KERN_PROC_ARGS) && !defined(HOST_KERN_PROC_ARGS)
+static const typeof(KERN_PROC_ARGS) HOST_KERN_PROC_ARGS = KERN_PROC_ARGS;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_ARGS
+#define KERN_PROC_ARGS		7	/* get/set arguments/proctitle */
+#if defined(KERN_PROC_SESSION) && !defined(HOST_KERN_PROC_SESSION)
+static const typeof(KERN_PROC_SESSION) HOST_KERN_PROC_SESSION = KERN_PROC_SESSION;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_SESSION
+#define KERN_PROC_SESSION	3	/* by session of pid */
+#if defined(KERN_PROC_TTY) && !defined(HOST_KERN_PROC_TTY)
+static const typeof(KERN_PROC_TTY) HOST_KERN_PROC_TTY = KERN_PROC_TTY;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_TTY
+#define KERN_PROC_TTY		4	/* by controlling tty */
+#if defined(KERN_PROC_RUID) && !defined(HOST_KERN_PROC_RUID)
+static const typeof(KERN_PROC_RUID) HOST_KERN_PROC_RUID = KERN_PROC_RUID;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_RUID
+#define KERN_PROC_RUID		6	/* by real uid */
+#if defined(KERN_PROC_FILEDESC) && !defined(HOST_KERN_PROC_FILEDESC)
+static const typeof(KERN_PROC_FILEDESC) HOST_KERN_PROC_FILEDESC = KERN_PROC_FILEDESC;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_FILEDESC
+#define KERN_PROC_FILEDESC	33	/* File descriptors for process */
+#if defined(KERN_PROC_UID) && !defined(HOST_KERN_PROC_UID)
+static const typeof(KERN_PROC_UID) HOST_KERN_PROC_UID = KERN_PROC_UID;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_UID
+#define KERN_PROC_UID		5	/* by effective uid */
+#if defined(KERN_PROC_VMMAP) && !defined(HOST_KERN_PROC_VMMAP)
+static const typeof(KERN_PROC_VMMAP) HOST_KERN_PROC_VMMAP = KERN_PROC_VMMAP;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PROC_VMMAP
+#define KERN_PROC_VMMAP		32	/* VM map entries for process */
+#if defined(KERN_USRSTACK) && !defined(HOST_KERN_USRSTACK)
+static const typeof(KERN_USRSTACK) HOST_KERN_USRSTACK = KERN_USRSTACK;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_USRSTACK
+#define KERN_USRSTACK		33	/* int: address of USRSTACK */
+#if defined(KERN_PS_STRINGS) && !defined(HOST_KERN_PS_STRINGS)
+static const typeof(KERN_PS_STRINGS) HOST_KERN_PS_STRINGS = KERN_PS_STRINGS;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_PS_STRINGS
+#define KERN_PS_STRINGS		32	/* int: address of PS_STRINGS */
+#if defined(CTL_SYSCTL) && !defined(HOST_CTL_SYSCTL)
+static const typeof(CTL_SYSCTL) HOST_CTL_SYSCTL = CTL_SYSCTL;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_SYSCTL
+#define CTL_SYSCTL	0		/* "magic" numbers */
+#if defined(CTL_SYSCTL_NEXT) && !defined(HOST_CTL_SYSCTL_NEXT)
+static const typeof(CTL_SYSCTL_NEXT) HOST_CTL_SYSCTL_NEXT = CTL_SYSCTL_NEXT;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_SYSCTL_NEXT
+#define CTL_SYSCTL_NEXT		2	/* next OID, honoring CTLFLAG_SKIP */
+#if defined(CTL_SYSCTL_NAME2OID) && !defined(HOST_CTL_SYSCTL_NAME2OID)
+static const typeof(CTL_SYSCTL_NAME2OID) HOST_CTL_SYSCTL_NAME2OID = CTL_SYSCTL_NAME2OID;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_SYSCTL_NAME2OID
+#define CTL_SYSCTL_NAME2OID	3	/* int array of name */
+#if defined(CTL_SYSCTL_OIDFMT) && !defined(HOST_CTL_SYSCTL_OIDFMT)
+static const typeof(CTL_SYSCTL_OIDFMT) HOST_CTL_SYSCTL_OIDFMT = CTL_SYSCTL_OIDFMT;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_SYSCTL_OIDFMT
+#define CTL_SYSCTL_OIDFMT	4	/* OID's kind and format */
+#if defined(CTL_SYSCTL_OIDDESCR) && !defined(HOST_CTL_SYSCTL_OIDDESCR)
+static const typeof(CTL_SYSCTL_OIDDESCR) HOST_CTL_SYSCTL_OIDDESCR = CTL_SYSCTL_OIDDESCR;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_SYSCTL_OIDDESCR
+#define CTL_SYSCTL_OIDDESCR	5	/* OID's description */
+#if defined(CTL_SYSCTL_OIDLABEL) && !defined(HOST_CTL_SYSCTL_OIDLABEL)
+static const typeof(CTL_SYSCTL_OIDLABEL) HOST_CTL_SYSCTL_OIDLABEL = CTL_SYSCTL_OIDLABEL;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_SYSCTL_OIDLABEL
+#define CTL_SYSCTL_OIDLABEL	6	/* aggregation label */
+#if defined(CTL_SYSCTL_NEXTNOSKIP) && !defined(HOST_CTL_SYSCTL_NEXTNOSKIP)
+static const typeof(CTL_SYSCTL_NEXTNOSKIP) HOST_CTL_SYSCTL_NEXTNOSKIP = CTL_SYSCTL_NEXTNOSKIP;
+#endif /* found in: sys/sysctl.h */
+#undef CTL_SYSCTL_NEXTNOSKIP
+#define CTL_SYSCTL_NEXTNOSKIP	7	/* next OID, ignoring CTLFLAG_SKIP */
+#if defined(KERN_OSRELDATE) && !defined(HOST_KERN_OSRELDATE)
+static const typeof(KERN_OSRELDATE) HOST_KERN_OSRELDATE = KERN_OSRELDATE;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_OSRELDATE
+#define KERN_OSRELDATE		24	/* int: kernel release date */
+#if defined(KERN_ARND) && !defined(HOST_KERN_ARND)
+static const typeof(KERN_ARND) HOST_KERN_ARND = KERN_ARND;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_ARND
+#define KERN_ARND		37	/* int: from arc4rand() */
+#if defined(KERN_OSTYPE) && !defined(HOST_KERN_OSTYPE)
+static const typeof(KERN_OSTYPE) HOST_KERN_OSTYPE = KERN_OSTYPE;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_OSTYPE
+#define KERN_OSTYPE		 1	/* string: system version */
+#if defined(KERN_OSRELEASE) && !defined(HOST_KERN_OSRELEASE)
+static const typeof(KERN_OSRELEASE) HOST_KERN_OSRELEASE = KERN_OSRELEASE;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_OSRELEASE
+#define KERN_OSRELEASE		 2	/* string: system release */
+#if defined(KERN_VERSION) && !defined(HOST_KERN_VERSION)
+static const typeof(KERN_VERSION) HOST_KERN_VERSION = KERN_VERSION;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_VERSION
+#define KERN_VERSION		 4	/* string: compile time info */
+#if defined(KERN_HOSTNAME) && !defined(HOST_KERN_HOSTNAME)
+static const typeof(KERN_HOSTNAME) HOST_KERN_HOSTNAME = KERN_HOSTNAME;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_HOSTNAME
+#define KERN_HOSTNAME		10	/* string: hostname */
+#if defined(KERN_ARGMAX) && !defined(HOST_KERN_ARGMAX)
+static const typeof(KERN_ARGMAX) HOST_KERN_ARGMAX = KERN_ARGMAX;
+#endif /* found in: sys/sysctl.h */
+#undef KERN_ARGMAX
+#define KERN_ARGMAX		 8	/* int: max arguments to exec */
+#if defined(TARGET_D_TTY)
+#undef TARGET_D_TTY
+#endif /* found in: sys/conf.h */
+#define TARGET_D_TTY	0x0004
+#if defined(TARGET_D_DISK)
+#undef TARGET_D_DISK
+#endif /* found in: sys/conf.h */
+#define TARGET_D_DISK	0x0002
 #if defined(SYS_syscall) && !defined(HOST_SYS_syscall)
 static const typeof(SYS_syscall) HOST_SYS_syscall = SYS_syscall;
 #endif /* found in: sys/syscall.h */
@@ -3742,521 +4093,28 @@ static const typeof(SYS_swapoff) HOST_SYS_swapoff = SYS_swapoff;
 #endif /* found in: sys/syscall.h */
 #undef SYS_swapoff
 #define SYS_swapoff	582
-#if defined(CTLTYPE) && !defined(HOST_CTLTYPE)
-static const typeof(CTLTYPE) HOST_CTLTYPE = CTLTYPE;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE
-#define CTLTYPE		0xf	/* mask for the type */
-#if defined(CTLTYPE_INT) && !defined(HOST_CTLTYPE_INT)
-static const typeof(CTLTYPE_INT) HOST_CTLTYPE_INT = CTLTYPE_INT;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_INT
-#define CTLTYPE_INT	2	/* name describes an integer */
-#if defined(CTLTYPE_UINT) && !defined(HOST_CTLTYPE_UINT)
-static const typeof(CTLTYPE_UINT) HOST_CTLTYPE_UINT = CTLTYPE_UINT;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_UINT
-#define CTLTYPE_UINT	6	/* name describes an unsigned integer */
-#if defined(CTLTYPE_LONG) && !defined(HOST_CTLTYPE_LONG)
-static const typeof(CTLTYPE_LONG) HOST_CTLTYPE_LONG = CTLTYPE_LONG;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_LONG
-#define CTLTYPE_LONG	7	/* name describes a long */
-#if defined(CTLTYPE_ULONG) && !defined(HOST_CTLTYPE_ULONG)
-static const typeof(CTLTYPE_ULONG) HOST_CTLTYPE_ULONG = CTLTYPE_ULONG;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_ULONG
-#define CTLTYPE_ULONG	8	/* name describes an unsigned long */
-#if defined(CTLTYPE_S8) && !defined(HOST_CTLTYPE_S8)
-static const typeof(CTLTYPE_S8) HOST_CTLTYPE_S8 = CTLTYPE_S8;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_S8
-#define CTLTYPE_S8	0xc	/* name describes a signed 8-bit number */
-#if defined(CTLTYPE_S16) && !defined(HOST_CTLTYPE_S16)
-static const typeof(CTLTYPE_S16) HOST_CTLTYPE_S16 = CTLTYPE_S16;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_S16
-#define CTLTYPE_S16	0xd	/* name describes a signed 16-bit number */
-#if defined(CTLTYPE_S32) && !defined(HOST_CTLTYPE_S32)
-static const typeof(CTLTYPE_S32) HOST_CTLTYPE_S32 = CTLTYPE_S32;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_S32
-#define CTLTYPE_S32	0xe	/* name describes a signed 32-bit number */
-#if defined(CTLTYPE_S64) && !defined(HOST_CTLTYPE_S64)
-static const typeof(CTLTYPE_S64) HOST_CTLTYPE_S64 = CTLTYPE_S64;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_S64
-#define CTLTYPE_S64	4	/* name describes a signed 64-bit number */
-#if defined(CTLTYPE_U8) && !defined(HOST_CTLTYPE_U8)
-static const typeof(CTLTYPE_U8) HOST_CTLTYPE_U8 = CTLTYPE_U8;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_U8
-#define CTLTYPE_U8	0xa	/* name describes an unsigned 8-bit number */
-#if defined(CTLTYPE_U16) && !defined(HOST_CTLTYPE_U16)
-static const typeof(CTLTYPE_U16) HOST_CTLTYPE_U16 = CTLTYPE_U16;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_U16
-#define CTLTYPE_U16	0xb	/* name describes an unsigned 16-bit number */
-#if defined(CTLTYPE_U32) && !defined(HOST_CTLTYPE_U32)
-static const typeof(CTLTYPE_U32) HOST_CTLTYPE_U32 = CTLTYPE_U32;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_U32
-#define CTLTYPE_U32	0xf	/* name describes an unsigned 32-bit number */
-#if defined(CTLTYPE_U64) && !defined(HOST_CTLTYPE_U64)
-static const typeof(CTLTYPE_U64) HOST_CTLTYPE_U64 = CTLTYPE_U64;
-#endif /* found in: sys/sysctl.h */
-#undef CTLTYPE_U64
-#define CTLTYPE_U64	9	/* name describes an unsigned 64-bit number */
-#if defined(CTL_MAXNAME) && !defined(HOST_CTL_MAXNAME)
-static const typeof(CTL_MAXNAME) HOST_CTL_MAXNAME = CTL_MAXNAME;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_MAXNAME
-#define CTL_MAXNAME	24	/* largest number of components supported */
-#if defined(CTL_KERN) && !defined(HOST_CTL_KERN)
-static const typeof(CTL_KERN) HOST_CTL_KERN = CTL_KERN;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_KERN
-#define CTL_KERN	1		/* "high kernel": proc, limits */
-#if defined(CTL_NET) && !defined(HOST_CTL_NET)
-static const typeof(CTL_NET) HOST_CTL_NET = CTL_NET;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_NET
-#define CTL_NET		4		/* network, see socket.h */
-#if defined(CTL_HW) && !defined(HOST_CTL_HW)
-static const typeof(CTL_HW) HOST_CTL_HW = CTL_HW;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_HW
-#define CTL_HW		6		/* generic cpu/io */
-#if defined(CTL_VFS) && !defined(HOST_CTL_VFS)
-static const typeof(CTL_VFS) HOST_CTL_VFS = CTL_VFS;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_VFS
-#define CTL_VFS		3		/* filesystem, mount type is next */
-#if defined(HW_NCPU) && !defined(HOST_HW_NCPU)
-static const typeof(HW_NCPU) HOST_HW_NCPU = HW_NCPU;
-#endif /* found in: sys/sysctl.h */
-#undef HW_NCPU
-#define HW_NCPU		 3		/* int: number of cpus */
-#if defined(HW_MACHINE) && !defined(HOST_HW_MACHINE)
-static const typeof(HW_MACHINE) HOST_HW_MACHINE = HW_MACHINE;
-#endif /* found in: sys/sysctl.h */
-#undef HW_MACHINE
-#define HW_MACHINE	 1		/* string: machine class */
-#if defined(HW_MACHINE_ARCH) && !defined(HOST_HW_MACHINE_ARCH)
-static const typeof(HW_MACHINE_ARCH) HOST_HW_MACHINE_ARCH = HW_MACHINE_ARCH;
-#endif /* found in: sys/sysctl.h */
-#undef HW_MACHINE_ARCH
-#define HW_MACHINE_ARCH	11		/* string: machine architecture */
-#if defined(KERN_PROC) && !defined(HOST_KERN_PROC)
-static const typeof(KERN_PROC) HOST_KERN_PROC = KERN_PROC;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC
-#define KERN_PROC		14	/* struct: process entries */
-#if defined(KERN_PROC_ALL) && !defined(HOST_KERN_PROC_ALL)
-static const typeof(KERN_PROC_ALL) HOST_KERN_PROC_ALL = KERN_PROC_ALL;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_ALL
-#define KERN_PROC_ALL		0	/* everything */
-#if defined(KERN_PROC_PROC) && !defined(HOST_KERN_PROC_PROC)
-static const typeof(KERN_PROC_PROC) HOST_KERN_PROC_PROC = KERN_PROC_PROC;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_PROC
-#define KERN_PROC_PROC		8	/* only return procs */
-#if defined(KERN_PROC_PID) && !defined(HOST_KERN_PROC_PID)
-static const typeof(KERN_PROC_PID) HOST_KERN_PROC_PID = KERN_PROC_PID;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_PID
-#define KERN_PROC_PID		1	/* by process id */
-#if defined(KERN_PROC_PGRP) && !defined(HOST_KERN_PROC_PGRP)
-static const typeof(KERN_PROC_PGRP) HOST_KERN_PROC_PGRP = KERN_PROC_PGRP;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_PGRP
-#define KERN_PROC_PGRP		2	/* by process group id */
-#if defined(KERN_PROC_INC_THREAD) && !defined(HOST_KERN_PROC_INC_THREAD)
-static const typeof(KERN_PROC_INC_THREAD) HOST_KERN_PROC_INC_THREAD = KERN_PROC_INC_THREAD;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_INC_THREAD
-#define KERN_PROC_INC_THREAD	0x10	/* */
-#if defined(KERN_PROC_PATHNAME) && !defined(HOST_KERN_PROC_PATHNAME)
-static const typeof(KERN_PROC_PATHNAME) HOST_KERN_PROC_PATHNAME = KERN_PROC_PATHNAME;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_PATHNAME
-#define KERN_PROC_PATHNAME	12	/* path to executable */
-#if defined(KERN_PROC_ARGS) && !defined(HOST_KERN_PROC_ARGS)
-static const typeof(KERN_PROC_ARGS) HOST_KERN_PROC_ARGS = KERN_PROC_ARGS;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_ARGS
-#define KERN_PROC_ARGS		7	/* get/set arguments/proctitle */
-#if defined(KERN_PROC_SESSION) && !defined(HOST_KERN_PROC_SESSION)
-static const typeof(KERN_PROC_SESSION) HOST_KERN_PROC_SESSION = KERN_PROC_SESSION;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_SESSION
-#define KERN_PROC_SESSION	3	/* by session of pid */
-#if defined(KERN_PROC_TTY) && !defined(HOST_KERN_PROC_TTY)
-static const typeof(KERN_PROC_TTY) HOST_KERN_PROC_TTY = KERN_PROC_TTY;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_TTY
-#define KERN_PROC_TTY		4	/* by controlling tty */
-#if defined(KERN_PROC_RUID) && !defined(HOST_KERN_PROC_RUID)
-static const typeof(KERN_PROC_RUID) HOST_KERN_PROC_RUID = KERN_PROC_RUID;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_RUID
-#define KERN_PROC_RUID		6	/* by real uid */
-#if defined(KERN_PROC_FILEDESC) && !defined(HOST_KERN_PROC_FILEDESC)
-static const typeof(KERN_PROC_FILEDESC) HOST_KERN_PROC_FILEDESC = KERN_PROC_FILEDESC;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_FILEDESC
-#define KERN_PROC_FILEDESC	33	/* File descriptors for process */
-#if defined(KERN_PROC_UID) && !defined(HOST_KERN_PROC_UID)
-static const typeof(KERN_PROC_UID) HOST_KERN_PROC_UID = KERN_PROC_UID;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_UID
-#define KERN_PROC_UID		5	/* by effective uid */
-#if defined(KERN_PROC_VMMAP) && !defined(HOST_KERN_PROC_VMMAP)
-static const typeof(KERN_PROC_VMMAP) HOST_KERN_PROC_VMMAP = KERN_PROC_VMMAP;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PROC_VMMAP
-#define KERN_PROC_VMMAP		32	/* VM map entries for process */
-#if defined(KERN_USRSTACK) && !defined(HOST_KERN_USRSTACK)
-static const typeof(KERN_USRSTACK) HOST_KERN_USRSTACK = KERN_USRSTACK;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_USRSTACK
-#define KERN_USRSTACK		33	/* int: address of USRSTACK */
-#if defined(KERN_PS_STRINGS) && !defined(HOST_KERN_PS_STRINGS)
-static const typeof(KERN_PS_STRINGS) HOST_KERN_PS_STRINGS = KERN_PS_STRINGS;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_PS_STRINGS
-#define KERN_PS_STRINGS		32	/* int: address of PS_STRINGS */
-#if defined(CTL_SYSCTL) && !defined(HOST_CTL_SYSCTL)
-static const typeof(CTL_SYSCTL) HOST_CTL_SYSCTL = CTL_SYSCTL;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_SYSCTL
-#define CTL_SYSCTL	0		/* "magic" numbers */
-#if defined(CTL_SYSCTL_NEXT) && !defined(HOST_CTL_SYSCTL_NEXT)
-static const typeof(CTL_SYSCTL_NEXT) HOST_CTL_SYSCTL_NEXT = CTL_SYSCTL_NEXT;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_SYSCTL_NEXT
-#define CTL_SYSCTL_NEXT		2	/* next OID, honoring CTLFLAG_SKIP */
-#if defined(CTL_SYSCTL_NAME2OID) && !defined(HOST_CTL_SYSCTL_NAME2OID)
-static const typeof(CTL_SYSCTL_NAME2OID) HOST_CTL_SYSCTL_NAME2OID = CTL_SYSCTL_NAME2OID;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_SYSCTL_NAME2OID
-#define CTL_SYSCTL_NAME2OID	3	/* int array of name */
-#if defined(CTL_SYSCTL_OIDFMT) && !defined(HOST_CTL_SYSCTL_OIDFMT)
-static const typeof(CTL_SYSCTL_OIDFMT) HOST_CTL_SYSCTL_OIDFMT = CTL_SYSCTL_OIDFMT;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_SYSCTL_OIDFMT
-#define CTL_SYSCTL_OIDFMT	4	/* OID's kind and format */
-#if defined(CTL_SYSCTL_OIDDESCR) && !defined(HOST_CTL_SYSCTL_OIDDESCR)
-static const typeof(CTL_SYSCTL_OIDDESCR) HOST_CTL_SYSCTL_OIDDESCR = CTL_SYSCTL_OIDDESCR;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_SYSCTL_OIDDESCR
-#define CTL_SYSCTL_OIDDESCR	5	/* OID's description */
-#if defined(CTL_SYSCTL_OIDLABEL) && !defined(HOST_CTL_SYSCTL_OIDLABEL)
-static const typeof(CTL_SYSCTL_OIDLABEL) HOST_CTL_SYSCTL_OIDLABEL = CTL_SYSCTL_OIDLABEL;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_SYSCTL_OIDLABEL
-#define CTL_SYSCTL_OIDLABEL	6	/* aggregation label */
-#if defined(CTL_SYSCTL_NEXTNOSKIP) && !defined(HOST_CTL_SYSCTL_NEXTNOSKIP)
-static const typeof(CTL_SYSCTL_NEXTNOSKIP) HOST_CTL_SYSCTL_NEXTNOSKIP = CTL_SYSCTL_NEXTNOSKIP;
-#endif /* found in: sys/sysctl.h */
-#undef CTL_SYSCTL_NEXTNOSKIP
-#define CTL_SYSCTL_NEXTNOSKIP	7	/* next OID, ignoring CTLFLAG_SKIP */
-#if defined(KERN_OSRELDATE) && !defined(HOST_KERN_OSRELDATE)
-static const typeof(KERN_OSRELDATE) HOST_KERN_OSRELDATE = KERN_OSRELDATE;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_OSRELDATE
-#define KERN_OSRELDATE		24	/* int: kernel release date */
-#if defined(KERN_ARND) && !defined(HOST_KERN_ARND)
-static const typeof(KERN_ARND) HOST_KERN_ARND = KERN_ARND;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_ARND
-#define KERN_ARND		37	/* int: from arc4rand() */
-#if defined(KERN_OSTYPE) && !defined(HOST_KERN_OSTYPE)
-static const typeof(KERN_OSTYPE) HOST_KERN_OSTYPE = KERN_OSTYPE;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_OSTYPE
-#define KERN_OSTYPE		 1	/* string: system version */
-#if defined(KERN_OSRELEASE) && !defined(HOST_KERN_OSRELEASE)
-static const typeof(KERN_OSRELEASE) HOST_KERN_OSRELEASE = KERN_OSRELEASE;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_OSRELEASE
-#define KERN_OSRELEASE		 2	/* string: system release */
-#if defined(KERN_VERSION) && !defined(HOST_KERN_VERSION)
-static const typeof(KERN_VERSION) HOST_KERN_VERSION = KERN_VERSION;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_VERSION
-#define KERN_VERSION		 4	/* string: compile time info */
-#if defined(KERN_HOSTNAME) && !defined(HOST_KERN_HOSTNAME)
-static const typeof(KERN_HOSTNAME) HOST_KERN_HOSTNAME = KERN_HOSTNAME;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_HOSTNAME
-#define KERN_HOSTNAME		10	/* string: hostname */
-#if defined(KERN_ARGMAX) && !defined(HOST_KERN_ARGMAX)
-static const typeof(KERN_ARGMAX) HOST_KERN_ARGMAX = KERN_ARGMAX;
-#endif /* found in: sys/sysctl.h */
-#undef KERN_ARGMAX
-#define KERN_ARGMAX		 8	/* int: max arguments to exec */
-#if defined(TIOCSETD) && !defined(HOST_TIOCSETD)
-static const typeof(TIOCSETD) HOST_TIOCSETD = TIOCSETD;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSETD
-#define TIOCSETD	_IOW('t', 27, int)	/* set line discipline */
-#if defined(TIOCGETD) && !defined(HOST_TIOCGETD)
-static const typeof(TIOCGETD) HOST_TIOCGETD = TIOCGETD;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCGETD
-#define TIOCGETD	_IOR('t', 26, int)	/* get line discipline */
-#if defined(TIOCSBRK) && !defined(HOST_TIOCSBRK)
-static const typeof(TIOCSBRK) HOST_TIOCSBRK = TIOCSBRK;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSBRK
-#define TIOCSBRK	 _IO('t', 123)		/* set break bit */
-#if defined(TIOCCBRK) && !defined(HOST_TIOCCBRK)
-static const typeof(TIOCCBRK) HOST_TIOCCBRK = TIOCCBRK;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCCBRK
-#define TIOCCBRK	 _IO('t', 122)		/* clear break bit */
-#if defined(TIOCSDTR) && !defined(HOST_TIOCSDTR)
-static const typeof(TIOCSDTR) HOST_TIOCSDTR = TIOCSDTR;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSDTR
-#define TIOCSDTR	 _IO('t', 121)		/* set data terminal ready */
-#if defined(TIOCCDTR) && !defined(HOST_TIOCCDTR)
-static const typeof(TIOCCDTR) HOST_TIOCCDTR = TIOCCDTR;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCCDTR
-#define TIOCCDTR	 _IO('t', 120)		/* clear data terminal ready */
-#if defined(TIOCGPGRP) && !defined(HOST_TIOCGPGRP)
-static const typeof(TIOCGPGRP) HOST_TIOCGPGRP = TIOCGPGRP;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCGPGRP
-#define TIOCGPGRP	_IOR('t', 119, int)	/* get pgrp of tty */
-#if defined(TIOCSPGRP) && !defined(HOST_TIOCSPGRP)
-static const typeof(TIOCSPGRP) HOST_TIOCSPGRP = TIOCSPGRP;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSPGRP
-#define TIOCSPGRP	_IOW('t', 118, int)	/* set pgrp of tty */
-#if defined(TIOCGETA) && !defined(HOST_TIOCGETA)
-static const typeof(TIOCGETA) HOST_TIOCGETA = TIOCGETA;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCGETA
-#define TIOCGETA	_IOR('t', 19, struct termios) /* get termios struct */
-#if defined(TIOCSETA) && !defined(HOST_TIOCSETA)
-static const typeof(TIOCSETA) HOST_TIOCSETA = TIOCSETA;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSETA
-#define TIOCSETA	_IOW('t', 20, struct termios) /* set termios struct */
-#if defined(TIOCSETAW) && !defined(HOST_TIOCSETAW)
-static const typeof(TIOCSETAW) HOST_TIOCSETAW = TIOCSETAW;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSETAW
-#define TIOCSETAW	_IOW('t', 21, struct termios) /* drain output, set */
-#if defined(TIOCSETAF) && !defined(HOST_TIOCSETAF)
-static const typeof(TIOCSETAF) HOST_TIOCSETAF = TIOCSETAF;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSETAF
-#define TIOCSETAF	_IOW('t', 22, struct termios) /* drn out, fls in, set */
-#if defined(TIOCPTMASTER) && !defined(HOST_TIOCPTMASTER)
-static const typeof(TIOCPTMASTER) HOST_TIOCPTMASTER = TIOCPTMASTER;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCPTMASTER
-#define TIOCPTMASTER	 _IO('t', 28)		/* pts master validation */
-#if defined(TIOCOUTQ) && !defined(HOST_TIOCOUTQ)
-static const typeof(TIOCOUTQ) HOST_TIOCOUTQ = TIOCOUTQ;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCOUTQ
-#define TIOCOUTQ	_IOR('t', 115, int)	/* output queue size */
-#if defined(TIOCSTI) && !defined(HOST_TIOCSTI)
-static const typeof(TIOCSTI) HOST_TIOCSTI = TIOCSTI;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSTI
-#define TIOCSTI		_IOW('t', 114, char)	/* simulate terminal input */
-#if defined(TIOCNOTTY) && !defined(HOST_TIOCNOTTY)
-static const typeof(TIOCNOTTY) HOST_TIOCNOTTY = TIOCNOTTY;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCNOTTY
-#define TIOCNOTTY	 _IO('t', 113)		/* void tty association */
-#if defined(TIOCSTOP) && !defined(HOST_TIOCSTOP)
-static const typeof(TIOCSTOP) HOST_TIOCSTOP = TIOCSTOP;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSTOP
-#define TIOCSTOP	 _IO('t', 111)		/* stop output, like ^S */
-#if defined(TIOCSTART) && !defined(HOST_TIOCSTART)
-static const typeof(TIOCSTART) HOST_TIOCSTART = TIOCSTART;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSTART
-#define TIOCSTART	 _IO('t', 110)		/* start output, like ^Q */
-#if defined(TIOCPKT) && !defined(HOST_TIOCPKT)
-static const typeof(TIOCPKT) HOST_TIOCPKT = TIOCPKT;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCPKT
-#define TIOCPKT		_IOW('t', 112, int)	/* pty: set/clear packet mode */
-#if defined(TIOCSCTTY) && !defined(HOST_TIOCSCTTY)
-static const typeof(TIOCSCTTY) HOST_TIOCSCTTY = TIOCSCTTY;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSCTTY
-#define TIOCSCTTY	 _IO('t', 97)		/* become controlling tty */
-#if defined(TIOCDRAIN) && !defined(HOST_TIOCDRAIN)
-static const typeof(TIOCDRAIN) HOST_TIOCDRAIN = TIOCDRAIN;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCDRAIN
-#define TIOCDRAIN	 _IO('t', 94)		/* wait till output drained */
-#if defined(TIOCEXCL) && !defined(HOST_TIOCEXCL)
-static const typeof(TIOCEXCL) HOST_TIOCEXCL = TIOCEXCL;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCEXCL
-#define TIOCEXCL	 _IO('t', 13)		/* set exclusive use of tty */
-#if defined(TIOCNXCL) && !defined(HOST_TIOCNXCL)
-static const typeof(TIOCNXCL) HOST_TIOCNXCL = TIOCNXCL;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCNXCL
-#define TIOCNXCL	 _IO('t', 14)		/* reset exclusive use of tty */
-#if defined(TIOCGWINSZ) && !defined(HOST_TIOCGWINSZ)
-static const typeof(TIOCGWINSZ) HOST_TIOCGWINSZ = TIOCGWINSZ;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCGWINSZ
-#define TIOCGWINSZ	_IOR('t', 104, struct winsize)	/* get window size */
-#if defined(TIOCSWINSZ) && !defined(HOST_TIOCSWINSZ)
-static const typeof(TIOCSWINSZ) HOST_TIOCSWINSZ = TIOCSWINSZ;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCSWINSZ
-#define TIOCSWINSZ	_IOW('t', 103, struct winsize)	/* set window size */
-#if defined(TIOCCONS) && !defined(HOST_TIOCCONS)
-static const typeof(TIOCCONS) HOST_TIOCCONS = TIOCCONS;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCCONS
-#define TIOCCONS	_IOW('t', 98, int)	/* become virtual console */
-#if defined(TIOCMSET) && !defined(HOST_TIOCMSET)
-static const typeof(TIOCMSET) HOST_TIOCMSET = TIOCMSET;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCMSET
-#define TIOCMSET	_IOW('t', 109, int)	/* set all modem bits */
-#if defined(TIOCMGET) && !defined(HOST_TIOCMGET)
-static const typeof(TIOCMGET) HOST_TIOCMGET = TIOCMGET;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCMGET
-#define TIOCMGET	_IOR('t', 106, int)	/* get all modem bits */
-#if defined(TIOCMBIS) && !defined(HOST_TIOCMBIS)
-static const typeof(TIOCMBIS) HOST_TIOCMBIS = TIOCMBIS;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCMBIS
-#define TIOCMBIS	_IOW('t', 108, int)	/* bis modem bits */
-#if defined(TIOCMBIC) && !defined(HOST_TIOCMBIC)
-static const typeof(TIOCMBIC) HOST_TIOCMBIC = TIOCMBIC;
-#endif /* found in: sys/ttycom.h */
-#undef TIOCMBIC
-#define TIOCMBIC	_IOW('t', 107, int)	/* bic modem bits */
-#if defined(UMTX_OP_SHM) && !defined(HOST_UMTX_OP_SHM)
-static const typeof(UMTX_OP_SHM) HOST_UMTX_OP_SHM = UMTX_OP_SHM;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_SHM
-#define UMTX_OP_SHM		25
-#if defined(UMTX_OP_WAIT_UINT) && !defined(HOST_UMTX_OP_WAIT_UINT)
-static const typeof(UMTX_OP_WAIT_UINT) HOST_UMTX_OP_WAIT_UINT = UMTX_OP_WAIT_UINT;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_WAIT_UINT
-#define UMTX_OP_WAIT_UINT	11
-#if defined(UMTX_OP_WAIT_UINT_PRIVATE) && !defined(HOST_UMTX_OP_WAIT_UINT_PRIVATE)
-static const typeof(UMTX_OP_WAIT_UINT_PRIVATE) HOST_UMTX_OP_WAIT_UINT_PRIVATE = UMTX_OP_WAIT_UINT_PRIVATE;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_WAIT_UINT_PRIVATE
-#define UMTX_OP_WAIT_UINT_PRIVATE	15
-#if defined(UMTX_OP_WAIT) && !defined(HOST_UMTX_OP_WAIT)
-static const typeof(UMTX_OP_WAIT) HOST_UMTX_OP_WAIT = UMTX_OP_WAIT;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_WAIT
-#define UMTX_OP_WAIT		2
-#if defined(UMTX_OP_WAKE) && !defined(HOST_UMTX_OP_WAKE)
-static const typeof(UMTX_OP_WAKE) HOST_UMTX_OP_WAKE = UMTX_OP_WAKE;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_WAKE
-#define UMTX_OP_WAKE		3
-#if defined(UMTX_OP_MUTEX_TRYLOCK) && !defined(HOST_UMTX_OP_MUTEX_TRYLOCK)
-static const typeof(UMTX_OP_MUTEX_TRYLOCK) HOST_UMTX_OP_MUTEX_TRYLOCK = UMTX_OP_MUTEX_TRYLOCK;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_MUTEX_TRYLOCK
-#define UMTX_OP_MUTEX_TRYLOCK	4
-#if defined(UMTX_OP_MUTEX_LOCK) && !defined(HOST_UMTX_OP_MUTEX_LOCK)
-static const typeof(UMTX_OP_MUTEX_LOCK) HOST_UMTX_OP_MUTEX_LOCK = UMTX_OP_MUTEX_LOCK;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_MUTEX_LOCK
-#define UMTX_OP_MUTEX_LOCK	5
-#if defined(UMTX_OP_MUTEX_UNLOCK) && !defined(HOST_UMTX_OP_MUTEX_UNLOCK)
-static const typeof(UMTX_OP_MUTEX_UNLOCK) HOST_UMTX_OP_MUTEX_UNLOCK = UMTX_OP_MUTEX_UNLOCK;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_MUTEX_UNLOCK
-#define UMTX_OP_MUTEX_UNLOCK	6
-#if defined(UMTX_OP_CV_WAIT) && !defined(HOST_UMTX_OP_CV_WAIT)
-static const typeof(UMTX_OP_CV_WAIT) HOST_UMTX_OP_CV_WAIT = UMTX_OP_CV_WAIT;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_CV_WAIT
-#define UMTX_OP_CV_WAIT		8
-#if defined(UMTX_OP_CV_SIGNAL) && !defined(HOST_UMTX_OP_CV_SIGNAL)
-static const typeof(UMTX_OP_CV_SIGNAL) HOST_UMTX_OP_CV_SIGNAL = UMTX_OP_CV_SIGNAL;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_CV_SIGNAL
-#define UMTX_OP_CV_SIGNAL	9
-#if defined(UMTX_OP_CV_BROADCAST) && !defined(HOST_UMTX_OP_CV_BROADCAST)
-static const typeof(UMTX_OP_CV_BROADCAST) HOST_UMTX_OP_CV_BROADCAST = UMTX_OP_CV_BROADCAST;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_CV_BROADCAST
-#define UMTX_OP_CV_BROADCAST	10
-#if defined(UMTX_OP_RW_RDLOCK) && !defined(HOST_UMTX_OP_RW_RDLOCK)
-static const typeof(UMTX_OP_RW_RDLOCK) HOST_UMTX_OP_RW_RDLOCK = UMTX_OP_RW_RDLOCK;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_RW_RDLOCK
-#define UMTX_OP_RW_RDLOCK	12
-#if defined(UMTX_OP_RW_WRLOCK) && !defined(HOST_UMTX_OP_RW_WRLOCK)
-static const typeof(UMTX_OP_RW_WRLOCK) HOST_UMTX_OP_RW_WRLOCK = UMTX_OP_RW_WRLOCK;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_RW_WRLOCK
-#define UMTX_OP_RW_WRLOCK	13
-#if defined(UMTX_OP_RW_UNLOCK) && !defined(HOST_UMTX_OP_RW_UNLOCK)
-static const typeof(UMTX_OP_RW_UNLOCK) HOST_UMTX_OP_RW_UNLOCK = UMTX_OP_RW_UNLOCK;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_RW_UNLOCK
-#define UMTX_OP_RW_UNLOCK	14
-#if defined(UMTX_OP_WAKE_PRIVATE) && !defined(HOST_UMTX_OP_WAKE_PRIVATE)
-static const typeof(UMTX_OP_WAKE_PRIVATE) HOST_UMTX_OP_WAKE_PRIVATE = UMTX_OP_WAKE_PRIVATE;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_WAKE_PRIVATE
-#define UMTX_OP_WAKE_PRIVATE	16
-#if defined(UMTX_OP_SEM2_WAIT) && !defined(HOST_UMTX_OP_SEM2_WAIT)
-static const typeof(UMTX_OP_SEM2_WAIT) HOST_UMTX_OP_SEM2_WAIT = UMTX_OP_SEM2_WAIT;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_SEM2_WAIT
-#define UMTX_OP_SEM2_WAIT	23
-#if defined(UMTX_OP_SEM2_WAKE) && !defined(HOST_UMTX_OP_SEM2_WAKE)
-static const typeof(UMTX_OP_SEM2_WAKE) HOST_UMTX_OP_SEM2_WAKE = UMTX_OP_SEM2_WAKE;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_SEM2_WAKE
-#define UMTX_OP_SEM2_WAKE	24
-#if defined(UMTX_OP_ROBUST_LISTS) && !defined(HOST_UMTX_OP_ROBUST_LISTS)
-static const typeof(UMTX_OP_ROBUST_LISTS) HOST_UMTX_OP_ROBUST_LISTS = UMTX_OP_ROBUST_LISTS;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_ROBUST_LISTS
-#define UMTX_OP_ROBUST_LISTS	26
-#if defined(UMTX_OP_MUTEX_WAIT) && !defined(HOST_UMTX_OP_MUTEX_WAIT)
-static const typeof(UMTX_OP_MUTEX_WAIT) HOST_UMTX_OP_MUTEX_WAIT = UMTX_OP_MUTEX_WAIT;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_MUTEX_WAIT
-#define UMTX_OP_MUTEX_WAIT	17
-#if defined(UMTX_OP_MUTEX_WAKE) && !defined(HOST_UMTX_OP_MUTEX_WAKE)
-static const typeof(UMTX_OP_MUTEX_WAKE) HOST_UMTX_OP_MUTEX_WAKE = UMTX_OP_MUTEX_WAKE;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_MUTEX_WAKE
-#define UMTX_OP_MUTEX_WAKE	18	/* deprecated */
-#if defined(UMTX_OP_SEM_WAIT) && !defined(HOST_UMTX_OP_SEM_WAIT)
-static const typeof(UMTX_OP_SEM_WAIT) HOST_UMTX_OP_SEM_WAIT = UMTX_OP_SEM_WAIT;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_SEM_WAIT
-#define UMTX_OP_SEM_WAIT	19	/* deprecated */
-#if defined(UMTX_OP_SEM_WAKE) && !defined(HOST_UMTX_OP_SEM_WAKE)
-static const typeof(UMTX_OP_SEM_WAKE) HOST_UMTX_OP_SEM_WAKE = UMTX_OP_SEM_WAKE;
-#endif /* found in: sys/umtx.h */
-#undef UMTX_OP_SEM_WAKE
-#define UMTX_OP_SEM_WAKE	20	/* deprecated */
+#if defined(PRI_TIMESHARE) && !defined(HOST_PRI_TIMESHARE)
+static const typeof(PRI_TIMESHARE) HOST_PRI_TIMESHARE = PRI_TIMESHARE;
+#endif /* found in: sys/priority.h */
+#undef PRI_TIMESHARE
+#define PRI_TIMESHARE		3	/* Time sharing process. */
+#if defined(PRI_REALTIME) && !defined(HOST_PRI_REALTIME)
+static const typeof(PRI_REALTIME) HOST_PRI_REALTIME = PRI_REALTIME;
+#endif /* found in: sys/priority.h */
+#undef PRI_REALTIME
+#define PRI_REALTIME		2	/* Real time process. */
+#if defined(PRI_IDLE) && !defined(HOST_PRI_IDLE)
+static const typeof(PRI_IDLE) HOST_PRI_IDLE = PRI_IDLE;
+#endif /* found in: sys/priority.h */
+#undef PRI_IDLE
+#define PRI_IDLE		4	/* Idle process. */
+#undef PRI_FIFO /* found in: sys/priority.h */
+#define PRI_FIFO		(PRI_FIFO_BIT | PRI_REALTIME)
+#if defined(PRI_FIFO_BIT) && !defined(HOST_PRI_FIFO_BIT)
+static const typeof(PRI_FIFO_BIT) HOST_PRI_FIFO_BIT = PRI_FIFO_BIT;
+#endif /* found in: sys/priority.h */
+#undef PRI_FIFO_BIT
+#define PRI_FIFO_BIT		8
 #if defined(TARGET_SEEK_CUR)
 #undef TARGET_SEEK_CUR
 #endif /* found in: sys/unistd.h */
@@ -4273,56 +4131,194 @@ static const typeof(UMTX_OP_SEM_WAKE) HOST_UMTX_OP_SEM_WAKE = UMTX_OP_SEM_WAKE;
 #undef TARGET__PC_ACL_EXTENDED
 #endif /* found in: sys/unistd.h */
 #define TARGET__PC_ACL_EXTENDED	59
-#if defined(WNOHANG) && !defined(HOST_WNOHANG)
-static const typeof(WNOHANG) HOST_WNOHANG = WNOHANG;
-#endif /* found in: sys/wait.h */
-#undef WNOHANG
-#define WNOHANG		1	/* Don't hang in wait. */
-#if defined(WUNTRACED) && !defined(HOST_WUNTRACED)
-static const typeof(WUNTRACED) HOST_WUNTRACED = WUNTRACED;
-#endif /* found in: sys/wait.h */
-#undef WUNTRACED
-#define WUNTRACED	2	/* Tell about stopped, untraced children. */
-#if defined(WCONTINUED) && !defined(HOST_WCONTINUED)
-static const typeof(WCONTINUED) HOST_WCONTINUED = WCONTINUED;
-#endif /* found in: sys/wait.h */
-#undef WCONTINUED
-#define WCONTINUED	4	/* Report a job control continued process. */
-#if defined(WNOWAIT) && !defined(HOST_WNOWAIT)
-static const typeof(WNOWAIT) HOST_WNOWAIT = WNOWAIT;
-#endif /* found in: sys/wait.h */
-#undef WNOWAIT
-#define WNOWAIT		8	/* Poll only. Don't delete the proc entry. */
-#if defined(WEXITED) && !defined(HOST_WEXITED)
-static const typeof(WEXITED) HOST_WEXITED = WEXITED;
-#endif /* found in: sys/wait.h */
-#undef WEXITED
-#define WEXITED		16	/* Wait for exited processes. */
-#if defined(WTRAPPED) && !defined(HOST_WTRAPPED)
-static const typeof(WTRAPPED) HOST_WTRAPPED = WTRAPPED;
-#endif /* found in: sys/wait.h */
-#undef WTRAPPED
-#define WTRAPPED	32	/* Wait for a process to hit a trap or */
-#if defined(TARGET_CLOCK_REALTIME)
-#undef TARGET_CLOCK_REALTIME
-#endif /* found in: sys/_clock_id.h */
-#define TARGET_CLOCK_REALTIME		0
-#if defined(TARGET_CLOCK_MONOTONIC)
-#undef TARGET_CLOCK_MONOTONIC
-#endif /* found in: sys/_clock_id.h */
-#define TARGET_CLOCK_MONOTONIC		4
-#if defined(TARGET_CLOCK_UPTIME)
-#undef TARGET_CLOCK_UPTIME
-#endif /* found in: sys/_clock_id.h */
-#define TARGET_CLOCK_UPTIME		5
-#if defined(TARGET_CLOCK_SECOND)
-#undef TARGET_CLOCK_SECOND
-#endif /* found in: sys/_clock_id.h */
-#define TARGET_CLOCK_SECOND		13
-#if defined(TARGET_CLOCK_MONOTONIC_FAST)
-#undef TARGET_CLOCK_MONOTONIC_FAST
-#endif /* found in: sys/_clock_id.h */
-#define TARGET_CLOCK_MONOTONIC_FAST	12
+#if defined(O_ACCMODE) && !defined(HOST_O_ACCMODE)
+static const typeof(O_ACCMODE) HOST_O_ACCMODE = O_ACCMODE;
+#endif /* found in: sys/fcntl.h */
+#undef O_ACCMODE
+#define O_ACCMODE	0x0003		/* mask for above modes */
+#if defined(O_WRONLY) && !defined(HOST_O_WRONLY)
+static const typeof(O_WRONLY) HOST_O_WRONLY = O_WRONLY;
+#endif /* found in: sys/fcntl.h */
+#undef O_WRONLY
+#define O_WRONLY	0x0001		/* open for writing only */
+#if defined(O_RDWR) && !defined(HOST_O_RDWR)
+static const typeof(O_RDWR) HOST_O_RDWR = O_RDWR;
+#endif /* found in: sys/fcntl.h */
+#undef O_RDWR
+#define O_RDWR		0x0002		/* open for reading and writing */
+#if defined(O_CREAT) && !defined(HOST_O_CREAT)
+static const typeof(O_CREAT) HOST_O_CREAT = O_CREAT;
+#endif /* found in: sys/fcntl.h */
+#undef O_CREAT
+#define O_CREAT		0x0200		/* create if nonexistent */
+#if defined(O_EXCL) && !defined(HOST_O_EXCL)
+static const typeof(O_EXCL) HOST_O_EXCL = O_EXCL;
+#endif /* found in: sys/fcntl.h */
+#undef O_EXCL
+#define O_EXCL		0x0800		/* error if already exists */
+#if defined(O_NOCTTY) && !defined(HOST_O_NOCTTY)
+static const typeof(O_NOCTTY) HOST_O_NOCTTY = O_NOCTTY;
+#endif /* found in: sys/fcntl.h */
+#undef O_NOCTTY
+#define O_NOCTTY	0x8000		/* don't assign controlling terminal */
+#if defined(O_TRUNC) && !defined(HOST_O_TRUNC)
+static const typeof(O_TRUNC) HOST_O_TRUNC = O_TRUNC;
+#endif /* found in: sys/fcntl.h */
+#undef O_TRUNC
+#define O_TRUNC		0x0400		/* truncate to zero length */
+#if defined(O_APPEND) && !defined(HOST_O_APPEND)
+static const typeof(O_APPEND) HOST_O_APPEND = O_APPEND;
+#endif /* found in: sys/fcntl.h */
+#undef O_APPEND
+#define O_APPEND	0x0008		/* set append mode */
+#if defined(O_NONBLOCK) && !defined(HOST_O_NONBLOCK)
+static const typeof(O_NONBLOCK) HOST_O_NONBLOCK = O_NONBLOCK;
+#endif /* found in: sys/fcntl.h */
+#undef O_NONBLOCK
+#define O_NONBLOCK	0x0004		/* no delay */
+#if defined(O_SYNC) && !defined(HOST_O_SYNC)
+static const typeof(O_SYNC) HOST_O_SYNC = O_SYNC;
+#endif /* found in: sys/fcntl.h */
+#undef O_SYNC
+#define O_SYNC		0x0080		/* POSIX synonym for O_FSYNC */
+#if defined(O_DIRECTORY) && !defined(HOST_O_DIRECTORY)
+static const typeof(O_DIRECTORY) HOST_O_DIRECTORY = O_DIRECTORY;
+#endif /* found in: sys/fcntl.h */
+#undef O_DIRECTORY
+#define O_DIRECTORY	0x00020000	/* Fail if not directory */
+#if defined(O_NOFOLLOW) && !defined(HOST_O_NOFOLLOW)
+static const typeof(O_NOFOLLOW) HOST_O_NOFOLLOW = O_NOFOLLOW;
+#endif /* found in: sys/fcntl.h */
+#undef O_NOFOLLOW
+#define O_NOFOLLOW	0x0100		/* don't follow symlinks */
+#if defined(O_DIRECT) && !defined(HOST_O_DIRECT)
+static const typeof(O_DIRECT) HOST_O_DIRECT = O_DIRECT;
+#endif /* found in: sys/fcntl.h */
+#undef O_DIRECT
+#define O_DIRECT	0x00010000
+#if defined(O_CLOEXEC) && !defined(HOST_O_CLOEXEC)
+static const typeof(O_CLOEXEC) HOST_O_CLOEXEC = O_CLOEXEC;
+#endif /* found in: sys/fcntl.h */
+#undef O_CLOEXEC
+#define O_CLOEXEC	0x00100000
+#if defined(O_PATH) && !defined(HOST_O_PATH)
+static const typeof(O_PATH) HOST_O_PATH = O_PATH;
+#endif /* found in: sys/fcntl.h */
+#undef O_PATH
+#define O_PATH		0x00400000	/* fd is only a path */
+#if defined(O_DSYNC) && !defined(HOST_O_DSYNC)
+static const typeof(O_DSYNC) HOST_O_DSYNC = O_DSYNC;
+#endif /* found in: sys/fcntl.h */
+#undef O_DSYNC
+#define O_DSYNC		0x01000000	/* POSIX data sync */
+#if defined(AT_FDCWD) && !defined(HOST_AT_FDCWD)
+static const typeof(AT_FDCWD) HOST_AT_FDCWD = AT_FDCWD;
+#endif /* found in: sys/fcntl.h */
+#undef AT_FDCWD
+#define AT_FDCWD		-100
+#if defined(AT_EACCESS) && !defined(HOST_AT_EACCESS)
+static const typeof(AT_EACCESS) HOST_AT_EACCESS = AT_EACCESS;
+#endif /* found in: sys/fcntl.h */
+#undef AT_EACCESS
+#define AT_EACCESS		0x0100	/* Check access using effective user */
+#if defined(AT_SYMLINK_NOFOLLOW) && !defined(HOST_AT_SYMLINK_NOFOLLOW)
+static const typeof(AT_SYMLINK_NOFOLLOW) HOST_AT_SYMLINK_NOFOLLOW = AT_SYMLINK_NOFOLLOW;
+#endif /* found in: sys/fcntl.h */
+#undef AT_SYMLINK_NOFOLLOW
+#define AT_SYMLINK_NOFOLLOW	0x0200	/* Do not follow symbolic links */
+#if defined(AT_SYMLINK_FOLLOW) && !defined(HOST_AT_SYMLINK_FOLLOW)
+static const typeof(AT_SYMLINK_FOLLOW) HOST_AT_SYMLINK_FOLLOW = AT_SYMLINK_FOLLOW;
+#endif /* found in: sys/fcntl.h */
+#undef AT_SYMLINK_FOLLOW
+#define AT_SYMLINK_FOLLOW	0x0400	/* Follow symbolic link */
+#if defined(AT_REMOVEDIR) && !defined(HOST_AT_REMOVEDIR)
+static const typeof(AT_REMOVEDIR) HOST_AT_REMOVEDIR = AT_REMOVEDIR;
+#endif /* found in: sys/fcntl.h */
+#undef AT_REMOVEDIR
+#define AT_REMOVEDIR		0x0800	/* Remove directory instead of file */
+#if defined(AT_RESOLVE_BENEATH) && !defined(HOST_AT_RESOLVE_BENEATH)
+static const typeof(AT_RESOLVE_BENEATH) HOST_AT_RESOLVE_BENEATH = AT_RESOLVE_BENEATH;
+#endif /* found in: sys/fcntl.h */
+#undef AT_RESOLVE_BENEATH
+#define AT_RESOLVE_BENEATH	0x2000	/* Do not allow name resolution */
+#if defined(AT_EMPTY_PATH) && !defined(HOST_AT_EMPTY_PATH)
+static const typeof(AT_EMPTY_PATH) HOST_AT_EMPTY_PATH = AT_EMPTY_PATH;
+#endif /* found in: sys/fcntl.h */
+#undef AT_EMPTY_PATH
+#define AT_EMPTY_PATH		0x4000	/* Operate on dirfd if path is empty */
+#if defined(F_DUPFD) && !defined(HOST_F_DUPFD)
+static const typeof(F_DUPFD) HOST_F_DUPFD = F_DUPFD;
+#endif /* found in: sys/fcntl.h */
+#undef F_DUPFD
+#define F_DUPFD		0		/* duplicate file descriptor */
+#if defined(F_DUPFD_CLOEXEC) && !defined(HOST_F_DUPFD_CLOEXEC)
+static const typeof(F_DUPFD_CLOEXEC) HOST_F_DUPFD_CLOEXEC = F_DUPFD_CLOEXEC;
+#endif /* found in: sys/fcntl.h */
+#undef F_DUPFD_CLOEXEC
+#define F_DUPFD_CLOEXEC	17		/* Like F_DUPFD, but FD_CLOEXEC is set */
+#if defined(F_DUP2FD) && !defined(HOST_F_DUP2FD)
+static const typeof(F_DUP2FD) HOST_F_DUP2FD = F_DUP2FD;
+#endif /* found in: sys/fcntl.h */
+#undef F_DUP2FD
+#define F_DUP2FD	10		/* duplicate file descriptor to arg */
+#if defined(F_DUP2FD_CLOEXEC) && !defined(HOST_F_DUP2FD_CLOEXEC)
+static const typeof(F_DUP2FD_CLOEXEC) HOST_F_DUP2FD_CLOEXEC = F_DUP2FD_CLOEXEC;
+#endif /* found in: sys/fcntl.h */
+#undef F_DUP2FD_CLOEXEC
+#define F_DUP2FD_CLOEXEC 18		/* Like F_DUP2FD, but FD_CLOEXEC is set */
+#if defined(F_GETFD) && !defined(HOST_F_GETFD)
+static const typeof(F_GETFD) HOST_F_GETFD = F_GETFD;
+#endif /* found in: sys/fcntl.h */
+#undef F_GETFD
+#define F_GETFD		1		/* get file descriptor flags */
+#if defined(F_SETFD) && !defined(HOST_F_SETFD)
+static const typeof(F_SETFD) HOST_F_SETFD = F_SETFD;
+#endif /* found in: sys/fcntl.h */
+#undef F_SETFD
+#define F_SETFD		2		/* set file descriptor flags */
+#if defined(F_GETFL) && !defined(HOST_F_GETFL)
+static const typeof(F_GETFL) HOST_F_GETFL = F_GETFL;
+#endif /* found in: sys/fcntl.h */
+#undef F_GETFL
+#define F_GETFL		3		/* get file status flags */
+#if defined(F_SETFL) && !defined(HOST_F_SETFL)
+static const typeof(F_SETFL) HOST_F_SETFL = F_SETFL;
+#endif /* found in: sys/fcntl.h */
+#undef F_SETFL
+#define F_SETFL		4		/* set file status flags */
+#if defined(F_GETOWN) && !defined(HOST_F_GETOWN)
+static const typeof(F_GETOWN) HOST_F_GETOWN = F_GETOWN;
+#endif /* found in: sys/fcntl.h */
+#undef F_GETOWN
+#define F_GETOWN	5		/* get SIGIO/SIGURG proc/pgrp */
+#if defined(F_SETOWN) && !defined(HOST_F_SETOWN)
+static const typeof(F_SETOWN) HOST_F_SETOWN = F_SETOWN;
+#endif /* found in: sys/fcntl.h */
+#undef F_SETOWN
+#define F_SETOWN	6		/* set SIGIO/SIGURG proc/pgrp */
+#if defined(F_GETLK) && !defined(HOST_F_GETLK)
+static const typeof(F_GETLK) HOST_F_GETLK = F_GETLK;
+#endif /* found in: sys/fcntl.h */
+#undef F_GETLK
+#define F_GETLK		11		/* get record locking information */
+#if defined(F_SETLK) && !defined(HOST_F_SETLK)
+static const typeof(F_SETLK) HOST_F_SETLK = F_SETLK;
+#endif /* found in: sys/fcntl.h */
+#undef F_SETLK
+#define F_SETLK		12		/* set record locking information */
+#if defined(F_SETLKW) && !defined(HOST_F_SETLKW)
+static const typeof(F_SETLKW) HOST_F_SETLKW = F_SETLKW;
+#endif /* found in: sys/fcntl.h */
+#undef F_SETLKW
+#define F_SETLKW	13		/* F_SETLK; wait if blocked */
+#if defined(TARGET_UTIME_NOW)
+#undef TARGET_UTIME_NOW
+#endif /* found in: sys/stat.h */
+#define TARGET_UTIME_NOW	-1
+#if defined(TARGET_UTIME_OMIT)
+#undef TARGET_UTIME_OMIT
+#endif /* found in: sys/stat.h */
+#define TARGET_UTIME_OMIT	-2
 
 /* Struct definitions: */
 
@@ -4557,6 +4553,16 @@ struct in6_ndireq;
 struct in6_ndifreq;
 
 /* Defines: */
+#undef SIOCGIFAFLAG_IN6 /* found in: netinet6/in6_var.h */
+#define SIOCGIFAFLAG_IN6	_IOWR('i', 73, struct in6_ifreq)
+#undef SIOCGIFALIFETIME_IN6 /* found in: netinet6/in6_var.h */
+#define SIOCGIFALIFETIME_IN6	_IOWR('i', 81, struct in6_ifreq)
+#undef SIOCGIFPSRCADDR_IN6 /* found in: netinet6/in6_var.h */
+#define SIOCGIFPSRCADDR_IN6	_IOWR('i', 71, struct in6_ifreq)
+#undef SIOCGIFINFO_IN6 /* found in: netinet6/in6_var.h */
+#define SIOCGIFINFO_IN6		_IOWR('i', 108, struct in6_ndireq)
+#undef SIOCGDEFIFACE_IN6 /* found in: netinet6/in6_var.h */
+#define SIOCGDEFIFACE_IN6	_IOWR('i', 86, struct in6_ndifreq)
 #if defined(IPV6_MULTICAST_HOPS) && !defined(HOST_IPV6_MULTICAST_HOPS)
 static const typeof(IPV6_MULTICAST_HOPS) HOST_IPV6_MULTICAST_HOPS = IPV6_MULTICAST_HOPS;
 #endif /* found in: netinet6/in6.h */
@@ -4622,16 +4628,6 @@ static const typeof(IPV6_MSFILTER) HOST_IPV6_MSFILTER = IPV6_MSFILTER;
 #endif /* found in: netinet6/in6.h */
 #undef IPV6_MSFILTER
 #define IPV6_MSFILTER		74 /* struct __msfilterreq; */
-#undef SIOCGIFAFLAG_IN6 /* found in: netinet6/in6_var.h */
-#define SIOCGIFAFLAG_IN6	_IOWR('i', 73, struct in6_ifreq)
-#undef SIOCGIFALIFETIME_IN6 /* found in: netinet6/in6_var.h */
-#define SIOCGIFALIFETIME_IN6	_IOWR('i', 81, struct in6_ifreq)
-#undef SIOCGIFPSRCADDR_IN6 /* found in: netinet6/in6_var.h */
-#define SIOCGIFPSRCADDR_IN6	_IOWR('i', 71, struct in6_ifreq)
-#undef SIOCGIFINFO_IN6 /* found in: netinet6/in6_var.h */
-#define SIOCGIFINFO_IN6		_IOWR('i', 108, struct in6_ndireq)
-#undef SIOCGDEFIFACE_IN6 /* found in: netinet6/in6_var.h */
-#define SIOCGDEFIFACE_IN6	_IOWR('i', 86, struct in6_ndifreq)
 
 /* Struct definitions: */
 
