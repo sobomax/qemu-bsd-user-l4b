@@ -382,7 +382,6 @@ static inline abi_long do_freebsd11_statfs(abi_long arg1, abi_long arg2)
 /* statfs(2) */
 static inline abi_long do_freebsd_statfs(abi_long arg1, abi_long arg2)
 {
-#if !defined(__linux__)
     abi_long ret;
     void *p;
     struct statfs host_stfs;
@@ -395,9 +394,6 @@ static inline abi_long do_freebsd_statfs(abi_long arg1, abi_long arg2)
     }
 
     return h2t_freebsd_statfs(arg2, &host_stfs);
-#else
-    abort();
-#endif
 }
 
 /* fstatfs(2) */
