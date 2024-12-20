@@ -88,6 +88,10 @@ static inline int sas_ss_flags(TaskState *ts, unsigned long sp)
         on_sig_stack(ts, sp) ? SS_ONSTACK : 0;
 }
 
+#if defined(__linux__)
+#define HOST_SIGPWR SIGPWR
+#endif
+
 /*
  * The BSD ABIs use the same signal numbers across all the CPU architectures, so
  * (unlike Linux) these functions are just the identity mapping. This might not
@@ -107,6 +111,7 @@ int host_to_target_signal(int sig)
         case HOST_SIGCONT: return TARGET_SIGCONT;
         case HOST_SIGCHLD: return TARGET_SIGCHLD;
         case HOST_SIGIO:   return TARGET_SIGIO;
+        case HOST_SIGPWR: return TARGET_SIGTHR;
     }
     if (sig >= HOST_SIGRTMIN && sig <= HOST_SIGRTMAX) {
         sig += (HOST_SIGRTMIN - TARGET_SIGRTMIN);
@@ -130,6 +135,7 @@ int target_to_host_signal(int sig)
         case TARGET_SIGCONT: return HOST_SIGCONT;
         case TARGET_SIGCHLD: return HOST_SIGCHLD;
         case TARGET_SIGIO:   return HOST_SIGIO;
+        case TARGET_SIGTHR:  return HOST_SIGPWR;
     }
     if (sig >= TARGET_SIGRTMIN && sig <= TARGET_SIGRTMAX) {
         sig -= (HOST_SIGRTMIN - TARGET_SIGRTMIN);
@@ -137,7 +143,7 @@ int target_to_host_signal(int sig)
         if (sig > HOST_SIGRTMAX)
             return -1;
     }
-    if (sig >= HOST_NSIG)
+    if (sig > HOST_NSIG)
         return -1;
 #endif	       
     return sig;
@@ -184,9 +190,9 @@ static void host_to_target_sigset_internal(target_sigset_t *d,
     int i;
 
     target_sigemptyset(d);
-    for (i = 1; i <= NSIG; i++) {
-        if (sigismember(s, i)) {
-            target_sigaddset(d, host_to_target_signal(i));
+    for (i = 1; i <= TARGET_NSIG; i++) {
+        if (sigismember(s, target_to_host_signal(i))) {
+            target_sigaddset(d, i);
         }
     }
 }
@@ -197,7 +203,7 @@ void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
     int i;
 
     host_to_target_sigset_internal(&d1, s);
-    for (i = 0; i < _SIG_WORDS; i++) {
+    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
         d->__bits[i] = tswap32(d1.__bits[i]);
     }
 }
