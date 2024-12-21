@@ -279,7 +279,7 @@ int host_to_target_errno(int err)
         case ENOTEMPTY: return TARGET_ENOTEMPTY;
         case ENOTRECOVERABLE: return TARGET_ENOTRECOVERABLE;
         case ENOTSOCK: return TARGET_ENOTSOCK;
-        case ENOTSUP: return TARGET_ENOTSUP;
+        case EOPNOTSUPP: return TARGET_EOPNOTSUPP;
         case ENOTTY: return TARGET_ENOTTY;
         case ENXIO: return TARGET_ENXIO;
         case EOVERFLOW: return TARGET_EOVERFLOW;
@@ -329,6 +329,9 @@ target_to_host_sock_type(int target_type)
         break;
     case TARGET_SOCK_STREAM:
         host_type = SOCK_STREAM;
+        break;
+    case TARGET_SOCK_SEQPACKET:
+        host_type = SOCK_SEQPACKET;
         break;
     default:
         abort();
