@@ -1248,7 +1248,8 @@ static inline void sysctl_oidfmt(uint32_t *holdp)
 #if defined(__linux__)
 static inline int sysctlnametomib(const char *name, int *mibp, size_t *sizep)
 {
-	abort();
+	qemu_log("sysctlnametomib(%s): not implemented yed\n", name);
+	return -TARGET_ENOENT;
 }
 
 static inline int sysctlbyname(const char *name, void *oldp, size_t *oldlenp,
@@ -1787,14 +1788,21 @@ static int
 handle_hw_machine_arch(void *holdp, size_t oldlen, size_t *holdlen)
 {
     struct utsname buffer;
+    const char *cp;
+
     if (uname(&buffer) == -1) {
         return -TARGET_EINVAL;
     }
-    *holdlen = strlen(buffer.machine) + 1;
+    if (strcmp(buffer.machine, "x86_64") == 0) {
+        cp = "amd64";
+    } else {
+        cp = buffer.machine;
+    }
+    *holdlen = strlen(cp) + 1;
     if (oldlen) {
         if (*holdlen > oldlen)
             *holdlen = oldlen;
-        memcpy(holdp, buffer.machine, *holdlen);
+        memcpy(holdp, cp, *holdlen);
     }
     return 0;
 }
@@ -1803,6 +1811,7 @@ static const struct handler handlers[] = {
     {"hw.pagesizes", handle_hw_pagesizes},
     {"hw.availpages", handle_hw_availpages},
     {"kern.ps_strings", handle_kern_ps_strings},
+    {"hw.machine", handle_hw_machine_arch},
     {"hw.machine_arch", handle_hw_machine_arch},
     {NULL, NULL} // Terminator
 };
