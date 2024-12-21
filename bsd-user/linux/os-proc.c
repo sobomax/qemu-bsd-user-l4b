@@ -375,6 +375,6 @@ do_freebsd_procctl(void *cpu_env, int idtype, abi_ulong arg2, abi_ulong arg3,
 
     return error;
 #else
-    abort();
+    return -TARGET_ENOSYS;
 #endif
 }
