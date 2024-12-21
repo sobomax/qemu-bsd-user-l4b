@@ -721,6 +721,22 @@ static abi_long do_bsd_readlinkat(abi_long arg1, abi_long arg2,
     return ret;
 }
 
+#if defined(__linux__)
+static int
+is_symlink(const char *p)
+{
+    struct stat st;
+    return (stat(p, &st) == 0 && S_ISLNK(st.st_mode));
+}
+
+static int
+f_is_symlink(int f)
+{
+    struct stat st;
+    return (fstat(f, &st) == 0 && S_ISLNK(st.st_mode));
+}
+#endif
+
 /* chmod(2) */
 static abi_long do_bsd_chmod(abi_long arg1, abi_long arg2)
 {
@@ -729,6 +745,10 @@ static abi_long do_bsd_chmod(abi_long arg1, abi_long arg2)
 
     LOCK_PATH(p, arg1);
     ret = get_errno(chmod(p, arg2)); /* XXX path(p)? */
+#if defined(__linux__)
+    if (ret == -TARGET_EOPNOTSUPP && is_symlink(p))
+        ret = 0;
+#endif
     UNLOCK_PATH(p, arg1);
 
     return ret;
@@ -737,7 +757,13 @@ static abi_long do_bsd_chmod(abi_long arg1, abi_long arg2)
 /* fchmod(2) */
 static abi_long do_bsd_fchmod(abi_long arg1, abi_long arg2)
 {
-    return get_errno(fchmod(arg1, arg2));
+    abi_long ret;
+    ret = get_errno(fchmod(arg1, arg2));
+#if defined(__linux__)
+    if (ret == -TARGET_EOPNOTSUPP && f_is_symlink(arg1))
+        ret = 0;
+#endif
+    return ret;
 }
 
 /* lchmod(2) */
@@ -769,6 +795,12 @@ static abi_long do_bsd_fchmodat(abi_long arg1, abi_long arg2,
     LOCK_PATH(p, arg2);
     ret = get_errno(fchmodat(arg1, p, arg3, arg4));
     UNLOCK_PATH(p, arg2);
+
+#if defined(__linux__)
+    if (ret == -TARGET_EOPNOTSUPP && arg4 == AT_SYMLINK_NOFOLLOW &&
+                                     f_is_symlink(arg1))
+        ret = 0;
+#endif
 
     return ret;
 }
