@@ -710,11 +710,52 @@ out:
     return ret;
 }
 
+static inline int
+target_to_host_lk_l_type(abi_int l_type)
+{
+    int h_l_type;
+    switch (l_type) {
+    case TARGET_F_RDLCK:
+        h_l_type = F_RDLCK;
+        break;
+    case TARGET_F_UNLCK:
+        h_l_type = F_UNLCK;
+        break;
+    case TARGET_F_WRLCK:
+        h_l_type = F_WRLCK;
+	break;
+    default:
+        abort();
+    }
+    return (h_l_type);
+}
+
+static inline abi_int
+host_to_target_lk_l_type(int h_l_type)
+{
+    abi_int l_type;
+    switch (h_l_type) {
+    case F_RDLCK:
+        l_type = TARGET_F_RDLCK;
+        break;
+    case F_UNLCK:
+        l_type = TARGET_F_UNLCK;
+        break;
+    case F_WRLCK:
+        l_type = TARGET_F_WRLCK;
+        break;
+    default:
+        abort();
+    }
+    return l_type;
+}
+
 /* fcntl(2) */
 static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         abi_ulong arg3)
 {
     abi_long ret;
+    abi_int l_type;
     struct host_fcntl_args host_cmd;
     struct flock fl;
     struct target_freebsd_flock *target_fl;
@@ -729,18 +770,20 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         if (!lock_user_struct(VERIFY_READ, target_fl, arg3, 1)) {
             return -TARGET_EFAULT;
         }
-        __get_user(fl.l_type, &target_fl->l_type);
+        __get_user(l_type, &target_fl->l_type);
         __get_user(fl.l_whence, &target_fl->l_whence);
         __get_user(fl.l_start, &target_fl->l_start);
         __get_user(fl.l_len, &target_fl->l_len);
         __get_user(fl.l_pid, &target_fl->l_pid);
         unlock_user_struct(target_fl, arg3, 0);
+        fl.l_type = target_to_host_lk_l_type(l_type);
         ret = get_errno(safe_fcntl(arg1, host_cmd.cmd, &fl));
         if (!is_error(ret)) {
             if (!lock_user_struct(VERIFY_WRITE, target_fl, arg3, 0)) {
                 return -TARGET_EFAULT;
             }
-            __put_user(fl.l_type, &target_fl->l_type);
+            l_type = host_to_target_lk_l_type(fl.l_type);
+            __put_user(l_type, &target_fl->l_type);
             __put_user(fl.l_whence, &target_fl->l_whence);
             __put_user(fl.l_start, &target_fl->l_start);
             __put_user(fl.l_len, &target_fl->l_len);
@@ -755,12 +798,13 @@ static inline abi_long do_freebsd_fcntl(abi_long arg1, abi_long arg2,
         if (!lock_user_struct(VERIFY_READ, target_fl, arg3, 1)) {
             return -TARGET_EFAULT;
         }
-        __get_user(fl.l_type, &target_fl->l_type);
+        __get_user(l_type, &target_fl->l_type);
         __get_user(fl.l_whence, &target_fl->l_whence);
         __get_user(fl.l_start, &target_fl->l_start);
         __get_user(fl.l_len, &target_fl->l_len);
         __get_user(fl.l_pid, &target_fl->l_pid);
         unlock_user_struct(target_fl, arg3, 0);
+        fl.l_type = target_to_host_lk_l_type(l_type);
         ret = get_errno(safe_fcntl(arg1, host_cmd.cmd, &fl));
         break;
 

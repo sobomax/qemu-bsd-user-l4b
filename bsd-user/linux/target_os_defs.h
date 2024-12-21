@@ -823,10 +823,6 @@ static const typeof(INFTIM) HOST_INFTIM = INFTIM;
 #undef TARGET_ENOTSOCK
 #endif /* found in: sys/errno.h */
 #define TARGET_ENOTSOCK	38		/* Socket operation on non-socket */
-#if defined(TARGET_ENOTSUP)
-#undef TARGET_ENOTSUP
-#endif /* found in: sys/errno.h */
-#define TARGET_ENOTSUP		EOPNOTSUPP	/* Operation not supported */
 #if defined(TARGET_ENOTTY)
 #undef TARGET_ENOTTY
 #endif /* found in: sys/errno.h */
@@ -4311,6 +4307,18 @@ static const typeof(F_SETLKW) HOST_F_SETLKW = F_SETLKW;
 #endif /* found in: sys/fcntl.h */
 #undef F_SETLKW
 #define F_SETLKW	13		/* F_SETLK; wait if blocked */
+#if defined(TARGET_F_RDLCK)
+#undef TARGET_F_RDLCK
+#endif /* found in: sys/fcntl.h */
+#define TARGET_F_RDLCK		1		/* shared or read lock */
+#if defined(TARGET_F_UNLCK)
+#undef TARGET_F_UNLCK
+#endif /* found in: sys/fcntl.h */
+#define TARGET_F_UNLCK		2		/* unlock */
+#if defined(TARGET_F_WRLCK)
+#undef TARGET_F_WRLCK
+#endif /* found in: sys/fcntl.h */
+#define TARGET_F_WRLCK		3		/* exclusive or write lock */
 #if defined(TARGET_UTIME_NOW)
 #undef TARGET_UTIME_NOW
 #endif /* found in: sys/stat.h */
