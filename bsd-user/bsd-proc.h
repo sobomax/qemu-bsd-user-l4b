@@ -21,6 +21,9 @@
 #define BSD_PROC_H
 
 #include <sys/resource.h>
+#if defined(__linux__)
+#include <grp.h>
+#endif
 
 #include "qemu-bsd.h"
 #include "gdbstub/syscalls.h"
@@ -42,7 +45,6 @@ static inline abi_long do_bsd_exit(void *cpu_env, abi_long arg1)
 /* getgroups(2) */
 static inline abi_long do_bsd_getgroups(abi_long gidsetsize, abi_long arg2)
 {
-#if !defined(__linux__)
     abi_long ret;
     uint32_t *target_grouplist;
     g_autofree gid_t *grouplist;
@@ -63,15 +65,11 @@ static inline abi_long do_bsd_getgroups(abi_long gidsetsize, abi_long arg2)
         }
     }
     return ret;
-#else
-    abort();
-#endif
 }
 
 /* setgroups(2) */
 static inline abi_long do_bsd_setgroups(abi_long gidsetsize, abi_long arg2)
 {
-#if !defined(__linux__)
     uint32_t *target_grouplist;
     g_autofree gid_t *grouplist;
     int i;
@@ -86,9 +84,6 @@ static inline abi_long do_bsd_setgroups(abi_long gidsetsize, abi_long arg2)
     }
     unlock_user(target_grouplist, arg2, 0);
     return get_errno(setgroups(gidsetsize, grouplist));
-#else
-    abort();
-#endif
 }
 
 /* umask(2) */
