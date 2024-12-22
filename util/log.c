@@ -85,6 +85,25 @@ static void qemu_log_thread_cleanup(Notifier *n, void *unused)
     }
 }
 
+static FILE *
+qemu_safe_fopen(const char *fname)
+{
+    int fd = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd < 0)
+        return NULL;
+    for (int h_fd = FD_SETSIZE; h_fd > fd; h_fd--) {
+        if (fcntl(h_fd, F_GETFD) >= 0)
+            continue;
+        int r = dup2(fd, h_fd);
+        if (r < 0)
+            continue;
+        close(fd);
+        fd = h_fd;
+        break;
+    }
+    return fdopen(fd, "w");
+}
+
 /* Lock/unlock output. */
 
 static FILE *qemu_log_trylock_with_err(Error **errp)
@@ -96,7 +115,7 @@ static FILE *qemu_log_trylock_with_err(Error **errp)
         if (log_per_thread) {
             g_autofree char *filename
                 = g_strdup_printf(global_filename, log_thread_id());
-            logfile = fopen(filename, "w");
+            logfile = qemu_safe_fopen(filename);
             if (!logfile) {
                 error_setg_errno(errp, errno,
                                  "Error opening logfile %s for thread %d",
@@ -317,7 +336,7 @@ static bool qemu_set_log_internal(const char *filename, bool changed_name,
                 }
                 qemu_log_unlock(logfile);
             } else {
-                logfile = fopen(filename, "w");
+                logfile = qemu_safe_fopen(filename);
                 if (!logfile) {
                     error_setg_errno(errp, errno, "Error opening logfile %s",
                                      filename);
