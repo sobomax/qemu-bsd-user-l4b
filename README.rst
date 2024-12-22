@@ -1,3 +1,7 @@
+.. image:: bsd-user/linux/misc/qemu_l4b_logo.png
+   :alt: BSD-USER 4 LINUX Qemu Logo
+   :align: center
+
 =======================
 BSD-USER 4 LINUX README
 =======================
@@ -66,9 +70,6 @@ arguments.
 .. code-block:: shell
 
   % qemu-x86_64 -L /usr/lib/freebsd ~/.local/bin/ls -l
-
-  do_bsd_lpathconf: stub
-  ls: ./Makefile: No such file or directory
   total 13140
   lrwxrwxrwx   1 1000 sshrpc       31 Nov 23  2024 Makefile -> /tmp/qemu-bsd-user-l4b/Makefile
   -rw-rw-r--   1 1000 sshrpc     8028 Nov 25  2024 Makefile.mtest
@@ -79,11 +80,20 @@ arguments.
   drwxrwxr-x   3 1000 sshrpc        3 Nov 23  2024 accel
   -rw-rw-r--   1 1000 sshrpc      555 Nov 23  2024 alpha-linux-user-config-target.h
 
+You can also register an automatic binfmt handler to run FreeBSD binaries.
+
+.. code-block:: shell
+
+  % echo ':freebsd.x86-64:M:0:\x7f\x45\x4c\x46\x02\x01\x01\x09\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x3e\x00:\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:'"`realpath qemu-x86_64`:" | \
+      sudo tee /proc/sys/fs/binfmt_misc/register
+
 Status
 ======
 
-Most of the basic syscalls are working. Dynamic linking, shared library support, and so on.
+Most of the basic system tools are working. Dynamic linking, shared library support, networking
+and so on. It can complete "make -j80 buildworld" reliably.
+
 Things that are missing at the moment:
 
-* IPC and networking;
-* Threading.
+* Advanced IPC and networking (kevent/kqueue);
+* sysctl(name2oid) & friends.
