@@ -1412,7 +1412,7 @@ abi_long freebsd_rw_wrlock(abi_ulong target_addr, long fflag, size_t tsz,
                 tswap32(state));
             ret = get_errno(safe_futex(&target_urwlock->rw_state,
                 QEMU_UMTX_OP(UMTX_OP_WAKE), INT_MAX, NULL, NULL, 0));
-            return ret;
+            return (ret > 0) ? 0 : ret;
         }
         /* re-read the state */
         __get_user(state, &target_urwlock->rw_state);
@@ -1555,8 +1555,9 @@ abi_long freebsd_rw_unlock(abi_ulong target_addr)
     if (count != 0) {
         DEBUG_UMTX("<WAKE> %s: _umtx_op(%p, %d, 0x%x, NULL, NULL)\n",
                 __func__, &target_urwlock->rw_state, UMTX_OP_WAKE, count);
-        return get_errno(safe_futex(&target_urwlock->rw_state, QEMU_UMTX_OP(UMTX_OP_WAKE),
-                    count, NULL, NULL, 0));
+        int ret = safe_futex(&target_urwlock->rw_state, QEMU_UMTX_OP(UMTX_OP_WAKE),
+                    count, NULL, NULL, 0);
+        return get_errno((ret > 0) ? 0 : ret);
     } else {
         return 0;
     }
