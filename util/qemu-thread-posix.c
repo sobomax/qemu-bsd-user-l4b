@@ -497,7 +497,6 @@ typedef struct {
     void *(*start_routine)(void *);
     void *arg;
     char *name;
-    sem_t started;
 } QemuThreadArgs;
 
 static void *qemu_thread_start(void *args)
@@ -521,6 +520,7 @@ static void *qemu_thread_start(void *args)
     }
     QEMU_TSAN_ANNOTATE_THREAD_NAME(qemu_thread_args->name);
     g_free(qemu_thread_args->name);
+    g_free(qemu_thread_args);
 
     /*
      * GCC 11 with glibc 2.17 on PowerPC reports
@@ -538,7 +538,6 @@ static void *qemu_thread_start(void *args)
 #endif
 
     pthread_cleanup_push(qemu_thread_atexit_notify, NULL);
-    sem_post(&qemu_thread_args->started);
     r = start_routine(arg);
     pthread_cleanup_pop(1);
 
@@ -578,15 +577,9 @@ void qemu_thread_create(QemuThread *thread, const char *name,
     qemu_thread_args->name = g_strdup(name);
     qemu_thread_args->start_routine = start_routine;
     qemu_thread_args->arg = arg;
-    sem_init(&qemu_thread_args->started, 0, 0);
 
     err = pthread_create(&thread->thread, &attr,
                          qemu_thread_start, qemu_thread_args);
-
-    if (!err)
-        sem_wait(&qemu_thread_args->started);
-    sem_destroy(&qemu_thread_args->started);
-    g_free(qemu_thread_args);
 
     if (err)
         error_exit(err, __func__);

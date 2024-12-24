@@ -49,6 +49,9 @@ QemuEvent rcu_gp_event;
 static int in_drain_call_rcu;
 static QemuMutex rcu_registry_lock;
 static QemuMutex rcu_sync_lock;
+#ifdef CONFIG_POSIX
+static sem_t rcu_init_sem;
+#endif
 
 /*
  * Check whether a quiescent state was crossed between the beginning of
@@ -376,6 +379,9 @@ void rcu_register_thread(void)
     qemu_mutex_lock(&rcu_registry_lock);
     QLIST_INSERT_HEAD(&registry, get_ptr_rcu_reader(), node);
     qemu_mutex_unlock(&rcu_registry_lock);
+#ifdef CONFIG_POSIX
+    sem_post(&rcu_init_sem);
+#endif
 }
 
 void rcu_unregister_thread(void)
@@ -416,6 +422,11 @@ static void rcu_init_complete(void)
                        NULL, QEMU_THREAD_DETACHED);
 
     rcu_register_thread();
+#ifdef CONFIG_POSIX
+    for (int i=0; i < 2; i++)
+        sem_wait(&rcu_init_sem);
+    sem_destroy(&rcu_init_sem);
+#endif
 }
 
 static int atfork_depth = 1;
@@ -458,6 +469,7 @@ static void rcu_init_child(void)
     }
 
     memset(&registry, 0, sizeof(registry));
+    sem_init(&rcu_init_sem, 0, 0);
     rcu_init_complete();
 }
 #endif
@@ -467,6 +479,7 @@ static void __attribute__((__constructor__)) rcu_init(void)
     smp_mb_global_init();
 #ifdef CONFIG_POSIX
     pthread_atfork(rcu_init_lock, rcu_init_unlock, rcu_init_child);
+    sem_init(&rcu_init_sem, 0, 0);
 #endif
     rcu_init_complete();
 }
