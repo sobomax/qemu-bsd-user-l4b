@@ -35,7 +35,8 @@ testing with 24.04, but other versions might do just fine.
 .. code-block:: shell
 
   # apt update
-  # apt install [TO BE DETERMINED]
+  # apt install libelf-dev python-is-python3 python3-pip python3-setuptools \
+  ninja-build pkg-config libglib2.0-dev git libbsd-dev
 
 Next, you'll need to clone this repo. I like to use the directory 'bsd-user'
 for the fork.
@@ -49,7 +50,7 @@ for the fork.
   % mkdir 00-bsd-user
   % cd 00-bsd-user
   % ../configure --disable-system --static --target-list=x86_64-bsd-user
-  % gmake
+  % ninja
 
 The above takes a little while to build. I disable the qemu-system-* binaries
 since they take a longer time to build and aren't relevant to bsd-user. Other
@@ -95,5 +96,6 @@ and so on. It can complete "make -j80 buildworld" reliably.
 
 Things that are missing at the moment:
 
+* GDB support;
 * Advanced IPC and networking (kevent/kqueue);
 * sysctl(name2oid) & friends.
