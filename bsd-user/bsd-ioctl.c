@@ -83,6 +83,23 @@
 #define T2H_V(x) ((x) == TARGET__POSIX_VDISABLE ? _POSIX_VDISABLE : (x))
 #endif
 
+/* Utility function: Table-driven functions to translate bitmasks
+ * between host and target formats
+ */
+unsigned int host_to_target_bitmask_len(unsigned int host_mask,
+                                        const bitmask_transtbl *tbl,
+                                        size_t len)
+{
+    unsigned int target_mask = 0;
+
+    for (size_t i = 0; i < len; ++i) {
+        if ((host_mask & tbl[i].host_mask) == tbl[i].host_bits) {
+            target_mask |= tbl[i].target_bits;
+        }
+    }
+    return target_mask;
+}
+
 static void target_to_host_termios(void *dst, const void *src)
 {
     struct termios *host = dst;

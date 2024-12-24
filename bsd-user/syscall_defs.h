@@ -900,12 +900,12 @@ struct target_pollfd {
 #if !defined(__linux__)
 #undef  target_to_host_bitmask
 #define target_to_host_bitmask(x, tbl) (x)
+#undef  host_to_target_bitmask
+#define host_to_target_bitmask(x, tbl) (x)
 #else
 static const bitmask_transtbl ipc_flags_tbl[0];
 extern const bitmask_transtbl fcntl_flags_tbl[19];
 extern const bitmask_transtbl at_flags_tbl[5];
 #endif
-#undef  host_to_target_bitmask
-#define host_to_target_bitmask(x, tbl) (x)
 
 #endif /* SYSCALL_DEFS_H */
