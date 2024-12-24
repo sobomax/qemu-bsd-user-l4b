@@ -75,6 +75,6 @@ jobs:
           BASE_IMAGE=${{ env.BASE_IMAGE }}
         tags: ${{ env.BUILD_IMAGE }}
         platforms: ${{ env.PLATFORMS }}
-        push: false
+        push: true
         cache-from: ${{ env.CACHE_SPEC }}
         cache-to: ${{ env.CACHE_SPEC }},mode=max
