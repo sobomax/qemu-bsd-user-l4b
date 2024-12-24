@@ -77,7 +77,7 @@
 
 /* non-blocking and interrupt i/o */
 #define TARGET_EAGAIN           35              /* Resource temporarily unavailable */
-#define TARGET_EWOULDBLOCK      EAGAIN          /* Operation would block */
+#define TARGET_EWOULDBLOCK      TARGET_EAGAIN          /* Operation would block */
 #define TARGET_EINPROGRESS      36              /* Operation now in progress */
 #define TARGET_EALREADY 37              /* Operation already in progress */
 
