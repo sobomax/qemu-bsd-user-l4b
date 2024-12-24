@@ -52,17 +52,7 @@ struct target_umtx {
     abi_ulong   u_owner;    /* Owner of the mutex. */
 };
 
-struct target_umutex {
-    uint32_t    m_owner;    /* Owner of the mutex */
-    uint32_t    m_flags;    /* Flags of the mutex */
-    uint32_t    m_ceiling[2];   /* Priority protect ceiling */
-    abi_ulong   m_rb_lnk;   /* Robust linkage. */
-#if TARGET_ABI_BITS == 32
-    uint32_t    m_pad;
-#endif
-    uint32_t    m_spare;
-    uint32_t    m_count;    /* Qemu-internal; takes one spare. */
-};
+#define m_count m_spare[1]
 
 struct target_ucond {
     uint32_t    c_has_waiters;  /* Has waiters in kernel */
@@ -113,7 +103,7 @@ pthread_mutex_t *new_freebsd_thread_lock_ptr = &new_thread_lock;
 static pthread_mutex_t umtx_wait_lck = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t *freebsd_umtx_wait_lck_ptr = &umtx_wait_lck;
 
-static void rtp_to_schedparam(const struct rtprio *rtp, int *policy,
+static void rtp_to_schedparam(const struct target_rtprio *rtp, int *policy,
         struct sched_param *param)
 {
 
@@ -184,7 +174,7 @@ void *new_freebsd_thread_start(void *arg)
 /*
  * FreeBSD user mutex (_umtx) emulation
  */
-static int tcmpset_al(abi_ulong *addr, abi_ulong a, abi_ulong b)
+static int tcmpset_al(volatile abi_ulong *addr, abi_ulong a, abi_ulong b)
 {
 #if !defined(__linux__)
     abi_ulong current = tswapal(a);
@@ -225,7 +215,7 @@ static struct umutex _cv_mutex;
 #endif
 
 #if !defined(_UMTX_OPTIMIZED) || defined(__linux__)
-static int tcmpset_32(uint32_t *addr, uint32_t a, uint32_t b)
+static int tcmpset_32(volatile uint32_t *addr, uint32_t a, uint32_t b)
 {
     uint32_t current = tswap32(a);
     uint32_t new = tswap32(b);
@@ -480,15 +470,15 @@ abi_long freebsd_umtx_mutex_wake2(abi_ulong target_addr, uint32_t flags)
     }
     pthread_mutex_lock(&umtx_wait_lck);
     __get_user(count, &target_umutex->m_count);
-    __get_user(owner, &target_umutex->m_owner);
+    __get_user(owner, (uint32_t *)&target_umutex->m_owner);
     while ((owner & TARGET_UMUTEX_CONTESTED) == 0 && (count > 1 ||
             (count == 1 && (owner & ~TARGET_UMUTEX_CONTESTED) != 0))) {
-        if (tcmpset_32(&target_umutex->m_owner, owner,
+        if (tcmpset_32((uint32_t *)&target_umutex->m_owner, owner,
                     (owner | TARGET_UMUTEX_CONTESTED)))
             break;
 
         /* owner has changed */
-        __get_user(owner, &target_umutex->m_owner);
+        __get_user(owner, (uint32_t *)&target_umutex->m_owner);
     }
     pthread_mutex_unlock(&umtx_wait_lck);
     addr = (uint32_t *)&target_umutex->m_owner;
@@ -745,7 +735,7 @@ abi_long freebsd_umtx_sem_wake(abi_ulong obj)
 
 int t2h_freebsd_rtprio(struct sched_param *host_rtp, abi_ulong target_addr)
 {
-    struct target_freebsd_rtprio *target_rtp;
+    struct target_rtprio *target_rtp;
     int policy;
     int type, prio;
 
@@ -789,7 +779,7 @@ int t2h_freebsd_rtprio(struct sched_param *host_rtp, abi_ulong target_addr)
 
 abi_long h2t_freebsd_rtprio(int host_policy, const struct sched_param *host_rtp, abi_ulong target_addr)
 {
-    struct target_freebsd_rtprio *target_rtp;
+    struct target_rtprio *target_rtp;
     abi_long target_type, target_prio;
 
     int hpmin = sched_get_priority_min(host_policy);
@@ -1001,7 +991,7 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
 
     for (;;) {
 
-        __get_user(owner, &target_umutex->m_owner);
+        __get_user(owner, (uint32_t *)&target_umutex->m_owner);
 
         if ((owner & ~TARGET_UMUTEX_CONTESTED) == 0) {
             /* Lock is unowned. */
@@ -1013,8 +1003,8 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
 
             /* Attempt to acquire it, preserve the contested bit ("owner"). */
             while ((owner & ~TARGET_UMUTEX_CONTESTED) == 0 &&
-                    !tcmpset_32(&target_umutex->m_owner, owner, owner | id)) {
-                __get_user(owner, &target_umutex->m_owner);
+                    !tcmpset_32((uint32_t *)&target_umutex->m_owner, owner, owner | id)) {
+                __get_user(owner, (uint32_t *)&target_umutex->m_owner);
             }
 
             if ((owner & ~TARGET_UMUTEX_CONTESTED) == 0) {
@@ -1043,7 +1033,7 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
 
         /* Set the contested bit and sleep. */
         while ((owner & TARGET_UMUTEX_CONTESTED) == 0) {
-            if (tcmpset_32(&target_umutex->m_owner, owner,
+            if (tcmpset_32((uint32_t *)&target_umutex->m_owner, owner,
                     owner | TARGET_UMUTEX_CONTESTED)) {
                 /*
                  * Keep our local view of owner consistent with what we think
@@ -1054,7 +1044,7 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
 
                 break;
             } else {
-                __get_user(owner, &target_umutex->m_count);
+                __get_user(owner, (uint32_t *)&target_umutex->m_count);
             }
         }
 
@@ -1068,7 +1058,7 @@ abi_long freebsd_lock_umutex(abi_ulong target_addr, uint32_t id,
         __put_user(count, &target_umutex->m_count);
         pthread_mutex_unlock(&umtx_wait_lck);
 
-        addr = &target_umutex->m_owner;
+        addr = (uint32_t *)&target_umutex->m_owner;
 
         unlock_user_struct(target_umutex, target_addr, 1);
 
@@ -1112,7 +1102,7 @@ abi_long freebsd_unlock_umutex(abi_ulong target_addr, uint32_t id)
         return -TARGET_EFAULT;
     }
     /* Make sure we own this mutex. */
-    __get_user(owner, &target_umutex->m_owner);
+    __get_user(owner, (uint32_t *)&target_umutex->m_owner);
     if ((owner & ~TARGET_UMUTEX_CONTESTED) != id) {
         unlock_user_struct(target_umutex, target_addr, 1);
         return -TARGET_EPERM;
@@ -1124,10 +1114,10 @@ abi_long freebsd_unlock_umutex(abi_ulong target_addr, uint32_t id)
     flags = TARGET_UMUTEX_UNOWNED;
     if (count > 1)
         flags |= TARGET_UMUTEX_CONTESTED;
-    __put_user(flags, &target_umutex->m_owner);
+    __put_user(flags, (void *)&target_umutex->m_owner);
     pthread_mutex_unlock(&umtx_wait_lck);
 
-    addr = &target_umutex->m_owner;
+    addr = (uint32_t *)&target_umutex->m_owner;
 
     unlock_user_struct(target_umutex, target_addr, 1);
 
@@ -1621,8 +1611,8 @@ abi_long do_freebsd_thr_new(CPUArchState *env,
     CPUState *new_cpu;
     struct target_freebsd_thr_param *target_param;
     abi_ulong target_rtp_addr;
-    struct target_freebsd_rtprio *target_rtp;
-    struct rtprio *rtp_ptr, rtp;
+    struct target_rtprio *target_rtp;
+    struct target_rtprio *rtp_ptr, rtp;
     CPUState *cpu = env_cpu(env);
     TaskState *parent_ts = (TaskState *)cpu->opaque;
     sigset_t sigmask;

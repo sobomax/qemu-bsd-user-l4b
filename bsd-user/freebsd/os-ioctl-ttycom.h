@@ -62,7 +62,7 @@
 #define TARGET_IXOFF    0x00000400  /* enable input flow control */
 #define TARGET_IXANY    0x00000800  /* any char will restart after stop */
 #define TARGET_IMAXBEL  0x00002000  /* ring bell on input queue full */
-
+#define TARGET_IUTF8    0x00004000  /* assume input is utf-8 encoded */
 /*
  * Output flags - software output processing
  */
@@ -118,6 +118,33 @@
 #define TARGET_NOKERNINFO 0x02000000    /* no kernel output from VSTATUS */
 #define TARGET_PENDIN   0x20000000  /* XXX retype pending input (state) */
 #define TARGET_NOFLSH   0x80000000  /* don't flush after interrupt */
+#define TARGET_NL1      0x00000100  /* tty 37 */
+#define TARGET_CR1      0x00001000  /* tn 300 */
+#define TARGET_CR2      0x00002000  /* tty 37 */
+#define TARGET_CR3      0x00003000  /* concept 100 */
+#define TARGET_FF1      0x00004000  /* tty 37 */
+#define TARGET_BS1      0x00008000
+
+#define TARGET_B0      0
+#define TARGET_B50     50
+#define TARGET_B75     75
+#define TARGET_B110    110
+#define TARGET_B134    134
+#define TARGET_B150    150
+#define TARGET_B200    200
+#define TARGET_B300    300
+#define TARGET_B600    600
+#define TARGET_B1200   1200
+#define TARGET_B1800   1800
+#define TARGET_B2400   2400
+#define TARGET_B4800   4800
+#define TARGET_B9600   9600
+#define TARGET_B19200  19200
+#define TARGET_B38400  38400
+#define TARGET_B57600  57600
+#define TARGET_B115200 115200
+#define TARGET_B230400 230400
+#define TARGET_B460800 460800
 
 struct target_termios {
     uint32_t c_iflag;   /* input flags */

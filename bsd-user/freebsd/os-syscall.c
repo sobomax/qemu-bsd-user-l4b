@@ -26,6 +26,11 @@
 #include <sys/mount.h>
 #include <sys/sysctl.h>
 #include <poll.h>
+#if !defined(__linux__)
+#define COMPAT_43TTY
+#include <sys/ioctl_compat.h>
+#endif
+#include <termios.h>
 
 #include "include/gdbstub/syscalls.h"
 
@@ -37,6 +42,7 @@
 
 /* BSD independent syscall shims */
 #include "bsd-file.h"
+#include "os-ioctl-ttycom.h"
 #include "bsd-ioctl.h"
 #include "bsd-mem.h"
 #include "bsd-misc.h"

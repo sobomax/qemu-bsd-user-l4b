@@ -518,7 +518,7 @@ static inline abi_long do_freebsd11_getdents(abi_long arg1,
 {
 #if !defined(__linux__)
     abi_long ret;
-    struct freebsd11_dirent *dirp;
+    struct target_freebsd11_dirent *dirp;
 
     dirp = lock_user(VERIFY_WRITE, arg2, nbytes, 0);
     if (dirp == NULL) {
@@ -526,7 +526,7 @@ static inline abi_long do_freebsd11_getdents(abi_long arg1,
     }
     ret = get_errno(freebsd11_getdents(arg1, (char *)dirp, nbytes));
     if (!is_error(ret)) {
-        struct freebsd11_dirent *de;
+        struct target_freebsd11_dirent *de;
         int len = ret;
         int reclen;
 
@@ -555,7 +555,7 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
         abi_ulong arg2, abi_long nbytes, abi_ulong arg4)
 {
     abi_long ret;
-    struct freebsd11_dirent *dirp;
+    struct target_freebsd11_dirent *dirp;
     struct dirent *adirp;
     off_t basep;
 
@@ -563,7 +563,7 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
     if (dirp == NULL) {
         return -TARGET_EFAULT;
     }
-    int h_nbytes = (nbytes * offsetof(struct dirent, d_name)) / offsetof(struct freebsd11_dirent, d_name);
+    int h_nbytes = (nbytes * offsetof(struct dirent, d_name)) / offsetof(struct target_freebsd11_dirent, d_name);
     adirp = aligned_alloca(h_nbytes, __alignof__(*adirp));
     if (adirp == NULL) {
         ret = -TARGET_ENOMEM;
@@ -572,7 +572,7 @@ static inline abi_long do_freebsd11_getdirentries(abi_long arg1,
     ret = get_errno(getdirentries(arg1, (char *)adirp, h_nbytes, &basep));
     if (ret <= 0)
         goto out;
-    struct freebsd11_dirent *tde = dirp;
+    struct target_freebsd11_dirent *tde = dirp;
     struct dirent *hde = adirp;
     int len = ret;
     ret = 0;
