@@ -809,8 +809,7 @@ static abi_long freebsd_syscall(void *cpu_env, int num, abi_long arg1,
         break;
 
     case TARGET_FREEBSD_NR_mkdirat: /* mkdirat(2) */
-        ret = do_bsd_mkdirat(arg1, arg2,
-                target_to_host_bitmask(arg3, at_flags_tbl));
+        ret = do_bsd_mkdirat(arg1, arg2, arg3);
         break;
 
     case TARGET_FREEBSD_NR_rmdir: /* rmdir(2) (XXX no rmdirat()?) */

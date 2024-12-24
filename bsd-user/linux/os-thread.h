@@ -295,7 +295,7 @@ static inline abi_long do_freebsd__umtx_op(abi_ulong obj, int op, abi_ulong val,
 {
     abi_long ret;
 #if defined(_UMTX_OPTIMIZED) || defined(__linux__)
-    struct _umtx_time ut[2];
+    struct target__umtx_time ut[2];
     size_t utsz;
     long tid;
 #endif

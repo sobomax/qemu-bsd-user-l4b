@@ -75,6 +75,14 @@
 #include "os-ioctl-sockio.h"
 #include "os-ioctl-ttycom.h"
 
+#if !defined(__linux__)
+#define H2T_V(x)
+#define T2H_V(x)
+#else
+#define H2T_V(x) ((x) == _POSIX_VDISABLE ? TARGET__POSIX_VDISABLE : (x))
+#define T2H_V(x) ((x) == TARGET__POSIX_VDISABLE ? _POSIX_VDISABLE : (x))
+#endif
+
 static void target_to_host_termios(void *dst, const void *src)
 {
     struct termios *host = dst;
@@ -86,40 +94,40 @@ static void target_to_host_termios(void *dst, const void *src)
     host->c_lflag = target_to_host_bitmask(tswap32(target->c_lflag), lflag_tbl);
 
     memset(host->c_cc, 0, sizeof(host->c_cc));
-    host->c_cc[HOST_VEOF] = target->c_cc[TARGET_VEOF];
-    host->c_cc[HOST_VEOL] = target->c_cc[TARGET_VEOL];
+    host->c_cc[VEOF] = T2H_V(target->c_cc[TARGET_VEOF]);
+    host->c_cc[VEOL] = T2H_V(target->c_cc[TARGET_VEOL]);
 #ifdef VEOL2
-    host->c_cc[HOST_VEOL2] = target->c_cc[TARGET_VEOL2];
+    host->c_cc[VEOL2] = T2H_V(target->c_cc[TARGET_VEOL2]);
 #endif
-    host->c_cc[HOST_VERASE] = target->c_cc[TARGET_VERASE];
+    host->c_cc[VERASE] = T2H_V(target->c_cc[TARGET_VERASE]);
 #ifdef VWERASE
-    host->c_cc[HOST_VWERASE] = target->c_cc[TARGET_VWERASE];
+    host->c_cc[VWERASE] = T2H_V(target->c_cc[TARGET_VWERASE]);
 #endif
-    host->c_cc[HOST_VKILL] = target->c_cc[TARGET_VKILL];
+    host->c_cc[VKILL] = T2H_V(target->c_cc[TARGET_VKILL]);
 #ifdef VREPRINT
-    host->c_cc[HOST_VREPRINT] = target->c_cc[TARGET_VREPRINT];
+    host->c_cc[VREPRINT] = T2H_V(target->c_cc[TARGET_VREPRINT]);
 #endif
 #ifdef VERASE2
-    host->c_cc[HOST_VERASE2] = target->c_cc[TARGET_VERASE2];
+    host->c_cc[VERASE2] = T2H_V(target->c_cc[TARGET_VERASE2]);
 #endif
-    host->c_cc[HOST_VINTR] = target->c_cc[TARGET_VINTR];
-    host->c_cc[HOST_VQUIT] = target->c_cc[TARGET_VQUIT];
-    host->c_cc[HOST_VSUSP] = target->c_cc[TARGET_VSUSP];
+    host->c_cc[VINTR] = T2H_V(target->c_cc[TARGET_VINTR]);
+    host->c_cc[VQUIT] = T2H_V(target->c_cc[TARGET_VQUIT]);
+    host->c_cc[VSUSP] = T2H_V(target->c_cc[TARGET_VSUSP]);
 #ifdef VDSUSP
-    host->c_cc[HOST_VDSUSP] = target->c_cc[TARGET_VDSUSP];
+    host->c_cc[VDSUSP] = T2H_V(target->c_cc[TARGET_VDSUSP]);
 #endif
-    host->c_cc[HOST_VSTART] = target->c_cc[TARGET_VSTART];
-    host->c_cc[HOST_VSTOP] = target->c_cc[TARGET_VSTOP];
+    host->c_cc[VSTART] = T2H_V(target->c_cc[TARGET_VSTART]);
+    host->c_cc[VSTOP] = T2H_V(target->c_cc[TARGET_VSTOP]);
 #ifdef VLNEXT
-    host->c_cc[HOST_VLNEXT] = target->c_cc[TARGET_VLNEXT];
+    host->c_cc[VLNEXT] = T2H_V(target->c_cc[TARGET_VLNEXT]);
 #endif
 #ifdef VDISCARD
-    host->c_cc[HOST_VDISCARD] = target->c_cc[TARGET_VDISCARD];
+    host->c_cc[VDISCARD] = T2H_V(target->c_cc[TARGET_VDISCARD]);
 #endif
-    host->c_cc[HOST_VMIN] = target->c_cc[TARGET_VMIN];
-    host->c_cc[HOST_VTIME] = target->c_cc[TARGET_VTIME];
+    host->c_cc[VMIN] = T2H_V(target->c_cc[TARGET_VMIN]);
+    host->c_cc[VTIME] = T2H_V(target->c_cc[TARGET_VTIME]);
 #ifdef VSTATUS
-    host->c_cc[HOST_VSTATUS] = target->c_cc[TARGET_VSTATUS];
+    host->c_cc[VSTATUS] = T2H_V(target->c_cc[TARGET_VSTATUS]);
 #endif
 
     host->c_ispeed = tswap32(target->c_ispeed);
@@ -137,40 +145,40 @@ static void host_to_target_termios(void *dst, const void *src)
     target->c_lflag = tswap32(host_to_target_bitmask(host->c_lflag, lflag_tbl));
 
     memset(target->c_cc, 0, sizeof(target->c_cc));
-    target->c_cc[TARGET_VEOF] = host->c_cc[HOST_VEOF];
-    target->c_cc[TARGET_VEOL] = host->c_cc[HOST_VEOL];
+    target->c_cc[TARGET_VEOF] = H2T_V(host->c_cc[VEOF]);
+    target->c_cc[TARGET_VEOL] = H2T_V(host->c_cc[VEOL]);
 #ifdef VEOL2
-    target->c_cc[TARGET_VEOL2] = host->c_cc[HOST_VEOL2];
+    target->c_cc[TARGET_VEOL2] = H2T_V(host->c_cc[VEOL2]);
 #endif
-    target->c_cc[TARGET_VERASE] = host->c_cc[HOST_VERASE];
+    target->c_cc[TARGET_VERASE] = H2T_V(host->c_cc[VERASE]);
 #ifdef VWERASE
-    target->c_cc[TARGET_VWERASE] = host->c_cc[HOST_VWERASE];
+    target->c_cc[TARGET_VWERASE] = H2T_V(host->c_cc[VWERASE]);
 #endif
-    target->c_cc[TARGET_VKILL] = host->c_cc[HOST_VKILL];
+    target->c_cc[TARGET_VKILL] = H2T_V(host->c_cc[VKILL]);
 #ifdef VREPRINT
-    target->c_cc[TARGET_VREPRINT] = host->c_cc[HOST_VREPRINT];
+    target->c_cc[TARGET_VREPRINT] = H2T_V(host->c_cc[VREPRINT]);
 #endif
 #ifdef VERASE2
-    target->c_cc[TARGET_VERASE2] = host->c_cc[HOST_VERASE2];
+    target->c_cc[TARGET_VERASE2] = H2T_V(host->c_cc[VERASE2]);
 #endif
-    target->c_cc[TARGET_VINTR] = host->c_cc[HOST_VINTR];
-    target->c_cc[TARGET_VQUIT] = host->c_cc[HOST_VQUIT];
-    target->c_cc[TARGET_VSUSP] = host->c_cc[HOST_VSUSP];
+    target->c_cc[TARGET_VINTR] = H2T_V(host->c_cc[VINTR]);
+    target->c_cc[TARGET_VQUIT] = H2T_V(host->c_cc[VQUIT]);
+    target->c_cc[TARGET_VSUSP] = H2T_V(host->c_cc[VSUSP]);
 #ifdef VDSUSP
-    target->c_cc[TARGET_VDSUSP] = host->c_cc[HOST_VDSUSP];
+    target->c_cc[TARGET_VDSUSP] = H2T_V(host->c_cc[VDSUSP]);
 #endif
-    target->c_cc[TARGET_VSTART] = host->c_cc[HOST_VSTART];
-    target->c_cc[TARGET_VSTOP] = host->c_cc[HOST_VSTOP];
+    target->c_cc[TARGET_VSTART] = H2T_V(host->c_cc[VSTART]);
+    target->c_cc[TARGET_VSTOP] = H2T_V(host->c_cc[VSTOP]);
 #ifdef VLNEXT
-    target->c_cc[TARGET_VLNEXT] = host->c_cc[HOST_VLNEXT];
+    target->c_cc[TARGET_VLNEXT] = H2T_V(host->c_cc[VLNEXT]);
 #endif
 #ifdef VDISCARD
-    target->c_cc[TARGET_VDISCARD] = host->c_cc[HOST_VDISCARD];
+    target->c_cc[TARGET_VDISCARD] = H2T_V(host->c_cc[VDISCARD]);
 #endif
-    target->c_cc[TARGET_VMIN] = host->c_cc[HOST_VMIN];
-    target->c_cc[TARGET_VTIME] = host->c_cc[HOST_VTIME];
+    target->c_cc[TARGET_VMIN] = H2T_V(host->c_cc[VMIN]);
+    target->c_cc[TARGET_VTIME] = H2T_V(host->c_cc[VTIME]);
 #ifdef VSTATUS
-    target->c_cc[TARGET_VSTATUS] = host->c_cc[HOST_VSTATUS];
+    target->c_cc[TARGET_VSTATUS] = H2T_V(host->c_cc[VSTATUS]);
 #endif
 
     target->c_ispeed = tswap32(host->c_ispeed);
@@ -220,11 +228,11 @@ static IOCTLEntry ioctl_entries[] = {
 #define IOC_W   0x0002
 #define IOC_RW  (IOC_R | IOC_W)
 #define IOCTL(cmd, access, ...) \
-    { TARGET_ ## cmd, HOST_ ##cmd, #cmd, access, 0, { __VA_ARGS__ } },
+    { TARGET_ ## cmd, cmd, #cmd, access, 0, { __VA_ARGS__ } },
 #define IOCTL2(cmd, hcmd, access, ...) \
     { TARGET_ ## cmd, hcmd, #cmd, access, 0, { __VA_ARGS__ } },
 #define IOCTL_SPECIAL(cmd, access, dofn, ...) \
-    { TARGET_ ## cmd, HOST_ ##cmd, #cmd, access, dofn, { __VA_ARGS__ } },
+    { TARGET_ ## cmd, cmd, #cmd, access, dofn, { __VA_ARGS__ } },
 #define IOCTL_SPECIAL_UNIMPL(cmd, access, dofn, ...) \
     { TARGET_ ## cmd, 0, #cmd, access, dofn, { __VA_ARGS__ } },
 #include "os-ioctl-cmds.h"
@@ -234,25 +242,25 @@ static IOCTLEntry ioctl_entries[] = {
 static void log_unsupported_ioctl(unsigned long cmd)
 {
     gemu_log("cmd=0x%08lx dir=", cmd);
-    switch (cmd & IOC_DIRMASK) {
-    case IOC_VOID:
+    switch (cmd & TARGET_IOC_DIRMASK) {
+    case TARGET_IOC_VOID:
         gemu_log("VOID ");
         break;
-    case IOC_OUT:
+    case TARGET_IOC_OUT:
         gemu_log("OUT ");
         break;
-    case IOC_IN:
+    case TARGET_IOC_IN:
         gemu_log("IN  ");
         break;
-    case IOC_INOUT:
+    case TARGET_IOC_INOUT:
         gemu_log("INOUT");
         break;
     default:
-        gemu_log("%01lx ???", (cmd & IOC_DIRMASK) >> 29);
+        gemu_log("%01lx ???", (cmd & TARGET_IOC_DIRMASK) >> 29);
         break;
     }
-    gemu_log(" '%c' %3d %lu\n", (char)IOCGROUP(cmd), (int)(cmd & 0xff),
-             IOCPARM_LEN(cmd));
+    gemu_log(" '%c' %3d %lu\n", (char)TARGET_IOCGROUP(cmd), (int)(cmd & 0xff),
+             TARGET_IOCPARM_LEN(cmd));
 }
 
 #if !defined(__linux__)
