@@ -333,7 +333,7 @@ qemu_set_binfmts() {
         fi
 
         qemu="$qemu$QEMU_SUFFIX"
-        if [ "$host_family" != "$family" ] ; then
+        if [ "$host_family" != "$family" -a -e "$qemu" ] ; then
             $BINFMT_SET
         fi
     done
