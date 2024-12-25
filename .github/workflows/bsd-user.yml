@@ -64,7 +64,7 @@ jobs:
         echo "OS_TAG=${OS_TAG}" >> $GITHUB_ENV
         echo "BUILD_IMAGE=${{ env.GHCR_REPO }}:latest-${OS_TAG}" >> $GITHUB_ENV
 
-    - name: Build Docker image
+    - name: Build L4B Qemu container image
       uses: docker/build-push-action@v6
       env:
         CACHE_SPEC: "type=registry,ref=${{ env.GHCR_REPO }}:${{ env.GIT_BRANCH }}-${{ env.OS_TAG}}-buildcache"
@@ -78,3 +78,19 @@ jobs:
         push: true
         cache-from: ${{ env.CACHE_SPEC }}
         cache-to: ${{ env.CACHE_SPEC }},mode=max
+
+    - name: Register FreeBSD binfmt
+      run: |
+       docker run --rm --privileged ${{ env.BUILD_IMAGE }}
+
+    - name: Build FreeBSD/base container image
+      uses: docker/build-push-action@v6
+      with:
+        context: ./bsd-user/scripts/ci
+        file: ./bsd-user/scripts/ci/Dockerfile.FreeBSD_base
+        build-args: |
+          BASE_IMAGE=${{ env.BASE_IMAGE }}
+          BUILD_IMAGE=${{ env.BUILD_IMAGE }}
+        tags: "${{ env.BUILD_IMAGE }}-freebsd141"
+        platforms: ${{ env.PLATFORMS }}
+        push: true
