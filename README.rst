@@ -88,6 +88,26 @@ You can also register an automatic binfmt handler to run FreeBSD binaries.
   % echo ':freebsd.x86-64:M:0:\x7f\x45\x4c\x46\x02\x01\x01\x09\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x3e\x00:\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:'"`realpath qemu-x86_64`:" | \
       sudo tee /proc/sys/fs/binfmt_misc/register
 
+There is also a pre-built Docker container published at the GitHub Container
+Registry.
+
+Register FreeBSD binfmt:
+
+.. code-block:: shell
+
+  % docker pull ghcr.io/sobomax/qemu-bsd-user-l4b:latest-ubuntu-latest
+  % docker run --rm --privileged ghcr.io/sobomax/qemu-bsd-user-l4b:latest-ubuntu-latest
+  Setting /usr/bin/qemu-freebsd_x86_64-static as binfmt interpreter for freebsd_x86_64
+
+Run the container:
+
+.. code-block:: shell
+
+  % docker pull ghcr.io/sobomax/qemu-bsd-user-l4b:latest-ubuntu-latest-freebsd141
+  % docker run -t -i --rm ghcr.io/sobomax/qemu-bsd-user-l4b:latest-ubuntu-latest-freebsd141
+  # uname -a
+  FreeBSD 400c43270c7d 14.1-QEMU-L4B FreeBSD 14.1-QEMU-L4B amd64
+
 Status
 ======
 
