@@ -1248,7 +1248,7 @@ static inline void sysctl_oidfmt(uint32_t *holdp)
 #if defined(__linux__)
 static inline int sysctlnametomib(const char *name, int *mibp, size_t *sizep)
 {
-	qemu_log("sysctlnametomib(%s): not implemented yed\n", name);
+	qemu_log("sysctlnametomib(%s): not implemented yet\n", name);
 	return -TARGET_ENOENT;
 }
 
