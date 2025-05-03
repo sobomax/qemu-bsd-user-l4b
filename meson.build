@@ -2197,6 +2197,9 @@ if not get_option('libdw').auto() or \
                        method: 'pkg-config',
                        required: get_option('libdw'))
 endif
+# Add libkqueue dependency
+libkqueue = not_found
+libkqueue = dependency('libkqueue', method: 'pkg-config')
 
 #################
 # config-host.h #
@@ -4016,6 +4019,8 @@ foreach target : target_dirs
   target_base_arch = config_target['TARGET_BASE_ARCH']
   arch_srcs = [config_target_h[target]]
   arch_deps = []
+# FIXME: Force it to link against libkqueue. Temporary solution
+  arch_deps += libkqueue
   c_args = ['-DCOMPILING_PER_TARGET',
             '-DCONFIG_TARGET="@0@-config-target.h"'.format(target),
             '-DCONFIG_DEVICES="@0@-config-devices.h"'.format(target)]
