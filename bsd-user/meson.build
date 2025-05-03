@@ -27,7 +27,10 @@ if host_os != 'linux'
   kvm = cc.find_library('kvm', required: true)
   bsd_user_ss.add(elf, procstat, kvm)
 else
-  bsd_user_ss.add(elf)
+  # Add libkqueue dependency
+  libkqueue = not_found
+  libkqueue = dependency('libkqueue', method: 'pkg-config', static: true)
+  bsd_user_ss.add(elf, libkqueue)
 endif
 
 # Pull in the OS-specific build glue, if any
