@@ -11,13 +11,17 @@ RUN ${APT_UPDATE}
 ARG CLANG_VER=19
 ARG BUILD_PKGS="libelf-dev llvm-${CLANG_VER} clang-${CLANG_VER} python-is-python3 \
   python3-pip python3-setuptools ninja-build pkg-config libglib2.0-dev git \
-  libbsd-dev curl tar xz-utils"
+  libbsd-dev curl tar xz-utils cmake make"
 WORKDIR /src
 RUN --mount=type=bind,source=bsd-user/scripts/ci/pre-build.sh,target=pre-build.sh \
   ./pre-build.sh
 RUN ${APT_INSTALL} ${BUILD_PKGS}
 ARG TARGETPLATFORM
 ARG BASE_IMAGE
+RUN --mount=type=bind,target=. \
+  eval `./bsd-user/scripts/ci/get-arch-buildargs platformopts` && \
+  CMAKE_PARAMS="`./bsd-user/scripts/ci/get-arch-buildargs cmakeopts`" \
+   bsd-user/scripts/ci/install-depends.sh
 RUN mkdir -p /tmp/world/bin
 RUN --mount=type=bind,target=.,rw \
   eval `./bsd-user/scripts/ci/get-arch-buildargs platformopts` && \

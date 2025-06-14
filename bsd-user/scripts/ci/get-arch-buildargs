@@ -58,10 +58,27 @@ platformopts() {
   test ! -z "${@}" && echo "${@}"
 }
 
+cmakeopts() {
+  case "${BASE_IMAGE}" in
+  debian:*)
+    case "${TARGETPLATFORM}" in
+    linux/arm/v5)
+      echo "-DLIBATOMIC_STATIC_PATH=/usr/lib/gcc/arm-linux-gnueabi/12"
+      ;;
+    esac
+    ;;
+  esac
+  test ! -z "${@}" && echo "${@}"
+}
+
 case "${1}" in
 platformopts)
   shift
   platformopts "${@}"
+  ;;
+cmakeopts)
+  shift
+  cmakeopts "${@}"
   ;;
 fltplatforms)
   fltplatforms
