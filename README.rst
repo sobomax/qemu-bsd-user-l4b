@@ -117,5 +117,4 @@ and so on. It can complete "make -j80 buildworld" reliably.
 Things that are missing at the moment:
 
 * GDB support;
-* Advanced IPC and networking (kevent/kqueue);
 * sysctl(name2oid) & friends.
