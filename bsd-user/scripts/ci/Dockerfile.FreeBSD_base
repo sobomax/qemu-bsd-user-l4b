@@ -12,9 +12,9 @@ ARG BUILD_PKGS="ca-certificates curl tar xz-utils"
 RUN ${APT_UPDATE} && ${APT_INSTALL} ${BUILD_PKGS}
 
 RUN mkdir -p /tmp/world
-RUN curl -o - -L https://download.freebsd.org/releases/amd64/14.1-RELEASE/base.txz | \
+RUN curl -o - -L https://download.freebsd.org/releases/amd64/14.3-RELEASE/base.txz | \
   tar -C /tmp/world --exclude ./sys -xJf -
-RUN curl -o - -L https://download.freebsd.org/releases/amd64/14.1-RELEASE/src.txz | \
+RUN curl -o - -L https://download.freebsd.org/releases/amd64/14.3-RELEASE/src.txz | \
   tar -C /tmp/world -xJf -
 
 ARG BUILD_IMAGE

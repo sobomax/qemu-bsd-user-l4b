@@ -27,7 +27,7 @@ RUN --mount=type=bind,target=.,rw \
   eval `./bsd-user/scripts/ci/get-arch-buildargs platformopts` && \
   bsd-user/scripts/ci/build.sh && cp build_ci/qemu-x86_64 /tmp/world/bin
 WORKDIR /tmp/world
-RUN curl -L https://download.freebsd.org/releases/amd64/14.1-RELEASE/base.txz -o - | \
+RUN curl -L https://download.freebsd.org/releases/amd64/14.3-RELEASE/base.txz -o - | \
   tar -C /tmp/world -xJf -
 RUN /tmp/world/bin/qemu-x86_64 -L /tmp/world /tmp/world/bin/echo "Hello World!"
 
