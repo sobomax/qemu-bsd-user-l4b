@@ -385,7 +385,7 @@ static const VMStateDescription vmstate_npcm7xx_gpio = {
     },
 };
 
-static Property npcm7xx_gpio_properties[] = {
+static const Property npcm7xx_gpio_properties[] = {
     /* Bit n set => pin n has pullup enabled by default. */
     DEFINE_PROP_UINT32("reset-pullup", NPCM7xxGPIOState, reset_pu, 0),
     /* Bit n set => pin n has pulldown enabled by default. */
@@ -394,10 +394,9 @@ static Property npcm7xx_gpio_properties[] = {
     DEFINE_PROP_UINT32("reset-osrc", NPCM7xxGPIOState, reset_osrc, 0),
     /* Bit n set => pin n has high drive strength by default. */
     DEFINE_PROP_UINT32("reset-odsc", NPCM7xxGPIOState, reset_odsc, 0),
-    DEFINE_PROP_END_OF_LIST(),
 };
 
-static void npcm7xx_gpio_class_init(ObjectClass *klass, void *data)
+static void npcm7xx_gpio_class_init(ObjectClass *klass, const void *data)
 {
     ResettableClass *reset = RESETTABLE_CLASS(klass);
     DeviceClass *dc = DEVICE_CLASS(klass);

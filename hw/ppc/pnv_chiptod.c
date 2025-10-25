@@ -23,7 +23,7 @@
  */
 
 #include "qemu/osdep.h"
-#include "sysemu/reset.h"
+#include "system/reset.h"
 #include "target/ppc/cpu.h"
 #include "qapi/error.h"
 #include "qemu/log.h"
@@ -450,14 +450,13 @@ static int pnv_chiptod_power9_dt_xscom(PnvXScomInterface *dev, void *fdt,
     return pnv_chiptod_dt_xscom(dev, fdt, xscom_offset, compat, sizeof(compat));
 }
 
-static Property pnv_chiptod_properties[] = {
+static const Property pnv_chiptod_properties[] = {
     DEFINE_PROP_BOOL("primary", PnvChipTOD, primary, false),
     DEFINE_PROP_BOOL("secondary", PnvChipTOD, secondary, false),
     DEFINE_PROP_LINK("chip", PnvChipTOD , chip, TYPE_PNV_CHIP, PnvChip *),
-    DEFINE_PROP_END_OF_LIST(),
 };
 
-static void pnv_chiptod_power9_class_init(ObjectClass *klass, void *data)
+static void pnv_chiptod_power9_class_init(ObjectClass *klass, const void *data)
 {
     PnvChipTODClass *pctc = PNV_CHIPTOD_CLASS(klass);
     DeviceClass *dc = DEVICE_CLASS(klass);
@@ -479,7 +478,7 @@ static const TypeInfo pnv_chiptod_power9_type_info = {
     .parent        = TYPE_PNV_CHIPTOD,
     .instance_size = sizeof(PnvChipTOD),
     .class_init    = pnv_chiptod_power9_class_init,
-    .interfaces    = (InterfaceInfo[]) {
+    .interfaces    = (const InterfaceInfo[]) {
         { TYPE_PNV_XSCOM_INTERFACE },
         { }
     }
@@ -493,7 +492,7 @@ static int pnv_chiptod_power10_dt_xscom(PnvXScomInterface *dev, void *fdt,
     return pnv_chiptod_dt_xscom(dev, fdt, xscom_offset, compat, sizeof(compat));
 }
 
-static void pnv_chiptod_power10_class_init(ObjectClass *klass, void *data)
+static void pnv_chiptod_power10_class_init(ObjectClass *klass, const void *data)
 {
     PnvChipTODClass *pctc = PNV_CHIPTOD_CLASS(klass);
     DeviceClass *dc = DEVICE_CLASS(klass);
@@ -515,7 +514,7 @@ static const TypeInfo pnv_chiptod_power10_type_info = {
     .parent        = TYPE_PNV_CHIPTOD,
     .instance_size = sizeof(PnvChipTOD),
     .class_init    = pnv_chiptod_power10_class_init,
-    .interfaces    = (InterfaceInfo[]) {
+    .interfaces    = (const InterfaceInfo[]) {
         { TYPE_PNV_XSCOM_INTERFACE },
         { }
     }
@@ -556,7 +555,7 @@ static void pnv_chiptod_unrealize(DeviceState *dev)
     qemu_unregister_reset(pnv_chiptod_reset, chiptod);
 }
 
-static void pnv_chiptod_class_init(ObjectClass *klass, void *data)
+static void pnv_chiptod_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
 

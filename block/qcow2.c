@@ -25,15 +25,15 @@
 #include "qemu/osdep.h"
 
 #include "block/qdict.h"
-#include "sysemu/block-backend.h"
+#include "system/block-backend.h"
 #include "qemu/main-loop.h"
 #include "qemu/module.h"
 #include "qcow2.h"
 #include "qemu/error-report.h"
 #include "qapi/error.h"
 #include "qapi/qapi-events-block-core.h"
-#include "qapi/qmp/qdict.h"
-#include "qapi/qmp/qstring.h"
+#include "qobject/qdict.h"
+#include "qobject/qstring.h"
 #include "trace.h"
 #include "qemu/option_int.h"
 #include "qemu/cutils.h"
@@ -1721,7 +1721,7 @@ qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
                 ret = -EINVAL;
                 goto fail;
             }
-        } else if (!(flags & BDRV_O_NO_IO)) {
+        } else {
             error_setg(errp, "Missing CRYPTO header for crypt method %d",
                        s->crypt_method_header);
             ret = -EINVAL;
@@ -1895,7 +1895,9 @@ qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
     g_free(s->image_data_file);
     if (open_data_file && has_data_file(bs)) {
         bdrv_graph_co_rdunlock();
+        bdrv_drain_all_begin();
         bdrv_co_unref_child(bs, s->data_file);
+        bdrv_drain_all_end();
         bdrv_graph_co_rdlock();
         s->data_file = NULL;
     }
@@ -1976,7 +1978,7 @@ static void qcow2_refresh_limits(BlockDriverState *bs, Error **errp)
 {
     BDRVQcow2State *s = bs->opaque;
 
-    if (bs->encrypted) {
+    if (s->crypto) {
         /* Encryption works on a sector granularity */
         bs->bl.request_alignment = qcrypto_block_get_sector_size(s->crypto);
     }
@@ -2141,9 +2143,9 @@ static void qcow2_join_options(QDict *options, QDict *old_options)
 }
 
 static int coroutine_fn GRAPH_RDLOCK
-qcow2_co_block_status(BlockDriverState *bs, bool want_zero, int64_t offset,
-                      int64_t count, int64_t *pnum, int64_t *map,
-                      BlockDriverState **file)
+qcow2_co_block_status(BlockDriverState *bs, unsigned int mode,
+                      int64_t offset, int64_t count, int64_t *pnum,
+                      int64_t *map, BlockDriverState **file)
 {
     BDRVQcow2State *s = bs->opaque;
     uint64_t host_offset;
@@ -2821,7 +2823,7 @@ qcow2_do_close(BlockDriverState *bs, bool close_data_file)
     if (close_data_file && has_data_file(bs)) {
         GLOBAL_STATE_CODE();
         bdrv_graph_rdunlock_main_loop();
-        bdrv_graph_wrlock();
+        bdrv_graph_wrlock_drained();
         bdrv_unref_child(bs, s->data_file);
         bdrv_graph_wrunlock();
         s->data_file = NULL;

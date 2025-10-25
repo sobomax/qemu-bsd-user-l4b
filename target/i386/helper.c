@@ -20,10 +20,13 @@
 #include "qemu/osdep.h"
 #include "qapi/qapi-events-run-state.h"
 #include "cpu.h"
-#include "exec/exec-all.h"
-#include "sysemu/runstate.h"
+#include "exec/cputlb.h"
+#include "exec/translation-block.h"
+#include "exec/target_page.h"
+#include "system/runstate.h"
 #ifndef CONFIG_USER_ONLY
-#include "sysemu/hw_accel.h"
+#include "system/hw_accel.h"
+#include "system/memory.h"
 #include "monitor/monitor.h"
 #include "kvm/kvm_i386.h"
 #endif
@@ -523,7 +526,7 @@ void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
 static inline target_ulong get_memio_eip(CPUX86State *env)
 {
 #ifdef CONFIG_TCG
-    uint64_t data[TARGET_INSN_START_WORDS];
+    uint64_t data[INSN_START_WORDS];
     CPUState *cs = env_cpu(env);
 
     if (!cpu_unwind_state_data(cs, cs->mem_io_pc, data)) {
@@ -616,6 +619,10 @@ void do_cpu_init(X86CPU *cpu)
 
 void do_cpu_sipi(X86CPU *cpu)
 {
+    CPUX86State *env = &cpu->env;
+    if (env->hflags & HF_SMM_MASK) {
+        return;
+    }
     apic_sipi(cpu->apic_state);
 }
 

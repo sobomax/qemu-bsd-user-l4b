@@ -23,7 +23,7 @@
 #include "qemu/range.h"
 #include "qemu/error-report.h"
 #include "qemu/module.h"
-#include "sysemu/numa.h"
+#include "system/numa.h"
 #include "hw/boards.h"
 #include "qom/object.h"
 
@@ -92,7 +92,7 @@ static void prop_pxb_uid_get(Object *obj, Visitor *v, const char *name,
     visit_type_uint32(v, name, &uid, errp);
 }
 
-static void pxb_bus_class_init(ObjectClass *class, void *data)
+static void pxb_bus_class_init(ObjectClass *class, const void *data)
 {
     PCIBusClass *pbc = PCI_BUS_CLASS(class);
 
@@ -169,7 +169,7 @@ static char *pxb_host_ofw_unit_address(const SysBusDevice *dev)
     return NULL;
 }
 
-static void pxb_host_class_init(ObjectClass *class, void *data)
+static void pxb_host_class_init(ObjectClass *class, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(class);
     SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(class);
@@ -224,7 +224,7 @@ void pxb_cxl_hook_up_registers(CXLState *cxl_state, PCIBus *bus, Error **errp)
     cxl_state->next_mr_idx++;
 }
 
-static void pxb_cxl_host_class_init(ObjectClass *class, void *data)
+static void pxb_cxl_host_class_init(ObjectClass *class, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(class);
     PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_CLASS(class);
@@ -420,15 +420,14 @@ static void pxb_dev_exitfn(PCIDevice *pci_dev)
     pxb_dev_list = g_list_remove(pxb_dev_list, pxb);
 }
 
-static Property pxb_dev_properties[] = {
+static const Property pxb_dev_properties[] = {
     /* Note: 0 is not a legal PXB bus number. */
     DEFINE_PROP_UINT8("bus_nr", PXBDev, bus_nr, 0),
     DEFINE_PROP_UINT16("numa_node", PXBDev, numa_node, NUMA_NODE_UNASSIGNED),
     DEFINE_PROP_BOOL("bypass_iommu", PXBDev, bypass_iommu, false),
-    DEFINE_PROP_END_OF_LIST(),
 };
 
-static void pxb_dev_class_init(ObjectClass *klass, void *data)
+static void pxb_dev_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
@@ -450,7 +449,7 @@ static const TypeInfo pxb_dev_info = {
     .parent        = TYPE_PCI_DEVICE,
     .instance_size = sizeof(PXBDev),
     .class_init    = pxb_dev_class_init,
-    .interfaces = (InterfaceInfo[]) {
+    .interfaces = (const InterfaceInfo[]) {
         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
         { },
     },
@@ -466,7 +465,7 @@ static void pxb_pcie_dev_realize(PCIDevice *dev, Error **errp)
     pxb_dev_realize_common(dev, PCIE, errp);
 }
 
-static void pxb_pcie_dev_class_init(ObjectClass *klass, void *data)
+static void pxb_pcie_dev_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
@@ -487,7 +486,7 @@ static const TypeInfo pxb_pcie_dev_info = {
     .parent        = TYPE_PXB_DEV,
     .instance_size = sizeof(PXBPCIEDev),
     .class_init    = pxb_pcie_dev_class_init,
-    .interfaces = (InterfaceInfo[]) {
+    .interfaces = (const InterfaceInfo[]) {
         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
         { },
     },
@@ -507,12 +506,11 @@ static void pxb_cxl_dev_realize(PCIDevice *dev, Error **errp)
     pxb_cxl_dev_reset(DEVICE(dev));
 }
 
-static Property pxb_cxl_dev_properties[] = {
+static const Property pxb_cxl_dev_properties[] = {
     DEFINE_PROP_BOOL("hdm_for_passthrough", PXBCXLDev, hdm_for_passthrough, false),
-    DEFINE_PROP_END_OF_LIST(),
 };
 
-static void pxb_cxl_dev_class_init(ObjectClass *klass, void *data)
+static void pxb_cxl_dev_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc   = DEVICE_CLASS(klass);
     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
@@ -539,7 +537,7 @@ static const TypeInfo pxb_cxl_dev_info = {
     .instance_size = sizeof(PXBCXLDev),
     .class_init    = pxb_cxl_dev_class_init,
     .interfaces =
-        (InterfaceInfo[]){
+        (const InterfaceInfo[]){
             { INTERFACE_CONVENTIONAL_PCI_DEVICE },
             {},
         },

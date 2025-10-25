@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Functional tests for the little-endian 32-bit MIPS Malta board
+# Functional tests for the big-endian 32-bit MIPS Malta board
 #
 # Copyright (c) Philippe Mathieu-Daudé <f4bug@amsat.org>
 #
@@ -8,9 +8,87 @@
 
 import os
 
-from qemu_test import LinuxKernelTest, Asset
+from qemu_test import LinuxKernelTest, Asset, wait_for_console_pattern
 from qemu_test import exec_command_and_wait_for_pattern
-from qemu_test.utils import gzip_uncompress
+
+
+def mips_run_common_commands(test, prompt='#'):
+    exec_command_and_wait_for_pattern(test,
+        'uname -m',
+        'mips')
+    exec_command_and_wait_for_pattern(test,
+        'grep XT-PIC /proc/interrupts',
+        'timer')
+    wait_for_console_pattern(test, prompt)
+    exec_command_and_wait_for_pattern(test,
+        'grep XT-PIC /proc/interrupts',
+        'serial')
+    wait_for_console_pattern(test, prompt)
+    exec_command_and_wait_for_pattern(test,
+        'grep XT-PIC /proc/interrupts',
+        'ata_piix')
+    wait_for_console_pattern(test, prompt)
+    exec_command_and_wait_for_pattern(test,
+        'grep XT-PIC /proc/interrupts',
+        'rtc')
+    wait_for_console_pattern(test, prompt)
+    exec_command_and_wait_for_pattern(test,
+        'cat /proc/devices',
+        'input')
+    wait_for_console_pattern(test, prompt)
+    exec_command_and_wait_for_pattern(test,
+        'cat /proc/devices',
+        'fb')
+    wait_for_console_pattern(test, prompt)
+    exec_command_and_wait_for_pattern(test,
+        'cat /proc/ioports',
+        ' : serial')
+    wait_for_console_pattern(test, prompt)
+    exec_command_and_wait_for_pattern(test,
+        'cat /proc/ioports',
+        ' : ata_piix')
+    wait_for_console_pattern(test, prompt)
+
+def mips_check_wheezy(test, kernel_path, image_path, kernel_command_line,
+                      dl_file, hsum, nic='pcnet', cpuinfo='MIPS 24Kc'):
+    test.require_netdev('user')
+    test.require_device(nic)
+    test.set_machine('malta')
+
+    port=8080
+    test.vm.add_args('-kernel', kernel_path,
+                     '-append', kernel_command_line,
+                     '-drive', 'file=%s,snapshot=on' % image_path,
+                     '-netdev', 'user,id=n1' +
+                                ',tftp=' + os.path.basename(kernel_path) +
+                                ',hostfwd=tcp:127.0.0.1:0-:%d' % port,
+                     '-device', f'{nic},netdev=n1',
+                     '-no-reboot')
+    test.vm.set_console()
+    test.vm.launch()
+
+    wait_for_console_pattern(test, 'login: ', 'Oops')
+    exec_command_and_wait_for_pattern(test, 'root', 'Password:')
+    exec_command_and_wait_for_pattern(test, 'root', ':~# ')
+    mips_run_common_commands(test)
+
+    exec_command_and_wait_for_pattern(test, 'cd /', '# ')
+    test.check_http_download(dl_file, hsum, port,
+                             pythoncmd='python -m SimpleHTTPServer')
+
+    exec_command_and_wait_for_pattern(test, 'cat /proc/cpuinfo', cpuinfo)
+    exec_command_and_wait_for_pattern(test, 'cat /proc/devices', 'usb')
+    exec_command_and_wait_for_pattern(test, 'cat /proc/ioports',
+                                      ' : piix4_smbus')
+    exec_command_and_wait_for_pattern(test, 'lspci -d 11ab:4620',
+                                      'GT-64120')
+    exec_command_and_wait_for_pattern(test,
+                                      'cat /sys/bus/i2c/devices/i2c-0/name',
+                                      'SMBus PIIX4 adapter')
+    exec_command_and_wait_for_pattern(test, 'cat /proc/mtd', 'YAMON')
+    # Empty 'Board Config' (64KB)
+    exec_command_and_wait_for_pattern(test, 'md5sum /dev/mtd2ro',
+                                      '0dfbe8aa4c20b52e1b8bf3cb6cbdf193')
 
 
 class MaltaMachineConsole(LinuxKernelTest):
@@ -22,9 +100,9 @@ class MaltaMachineConsole(LinuxKernelTest):
         '16ca524148afb0626f483163e5edf352bc1ab0e4fc7b9f9d473252762f2c7a43')
 
     def test_mips_malta(self):
-        deb_path = self.ASSET_KERNEL_2_63_2.fetch()
-        kernel_path = self.extract_from_deb(deb_path,
-                                            '/boot/vmlinux-2.6.32-5-4kc-malta')
+        kernel_path = self.archive_extract(
+            self.ASSET_KERNEL_2_63_2,
+            member='boot/vmlinux-2.6.32-5-4kc-malta')
 
         self.set_machine('malta')
         self.vm.set_console()
@@ -48,14 +126,15 @@ class MaltaMachineConsole(LinuxKernelTest):
         'dcfe3a7fe3200da3a00d176b95caaa086495eb158f2bff64afc67d7e1eb2cddc')
 
     def test_mips_malta_cpio(self):
-        deb_path = self.ASSET_KERNEL_4_5_0.fetch()
-        kernel_path = self.extract_from_deb(deb_path,
-                                            '/boot/vmlinux-4.5.0-2-4kc-malta')
-        initrd_path_gz = self.ASSET_INITRD.fetch()
-        initrd_path = os.path.join(self.workdir, 'rootfs.cpio')
-        gzip_uncompress(initrd_path_gz, initrd_path)
-
+        self.require_netdev('user')
         self.set_machine('malta')
+        self.require_device('pcnet')
+
+        kernel_path = self.archive_extract(
+            self.ASSET_KERNEL_4_5_0,
+            member='boot/vmlinux-4.5.0-2-4kc-malta')
+        initrd_path = self.uncompress(self.ASSET_INITRD)
+
         self.vm.set_console()
         kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
                                + 'console=ttyS0 console=tty '
@@ -63,6 +142,8 @@ class MaltaMachineConsole(LinuxKernelTest):
         self.vm.add_args('-kernel', kernel_path,
                          '-initrd', initrd_path,
                          '-append', kernel_command_line,
+                         '-netdev', 'user,id=n1,tftp=' + self.scratch_file('boot'),
+                         '-device', 'pcnet,netdev=n1',
                          '-no-reboot')
         self.vm.launch()
         self.wait_for_console_pattern('Boot successful.')
@@ -70,11 +151,45 @@ class MaltaMachineConsole(LinuxKernelTest):
         exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo',
                                                 'BogoMIPS')
         exec_command_and_wait_for_pattern(self, 'uname -a',
-                                                'Debian')
+                                                '4.5.0-2-4kc-malta #1 Debian')
+        mips_run_common_commands(self)
+
+        exec_command_and_wait_for_pattern(self, 'ip link set eth0 up',
+                                          'eth0: link up')
+        exec_command_and_wait_for_pattern(self,
+                                          'ip addr add 10.0.2.15 dev eth0',
+                                          '#')
+        exec_command_and_wait_for_pattern(self, 'route add default eth0', '#')
+        exec_command_and_wait_for_pattern(self,
+                         'tftp -g -r vmlinux-4.5.0-2-4kc-malta 10.0.2.2', '#')
+        exec_command_and_wait_for_pattern(self,
+                                          'md5sum vmlinux-4.5.0-2-4kc-malta',
+                                          'a98218a7efbdefb2dfdf9ecd08c98318')
+
         exec_command_and_wait_for_pattern(self, 'reboot',
                                                 'reboot: Restarting system')
         # Wait for VM to shut down gracefully
         self.vm.wait()
+
+    ASSET_WHEEZY_KERNEL = Asset(
+        ('https://people.debian.org/~aurel32/qemu/mips/'
+         'vmlinux-3.2.0-4-4kc-malta'),
+        '0377fcda31299213c10b8e5babe7260ef99188b3ae1aca6f56594abb71e7f67e')
+
+    ASSET_WHEEZY_DISK = Asset(
+        ('https://people.debian.org/~aurel32/qemu/mips/'
+         'debian_wheezy_mips_standard.qcow2'),
+        'de03599285b8382ad309309a6c4869f6c6c42a5cfc983342bab9ec0dfa7849a2')
+
+    def test_wheezy(self):
+        kernel_path = self.ASSET_WHEEZY_KERNEL.fetch()
+        image_path = self.ASSET_WHEEZY_DISK.fetch()
+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
+                               + 'console=ttyS0 root=/dev/sda1')
+        mips_check_wheezy(self,
+            kernel_path, image_path, kernel_command_line, nic='e1000',
+            dl_file='/boot/initrd.img-3.2.0-4-4kc-malta',
+            hsum='ff0c0369143d9bbb9a6e6bc79322a2be535619df639e84103237f406e87493dc')
 
 
 if __name__ == '__main__':

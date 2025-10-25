@@ -20,9 +20,8 @@
 
 #include "qemu/osdep.h"
 #include "cpu.h"
-#include "exec/exec-all.h"
 #include "tcg/tcg-op.h"
-#include "exec/cpu_ldst.h"
+#include "accel/tcg/cpu-ldst.h"
 #include "qemu/qemu-print.h"
 
 #include "exec/helper-proto.h"
@@ -30,6 +29,8 @@
 
 #include "tricore-opcodes.h"
 #include "exec/translator.h"
+#include "exec/translation-block.h"
+#include "exec/target_page.h"
 #include "exec/log.h"
 
 #define HELPER_H "helper.h"
@@ -1344,15 +1345,11 @@ static inline void gen_addi_CC(TCGv ret, TCGv r1, int32_t con)
 
 static inline void gen_addc_CC(TCGv ret, TCGv r1, TCGv r2)
 {
-    TCGv carry = tcg_temp_new_i32();
-    TCGv t0    = tcg_temp_new_i32();
+    TCGv t0     = tcg_temp_new_i32();
     TCGv result = tcg_temp_new_i32();
 
-    tcg_gen_movi_tl(t0, 0);
-    tcg_gen_setcondi_tl(TCG_COND_NE, carry, cpu_PSW_C, 0);
     /* Addition, carry and set C/V/SV bits */
-    tcg_gen_add2_i32(result, cpu_PSW_C, r1, t0, carry, t0);
-    tcg_gen_add2_i32(result, cpu_PSW_C, result, cpu_PSW_C, r2, t0);
+    tcg_gen_addcio_i32(result, cpu_PSW_C, r1, r2, cpu_PSW_C);
     /* calc V bit */
     tcg_gen_xor_tl(cpu_PSW_V, result, r1);
     tcg_gen_xor_tl(t0, r1, r2);
@@ -3979,7 +3976,7 @@ static void decode_bit_andacc(DisasContext *ctx)
                     pos1, pos2, &tcg_gen_andc_tl, &tcg_gen_and_tl);
         break;
     case OPC2_32_BIT_AND_NOR_T:
-        if (TCG_TARGET_HAS_andc_i32) {
+        if (tcg_op_supported(INDEX_op_andc, TCG_TYPE_I32, 0)) {
             gen_bit_2op(cpu_gpr_d[r3], cpu_gpr_d[r1], cpu_gpr_d[r2],
                         pos1, pos2, &tcg_gen_or_tl, &tcg_gen_andc_tl);
         } else {
@@ -4112,7 +4109,7 @@ static void decode_bit_orand(DisasContext *ctx)
                     pos1, pos2, &tcg_gen_andc_tl, &tcg_gen_or_tl);
         break;
     case OPC2_32_BIT_OR_NOR_T:
-        if (TCG_TARGET_HAS_orc_i32) {
+        if (tcg_op_supported(INDEX_op_orc, TCG_TYPE_I32, 0)) {
             gen_bit_2op(cpu_gpr_d[r3], cpu_gpr_d[r1], cpu_gpr_d[r2],
                         pos1, pos2, &tcg_gen_or_tl, &tcg_gen_orc_tl);
         } else {
@@ -8459,9 +8456,8 @@ static const TranslatorOps tricore_tr_ops = {
     .tb_stop            = tricore_tr_tb_stop,
 };
 
-
-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
-                           vaddr pc, void *host_pc)
+void tricore_translate_code(CPUState *cs, TranslationBlock *tb,
+                            int *max_insns, vaddr pc, void *host_pc)
 {
     DisasContext ctx;
     translator_loop(cs, tb, max_insns, pc, host_pc,

@@ -32,7 +32,7 @@
 #include "qemu/units.h"
 #include "hw/hw.h"
 #include "hw/sysbus.h"
-#include "sysemu/hw_accel.h"
+#include "system/hw_accel.h"
 #include "hw/ppc/ppc.h"
 #include "e500.h"
 #include "qom/object.h"
@@ -175,7 +175,7 @@ static void ppce500_spin_initfn(Object *obj)
     sysbus_init_mmio(dev, &s->iomem);
 }
 
-static void ppce500_spin_class_init(ObjectClass *klass, void *data)
+static void ppce500_spin_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
 

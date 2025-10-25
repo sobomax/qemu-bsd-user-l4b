@@ -28,6 +28,7 @@
 #include "qemu/datadir.h"
 #include "qemu/cutils.h"
 #include "qemu/guest-random.h"
+#include "exec/tswap.h"
 #include "hw/clock.h"
 #include "hw/southbridge/piix.h"
 #include "hw/isa/superio.h"
@@ -48,12 +49,12 @@
 #include "qom/object.h"
 #include "hw/sysbus.h"             /* SysBusDevice */
 #include "qemu/host-utils.h"
-#include "sysemu/qtest.h"
-#include "sysemu/reset.h"
-#include "sysemu/runstate.h"
+#include "system/qtest.h"
+#include "system/reset.h"
+#include "system/runstate.h"
 #include "qapi/error.h"
 #include "qemu/error-report.h"
-#include "sysemu/kvm.h"
+#include "system/kvm.h"
 #include "semihosting/semihost.h"
 #include "hw/mips/cps.h"
 #include "hw/qdev-clock.h"
@@ -92,12 +93,6 @@ typedef struct {
     SerialMM *uart;
     bool display_inited;
 } MaltaFPGAState;
-
-#if TARGET_BIG_ENDIAN
-#define BIOS_FILENAME "mips_bios.bin"
-#else
-#define BIOS_FILENAME "mipsel_bios.bin"
-#endif
 
 #define TYPE_MIPS_MALTA "mips-malta"
 OBJECT_DECLARE_SIMPLE_TYPE(MaltaState, MIPS_MALTA)
@@ -382,11 +377,7 @@ static uint64_t malta_fpga_read(void *opaque, hwaddr addr,
 
     /* STATUS Register */
     case 0x00208:
-#if TARGET_BIG_ENDIAN
-        val = 0x00000012;
-#else
-        val = 0x00000010;
-#endif
+        val = TARGET_BIG_ENDIAN ? 0x00000012 : 0x00000010;
         break;
 
     /* JMPRS Register */
@@ -879,8 +870,9 @@ static uint64_t load_kernel(void)
     kernel_size = load_elf(loaderparams.kernel_filename, NULL,
                            cpu_mips_kseg0_to_phys, NULL,
                            &kernel_entry, NULL,
-                           &kernel_high, NULL, TARGET_BIG_ENDIAN, EM_MIPS,
-                           1, 0);
+                           &kernel_high, NULL,
+                           TARGET_BIG_ENDIAN ? ELFDATA2MSB : ELFDATA2LSB,
+                           EM_MIPS, 1, 0);
     if (kernel_size < 0) {
         error_report("could not load kernel '%s': %s",
                      loaderparams.kernel_filename,
@@ -1175,9 +1167,12 @@ void mips_malta_init(MachineState *machine)
         target_long bios_size = FLASH_SIZE;
         /* Load firmware from flash. */
         if (!dinfo) {
+            const char *bios_name = TARGET_BIG_ENDIAN ? "mips_bios.bin"
+                                                        : "mipsel_bios.bin";
+
             /* Load a BIOS image. */
             filename = qemu_find_file(QEMU_FILE_TYPE_BIOS,
-                                      machine->firmware ?: BIOS_FILENAME);
+                                      machine->firmware ?: bios_name);
             if (filename) {
                 bios_size = load_image_targphys(filename, FLASH_ADDRESS,
                                                 BIOS_SIZE);
@@ -1195,8 +1190,7 @@ void mips_malta_init(MachineState *machine)
          * In little endian mode the 32bit words in the bios are swapped,
          * a neat trick which allows bi-endian firmware.
          */
-#if !TARGET_BIG_ENDIAN
-        {
+        if (!TARGET_BIG_ENDIAN) {
             uint32_t *end, *addr;
             const size_t swapsize = MIN(bios_size, 0x3e0000);
             addr = rom_ptr(FLASH_ADDRESS, swapsize);
@@ -1209,7 +1203,6 @@ void mips_malta_init(MachineState *machine)
                 addr++;
             }
         }
-#endif
     }
 
     /*

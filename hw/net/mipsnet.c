@@ -266,12 +266,11 @@ static void mipsnet_sysbus_reset(DeviceState *dev)
     mipsnet_reset(s);
 }
 
-static Property mipsnet_properties[] = {
+static const Property mipsnet_properties[] = {
     DEFINE_NIC_PROPERTIES(MIPSnetState, conf),
-    DEFINE_PROP_END_OF_LIST(),
 };
 
-static void mipsnet_class_init(ObjectClass *klass, void *data)
+static void mipsnet_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
 

@@ -8,29 +8,6 @@
 
 #include "qemu/osdep.h"
 #include "exec/target_page.h"
-#include "exec/cpu-defs.h"
-#include "cpu.h"
-#include "exec/cpu-all.h"
-
-size_t qemu_target_page_size(void)
-{
-    return TARGET_PAGE_SIZE;
-}
-
-int qemu_target_page_mask(void)
-{
-    return TARGET_PAGE_MASK;
-}
-
-int qemu_target_page_bits(void)
-{
-    return TARGET_PAGE_BITS;
-}
-
-int qemu_target_page_bits_min(void)
-{
-    return TARGET_PAGE_BITS_MIN;
-}
 
 /* Convert target pages to MiB (2**20). */
 size_t qemu_target_pages_to_MiB(size_t pages)

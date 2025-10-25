@@ -42,7 +42,7 @@ static inline void target_cpu_init(CPUARMState *env,
     env->xregs[31] = regs->sp;
 }
 
-static inline void target_cpu_loop(CPUARMState *env)
+static inline G_NORETURN void target_cpu_loop(CPUARMState *env)
 {
     CPUState *cs = env_cpu(env);
     int trapnr, ec, fsc, si_code, si_signo;

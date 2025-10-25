@@ -27,6 +27,7 @@
 #include "semihosting/semihost.h"
 #include "cpregs.h"
 #include "exec/helper-proto.h"
+#include "exec/target_page.h"
 
 #define HELPER_H "helper.h"
 #include "exec/helper-info.c.inc"
@@ -371,7 +372,7 @@ static void gen_rebuild_hflags(DisasContext *s, bool new_el)
     }
 }
 
-static void gen_exception_internal(int excp)
+void gen_exception_internal(int excp)
 {
     assert(excp_is_internal(excp));
     gen_helper_exception_internal(tcg_env, tcg_constant_i32(excp));
@@ -493,20 +494,9 @@ static void gen_add_CC(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
 static void gen_adc_CC(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
 {
     TCGv_i32 tmp = tcg_temp_new_i32();
-    if (TCG_TARGET_HAS_add2_i32) {
-        tcg_gen_movi_i32(tmp, 0);
-        tcg_gen_add2_i32(cpu_NF, cpu_CF, t0, tmp, cpu_CF, tmp);
-        tcg_gen_add2_i32(cpu_NF, cpu_CF, cpu_NF, cpu_CF, t1, tmp);
-    } else {
-        TCGv_i64 q0 = tcg_temp_new_i64();
-        TCGv_i64 q1 = tcg_temp_new_i64();
-        tcg_gen_extu_i32_i64(q0, t0);
-        tcg_gen_extu_i32_i64(q1, t1);
-        tcg_gen_add_i64(q0, q0, q1);
-        tcg_gen_extu_i32_i64(q1, cpu_CF);
-        tcg_gen_add_i64(q0, q0, q1);
-        tcg_gen_extr_i64_i32(cpu_NF, cpu_CF, q0);
-    }
+
+    tcg_gen_addcio_i32(cpu_NF, cpu_CF, t0, t1, cpu_CF);
+
     tcg_gen_mov_i32(cpu_ZF, cpu_NF);
     tcg_gen_xor_i32(cpu_VF, cpu_NF, t0);
     tcg_gen_xor_i32(tmp, t0, t1);
@@ -3510,7 +3500,7 @@ static int t32_expandimm_rot(DisasContext *s, int x)
 /* Return the unrotated immediate from T32ExpandImm.  */
 static int t32_expandimm_imm(DisasContext *s, int x)
 {
-    int imm = extract32(x, 0, 8);
+    uint32_t imm = extract32(x, 0, 8);
 
     switch (extract32(x, 8, 4)) {
     case 0: /* XY */
@@ -4941,7 +4931,7 @@ static TCGv_i32 op_addr_rr_pre(DisasContext *s, arg_ldst_rr *a)
 }
 
 static void op_addr_rr_post(DisasContext *s, arg_ldst_rr *a,
-                            TCGv_i32 addr, int address_offset)
+                            TCGv_i32 addr)
 {
     if (!a->p) {
         TCGv_i32 ofs = load_reg(s, a->rm);
@@ -4954,7 +4944,6 @@ static void op_addr_rr_post(DisasContext *s, arg_ldst_rr *a,
     } else if (!a->w) {
         return;
     }
-    tcg_gen_addi_i32(addr, addr, address_offset);
     store_reg(s, a->rn, addr);
 }
 
@@ -4974,7 +4963,7 @@ static bool op_load_rr(DisasContext *s, arg_ldst_rr *a,
      * Perform base writeback before the loaded value to
      * ensure correct behavior with overlapping index registers.
      */
-    op_addr_rr_post(s, a, addr, 0);
+    op_addr_rr_post(s, a, addr);
     store_reg_from_load(s, a->rt, tmp);
     return true;
 }
@@ -4999,7 +4988,7 @@ static bool op_store_rr(DisasContext *s, arg_ldst_rr *a,
     gen_aa32_st_i32(s, tmp, addr, mem_idx, mop);
     disas_set_da_iss(s, mop, issinfo);
 
-    op_addr_rr_post(s, a, addr, 0);
+    op_addr_rr_post(s, a, addr);
     return true;
 }
 
@@ -5059,7 +5048,7 @@ static bool trans_LDRD_rr(DisasContext *s, arg_ldst_rr *a)
     do_ldrd_load(s, addr, a->rt, a->rt + 1);
 
     /* LDRD w/ base writeback is undefined if the registers overlap.  */
-    op_addr_rr_post(s, a, addr, 0);
+    op_addr_rr_post(s, a, addr);
     return true;
 }
 
@@ -5111,7 +5100,7 @@ static bool trans_STRD_rr(DisasContext *s, arg_ldst_rr *a)
 
     do_strd_store(s, addr, a->rt, a->rt + 1);
 
-    op_addr_rr_post(s, a, addr, 0);
+    op_addr_rr_post(s, a, addr);
     return true;
 }
 
@@ -5147,13 +5136,14 @@ static TCGv_i32 op_addr_ri_pre(DisasContext *s, arg_ldst_ri *a)
 }
 
 static void op_addr_ri_post(DisasContext *s, arg_ldst_ri *a,
-                            TCGv_i32 addr, int address_offset)
+                            TCGv_i32 addr)
 {
+    int address_offset = 0;
     if (!a->p) {
         if (a->u) {
-            address_offset += a->imm;
+            address_offset = a->imm;
         } else {
-            address_offset -= a->imm;
+            address_offset = -a->imm;
         }
     } else if (!a->w) {
         return;
@@ -5178,7 +5168,7 @@ static bool op_load_ri(DisasContext *s, arg_ldst_ri *a,
      * Perform base writeback before the loaded value to
      * ensure correct behavior with overlapping index registers.
      */
-    op_addr_ri_post(s, a, addr, 0);
+    op_addr_ri_post(s, a, addr);
     store_reg_from_load(s, a->rt, tmp);
     return true;
 }
@@ -5203,7 +5193,7 @@ static bool op_store_ri(DisasContext *s, arg_ldst_ri *a,
     gen_aa32_st_i32(s, tmp, addr, mem_idx, mop);
     disas_set_da_iss(s, mop, issinfo);
 
-    op_addr_ri_post(s, a, addr, 0);
+    op_addr_ri_post(s, a, addr);
     return true;
 }
 
@@ -5216,7 +5206,7 @@ static bool op_ldrd_ri(DisasContext *s, arg_ldst_ri *a, int rt2)
     do_ldrd_load(s, addr, a->rt, rt2);
 
     /* LDRD w/ base writeback is undefined if the registers overlap.  */
-    op_addr_ri_post(s, a, addr, 0);
+    op_addr_ri_post(s, a, addr);
     return true;
 }
 
@@ -5245,7 +5235,7 @@ static bool op_strd_ri(DisasContext *s, arg_ldst_ri *a, int rt2)
 
     do_strd_store(s, addr, a->rt, rt2);
 
-    op_addr_ri_post(s, a, addr, 0);
+    op_addr_ri_post(s, a, addr);
     return true;
 }
 
@@ -7801,7 +7791,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
          * be possible after an indirect branch, at the start of the TB.
          */
         assert(dc->base.num_insns == 1);
-        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_tl(pc));
+        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_vaddr(pc));
         dc->base.is_jmp = DISAS_NORETURN;
         dc->base.pc_next = QEMU_ALIGN_UP(pc, 4);
         return;
@@ -8135,9 +8125,8 @@ static const TranslatorOps thumb_translator_ops = {
     .tb_stop            = arm_tr_tb_stop,
 };
 
-/* generate intermediate code for basic block 'tb'.  */
-void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int *max_insns,
-                           vaddr pc, void *host_pc)
+void arm_translate_code(CPUState *cpu, TranslationBlock *tb,
+                        int *max_insns, vaddr pc, void *host_pc)
 {
     DisasContext dc = { };
     const TranslatorOps *ops = &arm_translator_ops;

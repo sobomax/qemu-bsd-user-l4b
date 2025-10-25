@@ -58,6 +58,22 @@ static int dev_major_minor(const char *devpath,
     return -1;
 }
 
+/*
+ * Check if we already have the devmajor:devminor in the mounts
+ * If thats the case return true.
+ */
+static bool dev_exists(FsMountList *mounts, unsigned int devmajor, unsigned int devminor)
+{
+    FsMount *mount;
+
+    QTAILQ_FOREACH(mount, mounts, next) {
+        if (mount->devmajor == devmajor && mount->devminor == devminor) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static bool build_fs_mount_list_from_mtab(FsMountList *mounts, Error **errp)
 {
     struct mntent *ment;
@@ -86,6 +102,10 @@ static bool build_fs_mount_list_from_mtab(FsMountList *mounts, Error **errp)
         }
         if (dev_major_minor(ment->mnt_fsname, &devmajor, &devminor) == -2) {
             /* Skip bind mounts */
+            continue;
+        }
+        if (dev_exists(mounts, devmajor, devminor)) {
+            /* Skip already existing devices (bind mounts) */
             continue;
         }
 
@@ -169,6 +189,11 @@ bool build_fs_mount_list(FsMountList *mounts, Error **errp)
                 dev_major_minor(dash + dev_s, &devmajor, &devminor) < 0) {
                 continue;
             }
+        }
+
+        if (dev_exists(mounts, devmajor, devminor)) {
+            /* Skip already existing devices (bind mounts) */
+            continue;
         }
 
         mount = g_new0(FsMount, 1);
@@ -1375,20 +1400,22 @@ static bool linux_sys_state_supports_mode(SuspendMode mode, Error **errp)
 
 static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
 {
-    g_autoptr(GError) local_gerr = NULL;
     const char *sysfile_strs[3] = {"disk", "mem", NULL};
     const char *sysfile_str = sysfile_strs[mode];
+    int fd;
 
     if (!sysfile_str) {
         error_setg(errp, "unknown guest suspend mode");
         return;
     }
 
-    if (!g_file_set_contents(LINUX_SYS_STATE_FILE, sysfile_str,
-                             -1, &local_gerr)) {
-        error_setg(errp, "suspend: cannot write to '%s': %s",
-                   LINUX_SYS_STATE_FILE, local_gerr->message);
-        return;
+    fd = open(LINUX_SYS_STATE_FILE, O_WRONLY);
+    if (fd < 0 || write(fd, sysfile_str, strlen(sysfile_str)) < 0) {
+        error_setg(errp, "suspend: cannot write to '%s': %m",
+                   LINUX_SYS_STATE_FILE);
+    }
+    if (fd >= 0) {
+        close(fd);
     }
 }
 

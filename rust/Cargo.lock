@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "anyhow"
+version = "1.0.98"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e16d2d3311acee920a9eb8d33b8cbc1787ce4a264e85f964c2404b969bdcd487"
+
+[[package]]
 name = "arbitrary-int"
 version = "1.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -32,10 +38,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "bits"
+version = "0.1.0"
+dependencies = [
+ "qemu_api_macros",
+]
+
+[[package]]
 name = "either"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3dca9240753cf90908d7e4aac30f630662b02aebaa1b58a3cadabdb23385b58b"
+
+[[package]]
+name = "foreign"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17ca1b5be8c9d320daf386f1809c7acc0cb09accbae795c2001953fa50585846"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "hpet"
+version = "0.1.0"
+dependencies = [
+ "qemu_api",
+ "qemu_api_macros",
+]
 
 [[package]]
 name = "itertools"
@@ -47,11 +77,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "libc"
+version = "0.2.162"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18d287de67fe55fd7e1581fe933d965a5a9477b38e949cfa9f8574ef01506398"
+
+[[package]]
 name = "pl011"
 version = "0.1.0"
 dependencies = [
  "bilge",
  "bilge-impl",
+ "bits",
  "qemu_api",
  "qemu_api_macros",
 ]
@@ -92,8 +129,10 @@ dependencies = [
 name = "qemu_api"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "foreign",
+ "libc",
  "qemu_api_macros",
- "version_check",
 ]
 
 [[package]]

@@ -91,8 +91,12 @@ typedef enum MemOp {
      *    Depending on alignment, one or both will be single-copy atomic.
      *    This is the atomicity e.g. of Arm FEAT_LSE2 LDP.
      * MO_ATOM_SUBALIGN: the operation is single-copy atomic by parts
-     *    by the alignment.  E.g. if the address is 0 mod 4, then each
-     *    4-byte subobject is single-copy atomic.
+     *    by the alignment.  E.g. if an 8-byte value is accessed at an
+     *    address which is 0 mod 8, then the whole 8-byte access is
+     *    single-copy atomic; otherwise, if it is accessed at 0 mod 4
+     *    then each 4-byte subobject is single-copy atomic; otherwise
+     *    if it is accessed at 0 mod 2 then the four 2-byte subobjects
+     *    are single-copy atomic.
      *    This is the atomicity e.g. of IBM Power.
      * MO_ATOM_NONE: the operation has no atomicity requirements.
      *
@@ -158,8 +162,8 @@ static inline unsigned memop_size(MemOp op)
 static inline MemOp size_memop(unsigned size)
 {
 #ifdef CONFIG_DEBUG_TCG
-    /* Power of 2 up to 8.  */
-    assert((size & (size - 1)) == 0 && size >= 1 && size <= 8);
+    /* Power of 2 up to 1024 */
+    assert(is_power_of_2(size) && size >= 1 && size <= (1 << MO_SIZE));
 #endif
     return (MemOp)ctz32(size);
 }

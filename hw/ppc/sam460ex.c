@@ -17,19 +17,19 @@
 #include "qemu/error-report.h"
 #include "qapi/error.h"
 #include "hw/boards.h"
-#include "sysemu/kvm.h"
+#include "system/kvm.h"
 #include "kvm_ppc.h"
-#include "sysemu/device_tree.h"
-#include "sysemu/block-backend.h"
+#include "system/device_tree.h"
+#include "system/block-backend.h"
 #include "exec/page-protection.h"
 #include "hw/loader.h"
 #include "elf.h"
-#include "exec/memory.h"
+#include "system/memory.h"
 #include "ppc440.h"
 #include "hw/pci-host/ppc4xx.h"
 #include "hw/block/flash.h"
-#include "sysemu/sysemu.h"
-#include "sysemu/reset.h"
+#include "system/system.h"
+#include "system/reset.h"
 #include "hw/sysbus.h"
 #include "hw/char/serial-mm.h"
 #include "hw/i2c/ppc4xx_i2c.h"
@@ -142,7 +142,7 @@ static int sam460ex_load_device_tree(MachineState *machine,
     uint32_t clock_freq = CPU_FREQ;
     int offset;
 
-    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_FILE);
+    filename = qemu_find_file(QEMU_FILE_TYPE_DTB, BINARY_DEVICE_TREE_FILE);
     if (!filename) {
         error_report("Couldn't find dtb file `%s'", BINARY_DEVICE_TREE_FILE);
         exit(1);
@@ -234,7 +234,7 @@ static void main_cpu_reset(void *opaque)
 
         /* Create a mapping for the kernel.  */
         booke_set_tlb(&env->tlb.tlbe[0], 0, 0, 1 << 31);
-        env->gpr[6] = tswap32(EPAPR_MAGIC);
+        env->gpr[6] = EPAPR_MAGIC;
         env->gpr[7] = (16 * MiB) - 8; /* bi->ima_size; */
 
     } else {
@@ -479,7 +479,7 @@ static void sam460ex_init(MachineState *machine)
 
             success = load_elf(machine->kernel_filename, NULL, NULL, NULL,
                                &elf_entry, NULL, NULL, NULL,
-                               1, PPC_ELF_MACHINE, 0, 0);
+                               ELFDATA2MSB, PPC_ELF_MACHINE, 0, 0);
             entry = elf_entry;
         }
         /* XXX try again as binary */

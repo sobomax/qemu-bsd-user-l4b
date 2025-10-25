@@ -139,15 +139,14 @@ static bool aspeed_soc_boot_from_emmc(AspeedSoCState *s)
     return false;
 }
 
-static Property aspeed_soc_properties[] = {
+static const Property aspeed_soc_properties[] = {
     DEFINE_PROP_LINK("dram", AspeedSoCState, dram_mr, TYPE_MEMORY_REGION,
                      MemoryRegion *),
     DEFINE_PROP_LINK("memory", AspeedSoCState, memory, TYPE_MEMORY_REGION,
                      MemoryRegion *),
-    DEFINE_PROP_END_OF_LIST(),
 };
 
-static void aspeed_soc_class_init(ObjectClass *oc, void *data)
+static void aspeed_soc_class_init(ObjectClass *oc, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(oc);
     AspeedSoCClass *sc = ASPEED_SOC_CLASS(oc);

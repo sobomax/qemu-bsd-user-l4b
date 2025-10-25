@@ -21,22 +21,23 @@
 #include <linux/vfio.h>
 
 #include "hw/vfio/vfio-platform.h"
-#include "sysemu/iommufd.h"
+#include "system/iommufd.h"
 #include "migration/vmstate.h"
 #include "qemu/error-report.h"
 #include "qemu/lockable.h"
 #include "qemu/main-loop.h"
 #include "qemu/module.h"
 #include "qemu/range.h"
-#include "exec/memory.h"
-#include "exec/address-spaces.h"
+#include "system/memory.h"
+#include "system/address-spaces.h"
 #include "qemu/queue.h"
 #include "hw/sysbus.h"
 #include "trace.h"
 #include "hw/irq.h"
 #include "hw/platform-bus.h"
 #include "hw/qdev-properties.h"
-#include "sysemu/kvm.h"
+#include "system/kvm.h"
+#include "hw/vfio/vfio-region.h"
 
 /*
  * Functions used whatever the injection method
@@ -118,8 +119,8 @@ static int vfio_set_trigger_eventfd(VFIOINTp *intp,
 
     qemu_set_fd_handler(fd, (IOHandler *)handler, NULL, intp);
 
-    if (!vfio_set_irq_signaling(vbasedev, intp->pin, 0,
-                                VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
+    if (!vfio_device_irq_set_signaling(vbasedev, intp->pin, 0,
+                                       VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
         error_reportf_err(err, VFIO_MSG_PREFIX, vbasedev->name);
         qemu_set_fd_handler(fd, NULL, NULL, NULL);
         return -EINVAL;
@@ -300,7 +301,7 @@ static void vfio_platform_eoi(VFIODevice *vbasedev)
 
             if (vfio_irq_is_automasked(intp)) {
                 /* unmasks the physical level-sensitive IRQ */
-                vfio_unmask_single_irqindex(vbasedev, intp->pin);
+                vfio_device_irq_unmask(vbasedev, intp->pin);
             }
 
             /* a single IRQ can be active at a time */
@@ -356,8 +357,8 @@ static int vfio_set_resample_eventfd(VFIOINTp *intp)
     Error *err = NULL;
 
     qemu_set_fd_handler(fd, NULL, NULL, NULL);
-    if (!vfio_set_irq_signaling(vbasedev, intp->pin, 0,
-                                VFIO_IRQ_SET_ACTION_UNMASK, fd, &err)) {
+    if (!vfio_device_irq_set_signaling(vbasedev, intp->pin, 0,
+                                       VFIO_IRQ_SET_ACTION_UNMASK, fd, &err)) {
         error_reportf_err(err, VFIO_MSG_PREFIX, vbasedev->name);
         return -EINVAL;
     }
@@ -418,7 +419,6 @@ fail_vfio:
     abort();
 fail_irqfd:
     vfio_start_eventfd_injection(sbdev, irq);
-    return;
 }
 
 /* VFIO skeleton */
@@ -474,10 +474,10 @@ static bool vfio_populate_device(VFIODevice *vbasedev, Error **errp)
     QSIMPLEQ_INIT(&vdev->pending_intp_queue);
 
     for (i = 0; i < vbasedev->num_irqs; i++) {
-        struct vfio_irq_info irq = { .argsz = sizeof(irq) };
+        struct vfio_irq_info irq;
 
-        irq.index = i;
-        ret = ioctl(vbasedev->fd, VFIO_DEVICE_GET_IRQ_INFO, &irq);
+        ret = vfio_device_get_irq_info(vbasedev, i, &irq);
+
         if (ret) {
             error_setg_errno(errp, -ret, "failed to get device irq info");
             goto irq_err;
@@ -530,7 +530,7 @@ static bool vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
 {
     /* @fd takes precedence over @sysfsdev which takes precedence over @host */
     if (vbasedev->fd < 0 && vbasedev->sysfsdev) {
-        g_free(vbasedev->name);
+        vfio_device_free_name(vbasedev);
         vbasedev->name = g_path_get_basename(vbasedev->sysfsdev);
     } else if (vbasedev->fd < 0) {
         if (!vbasedev->name || strchr(vbasedev->name, '/')) {
@@ -546,7 +546,7 @@ static bool vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
         return false;
     }
 
-    if (!vfio_attach_device(vbasedev->name, vbasedev,
+    if (!vfio_device_attach(vbasedev->name, vbasedev,
                             &address_space_memory, errp)) {
         return false;
     }
@@ -555,7 +555,7 @@ static bool vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
         return true;
     }
 
-    vfio_detach_device(vbasedev);
+    vfio_device_detach(vbasedev);
     return false;
 }
 
@@ -575,6 +575,7 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
     VFIODevice *vbasedev = &vdev->vbasedev;
     int i;
 
+    warn_report("-device vfio-platform is deprecated");
     qemu_mutex_init(&vdev->intp_mutex);
 
     trace_vfio_platform_realize(vbasedev->sysfsdev ?
@@ -629,7 +630,7 @@ static const VMStateDescription vfio_platform_vmstate = {
     .unmigratable = 1,
 };
 
-static Property vfio_platform_dev_properties[] = {
+static const Property vfio_platform_dev_properties[] = {
     DEFINE_PROP_STRING("host", VFIOPlatformDevice, vbasedev.name),
     DEFINE_PROP_STRING("sysfsdev", VFIOPlatformDevice, vbasedev.sysfsdev),
     DEFINE_PROP_BOOL("x-no-mmap", VFIOPlatformDevice, vbasedev.no_mmap, false),
@@ -640,7 +641,6 @@ static Property vfio_platform_dev_properties[] = {
     DEFINE_PROP_LINK("iommufd", VFIOPlatformDevice, vbasedev.iommufd,
                      TYPE_IOMMUFD_BACKEND, IOMMUFDBackend *),
 #endif
-    DEFINE_PROP_END_OF_LIST(),
 };
 
 static void vfio_platform_instance_init(Object *obj)
@@ -659,7 +659,7 @@ static void vfio_platform_set_fd(Object *obj, const char *str, Error **errp)
 }
 #endif
 
-static void vfio_platform_class_init(ObjectClass *klass, void *data)
+static void vfio_platform_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
     SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
@@ -673,13 +673,35 @@ static void vfio_platform_class_init(ObjectClass *klass, void *data)
     dc->desc = "VFIO-based platform device assignment";
     sbc->connect_irq_notifier = vfio_start_irqfd_injection;
     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-    /* Supported by TYPE_VIRT_MACHINE */
-    dc->user_creatable = true;
+
+    object_class_property_set_description(klass, /* 2.4 */
+                                          "host",
+                                          "Host device name of assigned device");
+    object_class_property_set_description(klass, /* 2.4 and 2.5 */
+                                          "x-no-mmap",
+                                          "Disable MMAP for device. Allows to trace MMIO "
+                                          "accesses (DEBUG)");
+    object_class_property_set_description(klass, /* 2.4 */
+                                          "mmap-timeout-ms",
+                                          "When EOI is not provided by KVM/QEMU, wait time "
+                                          "(milliseconds) to re-enable device direct access "
+                                          "after level interrupt (DEBUG)");
+    object_class_property_set_description(klass, /* 2.4 */
+                                          "x-irqfd",
+                                          "Allow disabling irqfd support (DEBUG)");
+    object_class_property_set_description(klass, /* 2.6 */
+                                          "sysfsdev",
+                                          "Host sysfs path of assigned device");
+#ifdef CONFIG_IOMMUFD
+    object_class_property_set_description(klass, /* 9.0 */
+                                          "iommufd",
+                                          "Set host IOMMUFD backend device");
+#endif
 }
 
 static const TypeInfo vfio_platform_dev_info = {
     .name = TYPE_VFIO_PLATFORM,
-    .parent = TYPE_SYS_BUS_DEVICE,
+    .parent = TYPE_DYNAMIC_SYS_BUS_DEVICE,
     .instance_size = sizeof(VFIOPlatformDevice),
     .instance_init = vfio_platform_instance_init,
     .class_init = vfio_platform_class_init,

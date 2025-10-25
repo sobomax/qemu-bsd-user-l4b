@@ -15,6 +15,7 @@ bsd_user_ss.add(files(
   'elfload.c',
   'main.c',
   'mmap.c',
+  'plugin-api.c',
   'thunk.c',
   'signal.c',
   'uaccess.c',

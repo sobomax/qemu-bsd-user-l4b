@@ -31,7 +31,6 @@
 #include "qemu/osdep.h"
 #include "cpu.h"
 #include "s390x-internal.h"
-#include "exec/exec-all.h"
 #include "tcg/tcg-op.h"
 #include "tcg/tcg-op-gvec.h"
 #include "qemu/log.h"
@@ -40,6 +39,7 @@
 #include "exec/helper-gen.h"
 
 #include "exec/translator.h"
+#include "exec/translation-block.h"
 #include "exec/log.h"
 #include "qemu/atomic128.h"
 
@@ -1249,11 +1249,7 @@ static DisasJumpType op_addc32(DisasContext *s, DisasOps *o)
 static DisasJumpType op_addc64(DisasContext *s, DisasOps *o)
 {
     compute_carry(s);
-
-    TCGv_i64 zero = tcg_constant_i64(0);
-    tcg_gen_add2_i64(o->out, cc_src, o->in1, zero, cc_src, zero);
-    tcg_gen_add2_i64(o->out, cc_src, o->out, cc_src, o->in2, zero);
-
+    tcg_gen_addcio_i64(o->out, cc_src, o->in1, o->in2, cc_src);
     return DISAS_NEXT;
 }
 
@@ -6422,8 +6418,8 @@ static void s390x_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
     dc->base.is_jmp = translate_one(env, dc);
     if (dc->base.is_jmp == DISAS_NEXT) {
         if (dc->ex_value ||
-            !is_same_page(dcbase, dc->base.pc_next) ||
-            !is_same_page(dcbase, get_next_pc(env, dc, dc->base.pc_next))) {
+            !translator_is_same_page(dcbase, dc->base.pc_next) ||
+            !translator_is_same_page(dcbase, get_next_pc(env, dc, dc->base.pc_next))) {
             dc->base.is_jmp = DISAS_TOO_MANY;
         }
     }
@@ -6480,8 +6476,8 @@ static const TranslatorOps s390x_tr_ops = {
     .disas_log          = s390x_tr_disas_log,
 };
 
-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
-                           vaddr pc, void *host_pc)
+void s390x_translate_code(CPUState *cs, TranslationBlock *tb,
+                          int *max_insns, vaddr pc, void *host_pc)
 {
     DisasContext dc;
 

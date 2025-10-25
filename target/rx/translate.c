@@ -20,11 +20,11 @@
 #include "qemu/bswap.h"
 #include "qemu/qemu-print.h"
 #include "cpu.h"
-#include "exec/exec-all.h"
 #include "tcg/tcg-op.h"
 #include "exec/helper-proto.h"
 #include "exec/helper-gen.h"
 #include "exec/translator.h"
+#include "exec/translation-block.h"
 #include "exec/log.h"
 
 #define HELPER_H "helper.h"
@@ -2257,8 +2257,8 @@ static const TranslatorOps rx_tr_ops = {
     .tb_stop            = rx_tr_tb_stop,
 };
 
-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
-                           vaddr pc, void *host_pc)
+void rx_translate_code(CPUState *cs, TranslationBlock *tb,
+                       int *max_insns, vaddr pc, void *host_pc)
 {
     DisasContext dc;
 

@@ -1,14 +1,21 @@
 #include "qemu/osdep.h"
 #include "qemu/units.h"
+#include "qemu/error-report.h"
 #include "qapi/error.h"
+#include "exec/target_long.h"
 #include "exec/target_page.h"
 #include "trace.h"
 
+#include "hw/hw.h"
 #include "hw/pci/pci_host.h"
 #include "hw/xen/xen-hvm-common.h"
 #include "hw/xen/xen-bus.h"
 #include "hw/boards.h"
 #include "hw/xen/arch_hvm.h"
+#include "system/runstate.h"
+#include "system/system.h"
+#include "system/xen.h"
+#include "system/xen-mapcache.h"
 
 MemoryRegion xen_memory, xen_grants;
 
@@ -704,7 +711,7 @@ static int xen_map_ioreq_server(XenIOState *state)
     /*
      * If we fail to map the shared page with xenforeignmemory_map_resource()
      * or if we're using buffered ioreqs, we need xen_get_ioreq_server_info()
-     * to provide the the addresses to map the shared page and/or to get the
+     * to provide the addresses to map the shared page and/or to get the
      * event-channel port for buffered ioreqs.
      */
     if (state->shared_page == NULL || state->has_bufioreq) {

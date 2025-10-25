@@ -21,7 +21,7 @@
 #include "qemu/osdep.h"
 #include "cpu.h"
 #include "internal.h"
-#include "exec/exec-all.h"
+#include "exec/target_page.h"
 #include "tcg/tcg-op.h"
 #include "tcg/tcg-op-gvec.h"
 #include "qemu/host-utils.h"
@@ -30,6 +30,7 @@
 #include "exec/helper-gen.h"
 
 #include "exec/translator.h"
+#include "exec/translation-block.h"
 #include "exec/log.h"
 #include "qemu/atomic128.h"
 #include "spr_common.h"
@@ -635,6 +636,18 @@ void spr_write_dawrx0(DisasContext *ctx, int sprn, int gprn)
 {
     translator_io_start(&ctx->base);
     gen_helper_store_dawrx0(tcg_env, cpu_gpr[gprn]);
+}
+
+void spr_write_dawr1(DisasContext *ctx, int sprn, int gprn)
+{
+    translator_io_start(&ctx->base);
+    gen_helper_store_dawr1(tcg_env, cpu_gpr[gprn]);
+}
+
+void spr_write_dawrx1(DisasContext *ctx, int sprn, int gprn)
+{
+    translator_io_start(&ctx->base);
+    gen_helper_store_dawrx1(tcg_env, cpu_gpr[gprn]);
 }
 #endif /* defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY) */
 
@@ -1325,6 +1338,22 @@ void spr_write_lpcr(DisasContext *ctx, int sprn, int gprn)
     translator_io_start(&ctx->base);
     gen_helper_store_lpcr(tcg_env, cpu_gpr[gprn]);
 }
+
+void spr_read_pmsr(DisasContext *ctx, int gprn, int sprn)
+{
+    translator_io_start(&ctx->base);
+    gen_helper_load_pmsr(cpu_gpr[gprn], tcg_env);
+}
+
+void spr_write_pmcr(DisasContext *ctx, int sprn, int gprn)
+{
+    if (!gen_serialize_core_lpar(ctx)) {
+        return;
+    }
+    translator_io_start(&ctx->base);
+    gen_helper_store_pmcr(tcg_env, cpu_gpr[gprn]);
+}
+
 #endif /* !defined(CONFIG_USER_ONLY) */
 
 void spr_read_tar(DisasContext *ctx, int gprn, int sprn)
@@ -1716,11 +1745,10 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
                 tcg_gen_mov_tl(ca32, ca);
             }
         } else {
-            TCGv zero = tcg_constant_tl(0);
             if (add_ca) {
-                tcg_gen_add2_tl(t0, ca, arg1, zero, ca, zero);
-                tcg_gen_add2_tl(t0, ca, t0, ca, arg2, zero);
+                tcg_gen_addcio_tl(t0, ca, arg1, arg2, ca);
             } else {
+                TCGv zero = tcg_constant_tl(0);
                 tcg_gen_add2_tl(t0, ca, arg1, zero, arg2, zero);
             }
             gen_op_arith_compute_ca32(ctx, t0, arg1, arg2, ca32, 0);
@@ -1919,11 +1947,9 @@ static inline void gen_op_arith_subf(DisasContext *ctx, TCGv ret, TCGv arg1,
                 tcg_gen_mov_tl(cpu_ca32, cpu_ca);
             }
         } else if (add_ca) {
-            TCGv zero, inv1 = tcg_temp_new();
+            TCGv inv1 = tcg_temp_new();
             tcg_gen_not_tl(inv1, arg1);
-            zero = tcg_constant_tl(0);
-            tcg_gen_add2_tl(t0, cpu_ca, arg2, zero, cpu_ca, zero);
-            tcg_gen_add2_tl(t0, cpu_ca, t0, cpu_ca, inv1, zero);
+            tcg_gen_addcio_tl(t0, cpu_ca, arg2, inv1, cpu_ca);
             gen_op_arith_compute_ca32(ctx, t0, inv1, arg2, cpu_ca32, 0);
         } else {
             tcg_gen_setcond_tl(TCG_COND_GEU, cpu_ca, arg2, arg1);
@@ -3598,7 +3624,6 @@ static void pmu_count_insns(DisasContext *ctx)
 #else
 static void pmu_count_insns(DisasContext *ctx)
 {
-    return;
 }
 #endif /* #if defined(TARGET_PPC64) */
 
@@ -6668,8 +6693,8 @@ static const TranslatorOps ppc_tr_ops = {
     .tb_stop            = ppc_tr_tb_stop,
 };
 
-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int *max_insns,
-                           vaddr pc, void *host_pc)
+void ppc_translate_code(CPUState *cs, TranslationBlock *tb,
+                        int *max_insns, vaddr pc, void *host_pc)
 {
     DisasContext ctx;
 

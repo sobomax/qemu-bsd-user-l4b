@@ -45,7 +45,6 @@ void queue_signal(CPUArchState *env, int sig, int si_type,
 void signal_init(void);
 abi_long target_to_host_sigevent(struct sigevent *host_sevp,
                                  abi_ulong target_addr);
-int target_to_host_signal(int sig);
 void target_to_host_sigset(sigset_t *d, const target_sigset_t *s);
 
 /*
