@@ -68,6 +68,8 @@ jobs:
       uses: docker/build-push-action@v6
       env:
         CACHE_SPEC: "type=registry,ref=${{ env.GHCR_REPO }}:${{ env.GIT_BRANCH }}-${{ env.OS_TAG}}-buildcache"
+        DOCKER_BUILD_SUMMARY: false
+        DOCKER_BUILD_RECORD_UPLOAD: false
       with:
         context: .
         file: ./bsd-user/scripts/ci/Dockerfile
@@ -85,6 +87,9 @@ jobs:
 
     - name: Build FreeBSD/base container image
       uses: docker/build-push-action@v6
+      env:
+        DOCKER_BUILD_SUMMARY: false
+        DOCKER_BUILD_RECORD_UPLOAD: false
       with:
         context: ./bsd-user/scripts/ci
         file: ./bsd-user/scripts/ci/Dockerfile.FreeBSD_base
