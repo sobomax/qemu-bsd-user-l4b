@@ -193,7 +193,9 @@ typedef struct VhostUserShared {
 #endif
 
 #pragma GCC diagnostic push
+#ifdef __clang__
 #pragma GCC diagnostic ignored "-Wunaligned-access"
+#endif
 
 typedef struct VhostUserMsg {
     int request;
