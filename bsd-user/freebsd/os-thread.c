@@ -26,8 +26,8 @@
 #include "target_arch_cpu.h"
 #include "target_arch_thread.h"
 #include "tcg/startup.h"
-#include "exec/exec-all.h"
 #include "exec/tb-flush.h"
+#include "user/cpu_loop.h"
 
 #include "os-thread.h"
 

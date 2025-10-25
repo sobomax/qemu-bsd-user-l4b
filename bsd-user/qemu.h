@@ -27,8 +27,8 @@
 #include "qemu/int128.h"
 #include "cpu.h"
 #include "qemu/units.h"
-#include "exec/cpu_ldst.h"
-#include "exec/exec-all.h"
+#include "user/page-protection.h"
+#include "user/guest-host.h"
 #include "trace/trace-bsd_user.h"
 
 #include "user/abitypes.h"
@@ -581,5 +581,7 @@ target_arg64(uint64_t word0, uint64_t word1)
 #include <pthread.h>
 
 #include "user/safe-syscall.h"
+
+CPUArchState *cpu_copy(CPUArchState *env);
 
 #endif /* QEMU_H */

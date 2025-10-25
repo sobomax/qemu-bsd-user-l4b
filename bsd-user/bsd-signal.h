@@ -22,6 +22,8 @@
 
 #include <signal.h>
 
+#include "user/signal.h"
+
 /* sigaction(2) */
 static inline abi_long do_bsd_sigaction(abi_long arg1, abi_long arg2,
                                         abi_long arg3)

@@ -26,6 +26,7 @@
 
 #include "qemu.h"
 #include "qemu-os.h"
+#include "user/signal.h"
 
 int safe_thr_suspend(struct timespec *timeout);
 int safe__umtx_op(void *, int, unsigned long, void *, void *);

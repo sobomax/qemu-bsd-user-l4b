@@ -22,6 +22,7 @@
 #include "qemu/log.h"
 #include "qemu.h"
 #include "user/cpu_loop.h"
+#include "exec/abi_ptr.h"
 #include "exec/page-protection.h"
 #include "user/page-protection.h"
 #include "user/signal.h"

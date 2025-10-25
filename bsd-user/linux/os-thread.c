@@ -25,9 +25,10 @@
 #include "target_arch_cpu.h"
 #include "target_arch_thread.h"
 #include "tcg/startup.h"
-#include "exec/exec-all.h"
 #include "exec/tb-flush.h"
 #include "qemu/guest-random.h"
+#include "user/signal.h"
+#include "user/cpu_loop.h"
 
 #include <stdatomic.h>
 #include <linux/futex.h>

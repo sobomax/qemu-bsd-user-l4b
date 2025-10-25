@@ -560,8 +560,7 @@ static abi_ulong vma_dump_size(const struct vm_area_struct *vma)
     return vma->vma_end - vma->vma_start;
 }
 
-static int vma_walker(void *priv, target_ulong start, target_ulong end,
-                      unsigned long flags)
+static int vma_walker(void *priv, vaddr start, vaddr end, int flags)
 {
     struct mm_struct *mm = (struct mm_struct *)priv;
 
