@@ -28,7 +28,7 @@
 #include <sys/resource.h>
 
 #define ELF_NOTE_ROUNDSIZE  4
-#define ELF_MACHINE ELF_ARCH
+#define ELF_MACHINE ELF_TARGET_ARCH
 
 #define TARGET_NT_PRSTATUS              1       /* Process status. */
 #define TARGET_NT_FPREGSET              2       /* Floating point registers. */

@@ -25,8 +25,8 @@
 #define ELF_ET_DYN_LOAD_ADDR    0x100000
 #define ELF_CLASS   ELFCLASS64
 
-#define ELF_DATA    ELFDATA2LSB
-#define ELF_ARCH    EM_RISCV
+#define ELF_DATA        ELFDATA2LSB
+#define ELF_TARGET_ARCH EM_RISCV
 
 /*
  * Note: FreeBSD returns things a litle differently than this, but this is as

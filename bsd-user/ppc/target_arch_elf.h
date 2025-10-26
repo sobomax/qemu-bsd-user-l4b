@@ -26,16 +26,16 @@
 #if defined(TARGET_PPC64) && !defined(TARGET_ABI32)
 
 #define ELF_CLASS       ELFCLASS64
-#define ELF_ARCH        EM_PPC64
+#define ELF_TARGET_ARCH EM_PPC64
 
 #else
 
 #define ELF_CLASS       ELFCLASS32
-#define ELF_ARCH        EM_PPC
+#define ELF_TARGET_ARCH EM_PPC
 
 #endif
 
-#define elf_check_arch(x) ( (x) == ELF_ARCH )
+#define elf_check_arch(x) ( (x) == ELF_TARGET_ARCH )
 #ifdef TARGET_BIG_ENDIAN
 #define ELF_DATA        ELFDATA2MSB
 #else

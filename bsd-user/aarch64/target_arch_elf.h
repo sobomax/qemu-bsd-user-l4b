@@ -27,7 +27,7 @@
 
 #define ELF_CLASS       ELFCLASS64
 #define ELF_DATA        ELFDATA2LSB
-#define ELF_ARCH        EM_AARCH64
+#define ELF_TARGET_ARCH EM_AARCH64
 
 #define USE_ELF_CORE_DUMP
 #define ELF_EXEC_PAGESIZE       4096
