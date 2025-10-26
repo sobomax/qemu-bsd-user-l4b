@@ -2,36 +2,30 @@
 
 set -e
 
-debug_broken() {
-  echo "${BASE_IMAGE}: ${1} is BROKEN: ${2}" >&2
+mark_xxx() {
+  for f in ${1}
+  do
+    echo "${BASE_IMAGE}: ${f} is ${2}: ${3}" >&2
+    FILT_ADD="${f} ${FILT_ADD}"
+  done
+}
+
+mark_broken() {
+  mark_xxx "${1}" "BROKEN" "${2}"
+}
+
+mark_disabled() {
+  mark_xxx "${1}" "DISABLED" "${2}"
 }
 
 fltplatforms() {
-   FILT="grep -v -e unknown" # docker multi-arch is weird
-   case "${BASE_IMAGE}" in
-   debian:sid*)
-     FILT_ADD="linux/mips64le"
-     debug_broken "linux/mips64le" 'apt-get: Exec format error'
-     ;;
-   debian:12*)
-     FILT_ADD="linux/arm/v7 linux/ppc64le linux/mips64le"
-     debug_broken "linux/arm/v7" 'Unable to locate package llvm-18'
-     debug_broken "linux/ppc64le" 'Unable to locate package llvm-18'
-     debug_broken "linux/mips64le" 'Unable to locate package llvm-18'
-     ;;
-   ubuntu:latest)
-     FILT_ADD="linux/ppc64le linux/arm/v7"
-     debug_broken "linux/ppc64le" 'ERROR: C compiler "clang-18" either does not exist or does not work.'
-     debug_broken "linux/arm/v7" 'Unable to locate package llvm-18'
-     ;;
-   *)
-     ;;
-  esac
-  for f in linux/riscv64 linux/s390x
-  do
-    FILT_ADD="${FILT_ADD} ${f}"
-    debug_broken "${f}" "host is not supported yet (send PR!)"
-  done
+  mark_disabled "linux/386 linux/arm/v5 linux/arm/v7" "Emulating 64-bit platforms on 32-bit hosts are discontinued in 10.x: https://gitlab.com/qemu-project/qemu/-/issues/3181"
+  mark_broken "linux/riscv64 linux/s390x linux/mips64le" "host is not supported yet (send PR!)"
+  if [ "${BASE_IMAGE%-*}" = "debian:13" ]
+  then
+    mark_broken "linux/ppc64le" "broken llvm port"
+  fi
+  FILT="grep -v -e unknown" # docker multi-arch is weird
   if [ ! -z "${FILT_ADD}" ]
   then
     for f in ${FILT_ADD}

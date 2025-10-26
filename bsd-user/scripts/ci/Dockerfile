@@ -31,7 +31,7 @@ RUN curl -L https://download.freebsd.org/releases/amd64/14.3-RELEASE/base.txz -o
   tar -C /tmp/world -xJf -
 RUN /tmp/world/bin/qemu-x86_64 -L /tmp/world /tmp/world/bin/echo "Hello World!"
 
-FROM busybox
+FROM ${BASE_IMAGE}
 ENV QEMU_BIN_DIR=/usr/bin
 ADD https://raw.githubusercontent.com/multiarch/qemu-user-static/refs/heads/master/containers/latest/register.sh /register
 COPY scripts/qemu-binfmt-conf.sh /qemu-binfmt-conf.sh
