@@ -101,6 +101,7 @@ jobs:
         build-args: |
           BASE_IMAGE=${{ env.BASE_IMAGE }}
           BUILD_IMAGE=${{ env.BUILD_IMAGE }}
-        tags: "${{ env.BUILD_IMAGE }}-freebsd141"
+        tags: "${{ env.BUILD_IMAGE }}-freebsd143"
         platforms: ${{ env.PLATFORMS }}
+        pull: true
         push: true
