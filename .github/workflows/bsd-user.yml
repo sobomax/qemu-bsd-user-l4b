@@ -59,6 +59,11 @@ jobs:
         PLATFORMS="`docker manifest inspect ${{ env.BASE_IMAGE }} | \
           jq -r '.manifests[] | "\(.platform.os)/\(.platform.architecture)\(if .platform.variant != null then "/\(.platform.variant)" else "" end)"' | \
           sort -u | ./bsd-user/scripts/ci/get-arch-buildargs fltplatforms | paste -sd ','`"
+        if [ ! -n "${PLATFORMS}" ]
+        then
+          echo "Cannot get list of platforms supported by the ${{ env.BASE_IMAGE }}." >&2
+          exit 1
+        fi
         echo "GIT_BRANCH=${GIT_BRANCH}" >> $GITHUB_ENV
         echo "PLATFORMS=${PLATFORMS}" >> $GITHUB_ENV
         echo "OS_TAG=${OS_TAG}" >> $GITHUB_ENV
