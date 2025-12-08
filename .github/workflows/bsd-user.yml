@@ -34,6 +34,33 @@ jobs:
       BASE_IMAGE: ${{ matrix.base_image }}
 
     steps:
+    - name: Maximize build space
+      if: ${{ inputs.maximize_space }}
+      shell: sh -x -e {0}
+      run: |
+        echo "Memory and swap:"
+        sudo free -h
+        echo
+        sudo swapon --show
+        echo
+
+        echo "Available storage:"
+        sudo df -h
+        echo
+
+        PIDS=""
+        for d in /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+        do
+          sudo rm -rf "${d}" &
+          PIDS="${PIDS} ${!}"
+        done
+        sudo docker image prune --all --force &
+        PIDS="${PIDS} ${!}"
+        for pid in ${PIDS}
+        do
+          wait ${pid}
+        done
+
     - name: Checkout repository
       uses: actions/checkout@v4
 
