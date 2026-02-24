@@ -12,6 +12,7 @@
 
 static void alloc_syscall(TaskState *t, int num)
 {
+    /*
     assert(t->in_syscall == 0);
     assert(t->cs.number == 0);
     assert(t->cs.sc == NULL);
@@ -19,6 +20,7 @@ static void alloc_syscall(TaskState *t, int num)
     for (u_int i = 0; i < nitems(t->cs.s_args); i++) {
         assert(t->cs.s_args[i] == NULL);
     }
+    */
     memset(t->cs.args, 0, sizeof(t->cs.args));
     t->cs.number = num;
     t->cs.sc = &decoded_syscalls[num];
@@ -33,7 +35,9 @@ static void free_syscall(TaskState *t)
         free(t->cs.s_args[i]);
     }
     memset(&t->cs, 0, sizeof(t->cs));
-    fclose(t->outfile);
+    if (t->outfile) {
+        fclose(t->outfile);
+    }
     t->outfile = NULL;
     t->in_syscall = 0;
 }
@@ -117,6 +121,10 @@ static void print_syscall_ret(TaskState *ts, abi_ulong ret, abi_ulong ret2, int 
     char **s_args;
     int i, len, nargs;
 
+    if (!ts->cs.sc) {
+        printf("???\n");
+        return;
+    }
     name = ts->cs.sc->name;
     nargs = ts->cs.nargs;
     s_args = ts->cs.s_args;

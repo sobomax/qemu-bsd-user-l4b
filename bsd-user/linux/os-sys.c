@@ -45,6 +45,7 @@
 #include "target_arch_sysarch.h"
 #include "target_os_vmparam.h"
 #include "target_os_user.h"
+#include "target_os_sysctl.h"
 
 #include "os-dev_proc.h"
 
@@ -107,15 +108,274 @@ patch_osrelease(char *osp, off_t at, size_t olen) {
     memcpy(osp + QEMU_REL_POS, QEMU_REL_SUF, sizeof(QEMU_REL_SUF));
 }
 
-void
-init_bsd_sysctl(void)
+// Handlers for each case
+static int
+handle_hw_pagesizes(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
 {
-    patch_osrelease(osrelease_str, 0, sizeof(osrelease_str));
-    patch_osrelease(kversion_str, sizeof(FREEBSD_ABI_VENDOR), sizeof(kversion_str));
-    for (abi_ulong *ps = pagesizes; (void *)ps < ((void *)pagesizes+sizeof(pagesizes)); ps++) {
-        *ps = tswapal(*ps);
+    *holdlen = sizeof(pagesizes);
+    if (oldlen) {
+        if (*holdlen > oldlen)
+            *holdlen = oldlen;
+        memcpy(holdp, pagesizes, *holdlen);
     }
+    return 0; // success
 }
+
+static int
+handle_hw_availpages(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    *holdlen = sizeof(abi_long);
+    if (oldlen) {
+        struct meminfo_entry se = get_meminfo_value("MemAvailable");
+        if (se.error) {
+            return -TARGET_EINVAL;
+        }
+        *((abi_long *)holdp) = se.value / PAGE_SIZE;
+    }
+    return 0; // success
+}
+
+static int
+handle_kern_ps_strings(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    return -TARGET_EINVAL;
+}
+
+static int
+handle_hw_machine_arch(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    struct utsname buffer;
+    const char *cp;
+
+    if (uname(&buffer) == -1) {
+        return -TARGET_EINVAL;
+    }
+    if (strcmp(buffer.machine, "x86_64") == 0) {
+        cp = "amd64";
+    } else {
+        cp = buffer.machine;
+    }
+    *holdlen = strlen(cp) + 1;
+    if (oldlen) {
+        if (*holdlen > oldlen)
+            *holdlen = oldlen;
+        memcpy(holdp, cp, *holdlen);
+    }
+    return 0;
+}
+
+static inline int sysctlnametomib(const char *name, int *mibp, size_t *sizep);
+static int
+handle_sysctl_name2oid(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    size_t sizep = hnewplen / sizeof(int);
+    int r = sysctlnametomib(hnewp, holdp, &sizep);
+    *holdlen = sizep * sizeof(int);
+    return r;
+}
+
+static int oidfmt(const int *oid, int len, char *fmt, int fmtlen, uint32_t *kind);
+static int
+handle_sysctl_oidfmt(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    return oidfmt(
+        hnewp,
+        hnewplen / sizeof(int),
+        holdp == 0 ? 0 : holdp + sizeof(int),
+        hnewplen < 4 ? 0 : hnewplen - sizeof(int),
+        holdp
+    );
+}
+
+static int
+handle_sysctl_name(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    return oidfmt(
+        hnewp,
+        hnewplen / sizeof(int),
+        holdp,
+        oldlen,
+        0
+    );
+}
+
+static int
+handle_generic_const_int(void *holdp, size_t oldlen, size_t *holdlen, int val)
+{
+    if (oldlen < sizeof(int)) {
+        *holdlen = sizeof(int);
+        return -TARGET_ENOMEM;
+    }
+    *(int*)holdp = val;
+    *holdlen = sizeof(int);
+    return 0;
+}
+
+static int
+handle_vm_overcommit(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    return handle_generic_const_int(holdp, oldlen, holdlen, 0);
+}
+
+static int
+handle_kern_sched_cpusetsizemin(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    return handle_generic_const_int(holdp, oldlen, holdlen, 1);
+}
+
+static int
+handle_kern_sched_cpusetsize(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    return handle_generic_const_int(holdp, oldlen, holdlen, 1);
+}
+
+static int
+handle_dummy(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t hnewplen)
+{
+    return -TARGET_ENOENT;
+}
+
+struct handler {
+    const char *name;
+    int (*func)(void *holdp, size_t oldlen, size_t *holdlen, const void *hnewp, size_t nnewlen);
+    unsigned int kind;
+    bool prefix;
+    size_t nmib;
+    int mib[8];
+};
+
+/*
+ * Procedure for adding a new handler:
+ * - fill out the table here
+ * - implement the handler
+ * - add the name parser to sysctlnametomib
+ */
+static struct handler handlers[] = {
+    {"hw.pagesizes", handle_hw_pagesizes, CTLFLAG_RW},
+    {"hw.availpages", handle_hw_availpages, CTLFLAG_RD},
+    {"kern.ps_strings", handle_kern_ps_strings, CTLFLAG_RD | CTLFLAG_MPSAFE},
+    {"kern.ostype", handle_dummy, CTLFLAG_RD | CTLFLAG_CAPRD},
+    {"kern.hostname", handle_dummy, CTLTYPE_STRING | CTLFLAG_RW | CTLFLAG_PRISON | CTLFLAG_CAPRD | CTLFLAG_MPSAFE},
+    {"kern.osrelease", handle_dummy, CTLTYPE_STRING | CTLFLAG_RW | CTLFLAG_CAPRD | CTLFLAG_MPSAFE},
+    {"kern.osreldate", handle_dummy, CTLTYPE_INT | CTLFLAG_CAPRD | CTLFLAG_RD | CTLFLAG_MPSAFE},
+    {"kern.arandom", handle_dummy, CTLTYPE_OPAQUE | CTLFLAG_CAPRD | CTLFLAG_RD | CTLFLAG_MPSAFE},
+    {"kern.version", handle_dummy, CTLTYPE_STRING | CTLFLAG_MPSAFE | CTLFLAG_RD},
+    {"kern.usrstack", handle_dummy, CTLTYPE_ULONG | CTLFLAG_MPSAFE | CTLFLAG_RD | CTLFLAG_CAPRD},
+    {"kern.sched.cpusetsize", handle_kern_sched_cpusetsize, CTLTYPE_UINT | CTLFLAG_RD | CTLFLAG_CAPRD},
+    {"kern.sched.cpusetsizemin", handle_kern_sched_cpusetsizemin, CTLTYPE_UINT | CTLFLAG_RD | CTLFLAG_CAPRD},
+    {"hw.machine", handle_hw_machine_arch, CTLTYPE_STRING | CTLFLAG_RD | CTLFLAG_CAPRD | CTLFLAG_MPSAFE},
+    {"hw.machine_arch", handle_hw_machine_arch, CTLTYPE_STRING | CTLFLAG_RD | CTLFLAG_CAPRD | CTLFLAG_MPSAFE},
+    {"vm.overcommit", handle_vm_overcommit, CTLTYPE_INT | CTLFLAG_RW},
+    {"sysctl.name2oid", handle_sysctl_name2oid, CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_ANYBODY | CTLFLAG_MPSAFE | CTLFLAG_CAPRW},
+    {"sysctl.name", handle_sysctl_name, CTLFLAG_RD | CTLFLAG_MPSAFE | CTLFLAG_CAPRD, true},
+    {"sysctl.oidfmt", handle_sysctl_oidfmt, CTLFLAG_RD | CTLFLAG_MPSAFE | CTLFLAG_CAPRD, true},
+    {NULL, NULL} // Terminator
+};
+
+#if defined(__linux__)
+
+enum extra_oids {
+    KERN_SCHED = 0x70000000,
+    KERN_SCHED_CPUSETSIZEMIN,
+    KERN_SCHED_CPUSETSIZE,
+    CTL_VM,
+    HW_PAGESIZES,
+    HW_AVAILPAGES,
+};
+
+static inline int sysctlnametomib(const char *name, int *mibp, size_t *sizep)
+{
+#define NAME(c, v, children) \
+    else if (strncmp(name, (c), sizeof(c)-1) == 0 && (name[sizeof(c)-1] == 0 || name[sizeof(c)-1] == '.')) { \
+        if (seen < *sizep) { \
+            mibp[seen] = (v); \
+        } \
+        name += sizeof(c); \
+        seen += 1; \
+        if (name[-1] == 0) { \
+            *sizep = seen; \
+            return 0; \
+        } \
+        children \
+    }
+
+    int seen = 0;
+    const char *orig_name = name;
+
+    if (0) {}
+    NAME("sysctl", CTL_SYSCTL,
+        NAME("name2oid", CTL_SYSCTL_NAME2OID, )
+        NAME("oidfmt", CTL_SYSCTL_OIDFMT, )
+        NAME("name", CTL_SYSCTL_NAME, )
+    )
+    NAME("kern", CTL_KERN,
+        NAME("ps_strings", KERN_PS_STRINGS, )
+        NAME("ostype", KERN_OSTYPE, )
+        NAME("hostname", KERN_HOSTNAME, )
+        NAME("osrelease", KERN_OSRELEASE, )
+        NAME("osreldate", KERN_OSRELDATE, )
+        NAME("arandom", KERN_ARND, )
+        NAME("version", KERN_VERSION, )
+        NAME("usrstack", KERN_USRSTACK, )
+        NAME("sched", KERN_SCHED,
+            NAME("cpusetsizemin", KERN_SCHED_CPUSETSIZEMIN, )
+            NAME("cpusetsize", KERN_SCHED_CPUSETSIZE, )
+        )
+    )
+    NAME("hw", CTL_HW,
+        NAME("pagesizes", HW_PAGESIZES, )
+        NAME("availpages", HW_AVAILPAGES, )
+        NAME("machine", HW_MACHINE, )
+        NAME("machine_arch", HW_MACHINE_ARCH, )
+    )
+    NAME("vm", CTL_VM,
+        NAME("overcommit", VM_OVERCOMMIT, )
+    )
+	qemu_log("sysctlnametomib(%s): not implemented yet\n", orig_name);
+	return -TARGET_ENOENT;
+}
+
+static inline int sysctl(const int *name, u_int namelen, void *oldp, size_t *oldlenp,
+                         const void *newp, size_t newlen)
+{
+    for (int i = 0; handlers[i].name; i++) {
+        if ((handlers[i].prefix ? handlers[i].nmib <= namelen : handlers[i].nmib == namelen) && memcmp(handlers[i].mib, name, handlers[i].nmib * sizeof(int)) == 0) {
+            if (handlers[i].prefix) {
+                newp = &name[handlers[i].nmib];
+                newlen = (namelen - handlers[i].nmib) * sizeof(int);
+            }
+            return handlers[i].func(oldp, *oldlenp, oldlenp, newp, newlen);
+        }
+    }
+#if DEBUG
+    printf("Unimplemented sysctl ");
+    for (int i = 0; i < namelen; i++) {
+        if (i != 0) {
+            printf(",");
+        }
+        printf("%#010x", name[i]);
+    }
+    printf("\n");
+#endif
+    return -TARGET_ENOENT;
+}
+
+static inline int sysctlbyname(const char *name, void *oldp, size_t *oldlenp,
+         const void *newp, size_t newlen)
+{
+    for (int i = 0; handlers[i].name; i++) {
+        if (strcmp(name, handlers[i].name) == 0) {
+            return handlers[i].func(oldp, *oldlenp, oldlenp, newp, newlen);
+        }
+    }
+#if DEBUG
+    printf("Unimplemented sysctlbyname %s\n", name);
+#endif
+    return -TARGET_ENOENT;
+}
+
+#endif
+
 
 #ifdef TARGET_ABI32
 /*
@@ -1105,7 +1365,7 @@ host_to_target_vfc_flags(int flags)
  * sysctl, see /sys/kern/kern_sysctl.c:sysctl_sysctl_oidfmt() (compare to
  * src/sbin/sysctl/sysctl.c)
  */
-static int oidfmt(int *oid, int len, char *fmt, uint32_t *kind)
+static int oidfmt(const int *oid, int len, char *fmt, int fmtlen, uint32_t *kind)
 {
 #if !defined(__linux__)
     int qoid[CTL_MAXNAME + 2];
@@ -1128,10 +1388,31 @@ static int oidfmt(int *oid, int len, char *fmt, uint32_t *kind)
     }
 
     if (fmt) {
-        strcpy(fmt, (char *)(buf + sizeof(uint32_t)));
+        strncpy(fmt, (char *)(buf + sizeof(uint32_t)), fmtlen);
     }
     return 0;
 #else
+    for (int i = 0; handlers[i].name != 0; i++) {
+        if ((handlers[i].prefix ? len >= handlers[i].nmib : len == handlers[i].nmib) && memcmp(oid, handlers[i].mib, handlers[i].nmib * sizeof(int)) == 0) {
+            if (kind) {
+                *kind = handlers[i].kind;
+            }
+            if (fmt) {
+                strncpy(fmt, handlers[i].name, fmtlen);
+            }
+            return 0;
+        }
+    }
+#if DEBUG
+    printf("Unimplemented sysctl (oidfmt) ");
+    for (int i = 0; i < len; i++) {
+        if (i != 0) {
+            printf(",");
+        }
+        printf("%#010x", oid[i]);
+    }
+    printf("\n");
+#endif
     return -TARGET_ENOENT;
 #endif
 }
@@ -1245,26 +1526,6 @@ static inline void sysctl_oidfmt(uint32_t *holdp)
     holdp[0] = tswap32(holdp[0]);
 }
 
-#if defined(__linux__)
-static inline int sysctlnametomib(const char *name, int *mibp, size_t *sizep)
-{
-	qemu_log("sysctlnametomib(%s): not implemented yet\n", name);
-	return -TARGET_ENOENT;
-}
-
-static inline int sysctlbyname(const char *name, void *oldp, size_t *oldlenp,
-         const void *newp, size_t newlen)
-{
-	abort();
-}
-
-static inline int sysctl(const int *name, u_int namelen, void *oldp, size_t *oldlenp,
-	const void *newp, size_t newlen)
-{
-	return -TARGET_ENOENT;
-}
-#endif
-
 static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
         int32_t namelen, void *holdp, size_t *holdlenp, void *hnewp,
         size_t newlen)
@@ -1280,7 +1541,7 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
     const char *ret_str;
 
     holdlen = oldlen = *holdlenp;
-    oidfmt(snamep, namelen, NULL, &kind);
+    oidfmt(snamep, namelen, NULL, 0, &kind);
 
     /* Handle some arch/emulator dependent sysctl()'s here. */
     switch (snamep[0]) {
@@ -1477,8 +1738,6 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
             ret = 0;
             goto out;
         }
-#else
-	abort();
 #endif
     }
     break;
@@ -1725,7 +1984,7 @@ static abi_long do_freebsd_sysctl_oid(CPUArchState *env, int32_t *snamep,
     }
 #ifdef DEBUG
     else {
-        printf("sysctl(mib[0]=%d, mib[1]=%d, mib[3]=%d...) returned %d\n",
+        printf("sysctl(mib[0]=%d, mib[1]=%d, mib[2]=%d...) returned %d\n",
                snamep[0], snamep[1], snamep[2], (int)ret);
     }
 #endif
@@ -1745,76 +2004,6 @@ out_str:
     goto out;
 }
 
-
-struct handler {
-    const char *name;
-    int (*func)(void *holdp, size_t oldlen, size_t *holdlen);
-};
-
-// Handlers for each case
-static int
-handle_hw_pagesizes(void *holdp, size_t oldlen, size_t *holdlen)
-{
-    *holdlen = sizeof(pagesizes);
-    if (oldlen) {
-        if (*holdlen > oldlen)
-            *holdlen = oldlen;
-        memcpy(holdp, pagesizes, *holdlen);
-    }
-    return 0; // success
-}
-
-static int
-handle_hw_availpages(void *holdp, size_t oldlen, size_t *holdlen)
-{
-    *holdlen = sizeof(abi_long);
-    if (oldlen) {
-        struct meminfo_entry se = get_meminfo_value("MemAvailable");
-        if (se.error) {
-            return -TARGET_EINVAL;
-        }
-        *((abi_long *)holdp) = se.value / PAGE_SIZE;
-    }
-    return 0; // success
-}
-
-static int
-handle_kern_ps_strings(void *holdp, size_t oldlen, size_t *holdlen)
-{
-    return -TARGET_EINVAL;
-}
-
-static int
-handle_hw_machine_arch(void *holdp, size_t oldlen, size_t *holdlen)
-{
-    struct utsname buffer;
-    const char *cp;
-
-    if (uname(&buffer) == -1) {
-        return -TARGET_EINVAL;
-    }
-    if (strcmp(buffer.machine, "x86_64") == 0) {
-        cp = "amd64";
-    } else {
-        cp = buffer.machine;
-    }
-    *holdlen = strlen(cp) + 1;
-    if (oldlen) {
-        if (*holdlen > oldlen)
-            *holdlen = oldlen;
-        memcpy(holdp, cp, *holdlen);
-    }
-    return 0;
-}
-
-static const struct handler handlers[] = {
-    {"hw.pagesizes", handle_hw_pagesizes},
-    {"hw.availpages", handle_hw_availpages},
-    {"kern.ps_strings", handle_kern_ps_strings},
-    {"hw.machine", handle_hw_machine_arch},
-    {"hw.machine_arch", handle_hw_machine_arch},
-    {NULL, NULL} // Terminator
-};
 
 /*
  * This syscall was created to make sysctlbyname(3) more efficient, but we can't
@@ -1861,7 +2050,7 @@ abi_long do_freebsd_sysctlbyname(CPUArchState *env, abi_ulong namep,
 
     for (const struct handler *h = handlers; h->name; h++) {
         if (namelen == strlen(h->name) && strcmp(snamep, h->name) == 0) {
-            ret = h->func(holdp, oldlen, &holdlen);
+            ret = h->func(holdp, oldlen, &holdlen, hnewp, newlen);
 	    goto out;
         }
     }
@@ -1898,6 +2087,10 @@ abi_long do_freebsd_sysctl(CPUArchState *env, abi_ulong namep, int32_t namelen,
     size_t holdlen;
     abi_ulong oldlen = 0;
     int32_t *snamep = g_malloc(sizeof(int32_t) * namelen), *p, *q, i;
+    if (namelen == 0) {
+        ret = -TARGET_EINVAL;
+        goto out;
+    }
 
     /* oldlenp is read/write, pre-check here for write */
     if (oldlenp) {
@@ -1949,4 +2142,20 @@ out:
 abi_long do_freebsd_sysarch(void *cpu_env, abi_long arg1, abi_long arg2)
 {
     return do_freebsd_arch_sysarch(cpu_env, arg1, arg2);
+}
+
+void
+init_bsd_sysctl(void)
+{
+    patch_osrelease(osrelease_str, 0, sizeof(osrelease_str));
+    patch_osrelease(kversion_str, sizeof(FREEBSD_ABI_VENDOR), sizeof(kversion_str));
+    for (abi_ulong *ps = pagesizes; (void *)ps < ((void *)pagesizes+sizeof(pagesizes)); ps++) {
+        *ps = tswapal(*ps);
+    }
+    for (int i = 0; handlers[i].name; i++) {
+        handlers[i].nmib = 8;
+        if (sysctlnametomib(handlers[i].name, &handlers[i].mib[0], &handlers[i].nmib) < 0) {
+            printf("Handler we can't convert to mib: %s\n", handlers[i].name);
+        }
+    }
 }

@@ -117,7 +117,6 @@ int host_to_target_signal(int sig)
         case HOST_SIGCONT: return TARGET_SIGCONT;
         case HOST_SIGCHLD: return TARGET_SIGCHLD;
         case HOST_SIGIO:   return TARGET_SIGIO;
-        case HOST_SIGPWR: return TARGET_SIGTHR;
     }
     if (sig >= HOST_SIGRTMIN && sig <= HOST_SIGRTMAX) {
         sig += (HOST_SIGRTMIN - TARGET_SIGRTMIN);

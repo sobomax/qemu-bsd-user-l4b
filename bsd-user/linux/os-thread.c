@@ -24,6 +24,7 @@
 #include "signal-common.h"
 #include "target_arch_cpu.h"
 #include "target_arch_thread.h"
+#include "target_os_clock.h"
 #include "tcg/startup.h"
 #include "exec/tb-flush.h"
 #include "qemu/guest-random.h"
@@ -175,6 +176,63 @@ void *new_freebsd_thread_start(void *arg)
 /*
  * FreeBSD user mutex (_umtx) emulation
  */
+static void make_ts_relative(struct timespec *tm, clockid_t clockid) {
+    struct timespec now;
+    assert(clock_gettime(clockid, &now) == 0);
+
+    /* if the target is in the past, return zero */
+    if (tm->tv_sec < now.tv_sec || (tm->tv_sec == now.tv_sec && tm->tv_nsec < now.tv_nsec)) {
+        tm->tv_sec = 0;
+        tm->tv_nsec = 0;
+        return;
+    }
+
+    /* borrowing */
+    if (tm->tv_nsec < now.tv_nsec) {
+        tm->tv_sec -= 1;
+        tm->tv_nsec += 1000000000;
+    }
+    /* simple subtraction */
+    tm->tv_sec -= now.tv_sec;
+    tm->tv_nsec -= now.tv_nsec;
+}
+
+static void translate_timeout(void *t, size_t tsz, struct timespec *timeout, struct timespec **timeoutp, int *op_flags) {
+    if (tsz == 0) {
+        *timeoutp = NULL;
+        return;
+    }
+
+    if (tsz == sizeof(struct timespec)) {
+        /* just a timespec */
+        memcpy(timeout, t, tsz);
+        *timeoutp = timeout;
+        return;
+    }
+
+    /* _umtx_time */
+    assert(tsz >= sizeof(struct timespec) + sizeof(uint32_t) + sizeof(uint32_t));
+    memcpy(timeout, t, sizeof(struct timespec));
+    *timeoutp = timeout;
+    uint32_t flags = *(uint32_t*)(t + sizeof(struct timespec));
+    uint32_t clock = *(uint32_t*)(t + sizeof(struct timespec) + sizeof(uint32_t));
+    clockid_t host_clockid;
+
+    switch (clock) {
+        case TARGET_CLOCK_REALTIME:
+        case TARGET_CLOCK_REALTIME_FAST:
+        case TARGET_CLOCK_REALTIME_PRECISE:
+        *op_flags |= FUTEX_CLOCK_REALTIME;
+        host_clockid = CLOCK_REALTIME;
+        break;
+        default:
+        host_clockid = CLOCK_MONOTONIC;
+    }
+
+    if (flags & TARGET_UMTX_ABSTIME) {
+        make_ts_relative(timeout, host_clockid);
+    }
+}
 static int tcmpset_al(volatile abi_ulong *addr, abi_ulong a, abi_ulong b)
 {
 #if !defined(__linux__)
@@ -259,9 +317,11 @@ static abi_long _umtx_wait_uint(uint32_t *addr, uint32_t target_val,
         } while (1);
     } else
 #endif
-    assert(tsz == 0 && t == 0);
-    return get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAIT_UINT),
-            target_val, 0, 0, 0));
+    struct timespec *timeoutp;
+    struct timespec timeout;
+    int op = QEMU_UMTX_OP(UMTX_OP_WAIT_UINT);
+    translate_timeout(t, tsz, &timeout, &timeoutp, &op);
+    return get_errno(safe_futex(addr, op, target_val, timeoutp, 0, 0));
 }
 
 abi_long freebsd_umtx_wait_uint(abi_ulong obj, uint32_t target_val,
@@ -307,9 +367,11 @@ static abi_long _umtx_wait_uint_private(uint32_t *addr, uint32_t target_val,
         } while (1);
     }
 #endif /* DETECT_DEADLOCK */
-    assert (t == 0 && tsz == 0); /* "Not implemented yet: open PR!" */
-    return get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAIT_UINT_PRIVATE),
-			    target_val, NULL, NULL, 0));
+    struct timespec *timeoutp;
+    struct timespec timeout;
+    int op = QEMU_UMTX_OP(UMTX_OP_WAIT_UINT_PRIVATE);
+    translate_timeout(t, tsz, &timeout, &timeoutp, &op);
+    return get_errno(safe_futex(addr, op, target_val, NULL, NULL, 0));
 }
 
 abi_long freebsd_umtx_wait_uint_private(abi_ulong obj, uint32_t target_val,
@@ -355,8 +417,11 @@ static abi_long _umtx_wait(uint32_t *addr, uint32_t target_val, size_t tsz,
         } while (1);
     } else
 #endif /* DETECT_DEADLOCK */
-    assert (t == 0 && tsz == 0); /* "Not implemented yet: open PR!" */
-    return get_errno(safe_futex(addr, QEMU_UMTX_OP(UMTX_OP_WAIT), target_val, NULL, NULL, 0));
+    struct timespec *timeoutp;
+    struct timespec timeout;
+    int op = QEMU_UMTX_OP(UMTX_OP_WAIT);
+    translate_timeout(t, tsz, &timeout, &timeoutp, &op);
+    return get_errno(safe_futex(addr, op, target_val, NULL, NULL, 0));
 }
 
 abi_long freebsd_umtx_wait(abi_ulong targ_addr, abi_ulong target_id, size_t tsz,
